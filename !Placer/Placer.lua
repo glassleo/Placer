@@ -8,6 +8,7 @@ frame:RegisterEvent("PLAYER_LEVEL_UP")
 frame:RegisterUnitEvent("PLAYER_SPECIALIZATION_CHANGED", "player")
 
 local loaded = false
+local throttled = false
 
 
 -- Polymorph
@@ -73,8 +74,8 @@ local slotNames = {
 	["6"] = 6,
 	["7"] = 7,
 	["CE"] = 8,
-	["B"] = 13,
-	["SB"] = 14,
+	["N"] = 13,
+	["SN"] = 14,
 	["R"] = 15,
 	["SR"] = 16,
 	["CR"] = 17,
@@ -83,9 +84,9 @@ local slotNames = {
 	["AE"] = 20,
 	[","] = 25,
 	["."] = 26,
-	["N"] = 27,
-	["SN"] = 28,
-	["CN"] = 29,
+	["J"] = 27,
+	["SJ"] = 28,
+	["CJ"] = 29,
 	["CF"] = 30,
 	["SF"] = 31,
 	["F"] = 32,
@@ -432,7 +433,7 @@ local function signature(slotName)
 	end
 end
 
-local function essence(slotName, kyrianSpell, nightfaeSpell, necrolordSpell, venthyrSpell)
+local function essence(slotName, kyrianSpell, necrolordSpell, nightfaeSpell, venthyrSpell)
 	local _, _, _, _, _, _, kyrian = GetSpellInfo("Summon Steward")
 	local _, _, _, _, _, _, nightfae = GetSpellInfo("Soulshape")
 	local _, _, _, _, _, _, necrolord = GetSpellInfo("Fleshcraft")
@@ -568,7 +569,7 @@ local function updateBars()
 			m("C07", 237524, "#showtooltip\n/use Gnaw")
 
 			-- Essence
-			essence("B", "Shackle the Unworthy", false, "Abomination Limb", "Swarming Mist")
+			essence("N", "Shackle the Unworthy", "Abomination Limb", false, "Swarming Mist")
 
 			if spec == 1 then
 				-- Blood
@@ -752,7 +753,7 @@ local function updateBars()
 			m("C04", nil, "#showtooltip Disrupt\n/stopcasting\n/stopcasting\n/use Disrupt")
 
 			-- Essence
-			essence("B", false, false, false, false)
+			essence("N", false, false, false, false)
 
 			if spec == 1 then
 				-- Havoc
@@ -916,7 +917,7 @@ local function updateBars()
 			m("C15", nil, "#showtooltip Treant Form\n/use [nospec:1,talent:3/1,noform:5][nospec:1,notalent:3/1,noform:4][spec:1,noform:5]Treant Form")
 
 			-- Essence
-			essence("B", false, false, false, false)
+			essence("N", false, false, false, false)
 
 			if spec == 1 then
 				-- Balance
@@ -1302,7 +1303,7 @@ local function updateBars()
 			m("C05", nil, "#showtooltip\n/use [@pet,dead][nopet]Revive Pet;Mend Pet")
 
 			-- Essence
-			essence("B", false, false, false, false)
+			essence("N", false, false, "Wild Spirits", false)
 
 			if spec == 1 then
 				-- Beast Mastery
@@ -1484,7 +1485,7 @@ local function updateBars()
 			m("C03", 1698698, "#showtooltip\n/use Freeze")
 
 			-- Essence
-			essence("B", false, false, false, false)
+			essence("N", false, false, false, false)
 
 			if spec == 1 then
 				-- Arcane
@@ -1670,7 +1671,7 @@ local function updateBars()
 			m("C05", 615340, "#showtooltip Provoke\n/targetexact Black Ox Statue\n/use Provoke\n/targetlasttarget")
 
 			-- Essence
-			essence("B", false, false, false, false)
+			essence("N", false, false, false, false)
 
 			if spec == 1 then
 				-- Brewmaster
@@ -1854,7 +1855,7 @@ local function updateBars()
 			m("C04", nil, "#showtooltip Rebuke\n/stopcasting\n/stopcasting\n/use Rebuke")
 
 			-- Essence
-			essence("B", false, false, false, false)
+			essence("N", "Divine Toll", false, false, false)
 
 			if spec == 1 then
 				-- Holy
@@ -2050,7 +2051,7 @@ local function updateBars()
 			m("C10", nil, "#showtooltip\n/use [harm]Shadow Word: Death;[spec:2,talent:5/2]Binding Heal;Shadow Word: Death")
 
 			-- Essence
-			essence("B", false, false, false, false)
+			essence("N", "Boon of the Ascended", false, false, false)
 
 			if spec == 1 then
 				-- Discipline
@@ -2058,15 +2059,15 @@ local function updateBars()
 				spell("2", "Mind Blast")
 				spell("3", "Penance")
 				spell("4", "Power Word: Radiance")
-				spell("5", "Rapture")
+				if talent[1][3] then spell("5", "Schism") else empty("5") end
 				empty("CE")
 
 				if talent[3][3] then spell("C", "Power Word: Solace") else empty("C") end
-				if talent[1][3] then spell("SC", "Schism") else empty("SC") end
+				if talent[5][3] then spell("SC", "Shadow Covenant") else empty("SC") end
 				spell("Q", "Mind Sear")
 				macro("E", "C03") -- Shadow Word: Pain/Power Word: Shield
-				if talent[6][2] then spell("G", "Divine Star") elseif talent[6][3] then spell("G", "Halo") else empty("G") end
-				spell("V", "Power Infusion")
+				spell("G", "Power Infusion")
+				spell("V", "Shadowfiend")
 				spell("SE", "Pain Suppression")
 
 				spell("R", "Shadow Word: Death", 14)
@@ -2078,8 +2079,8 @@ local function updateBars()
 				spell("F1", "Fade")
 				spell("F2", "Power Word: Barrier")
 				spell("F3", "Desperate Prayer")
-				if talent[7][3] then spell("F4", "Evangelism") else empty("F4") end
-				empty("F5")
+				spell("F4", "Rapture")
+				if talent[7][3] then spell("F5", "Evangelism") else empty("F5") end
 				spell("CQ", "Levitate")
 
 				spell("T", "Shackle Undead")
@@ -2088,8 +2089,8 @@ local function updateBars()
 				if talent[4][3] then spell("CB3", "Shining Force") else empty("CB3") end
 				spell("AB3", "Mass Dispel")
 				spell("SQ", "Flash Heal")
-				if talent[5][3] then spell("SV", "Shadow Covenant") else empty("SV") end
-				spell("CV", "Shadowfiend")
+				if talent[6][2] then spell("SV", "Divine Star") elseif talent[6][3] then spell("SV", "Halo") else empty("SV") end
+				empty("CV")
 
 				spell("CF", "Leap of Faith")
 				if talent[2][3] then spell("SF", "Angelic Feather") else empty("SF") end -- Angelic Feather
@@ -2107,8 +2108,8 @@ local function updateBars()
 				spell("SC", "Holy Word: Sanctify")
 				spell("Q", "Holy Nova")
 				if level >= 12 then macro("E", "C03") else spell("E", "Shadow Word: Pain") end -- Renew/Shadow Word: Pain
-				if talent[6][2] then spell("G", "Divine Star") elseif talent[6][3] then spell("G", "Halo") else empty("G") end
-				spell("V", "Power Infusion")
+				if talent[7][2] then spell("V", "Apotheosis") elseif talent[7][3] then spell("V", "Holy Word: Salvation") else empty("V") end
+				spell("G", "Power Infusion")
 				spell("SE", "Guardian Spirit")
 
 				macro("R", "C10", 14) -- Binding Heal/Shadow Word: Death
@@ -2130,7 +2131,7 @@ local function updateBars()
 				if talent[4][3] then spell("CB3", "Shining Force") else empty("CB3") end
 				spell("AB3", "Mass Dispel")
 				spell("SQ", "Flash Heal")
-				if talent[7][2] then spell("SV", "Apotheosis") elseif talent[7][3] then spell("SV", "Holy Word: Salvation") else empty("SV") end
+				if talent[6][2] then spell("SV", "Divine Star") elseif talent[6][3] then spell("SV", "Halo") else empty("SV") end
 				spell("CV", "Symbol of Hope")
 
 				spell("CF", "Leap of Faith")
@@ -2141,19 +2142,19 @@ local function updateBars()
 				if level >= 15 then spell("1", "Vampiric Touch") else spell("1", "Smite") end
 				spell("2", "Smite", 15)
 				spell("3", "Mind Blast")
-				spell("4", "Shadow Word: Death", 14)
-				if talent[6][1] then spell("5", "Damnation") elseif talent[6][3] then spell("5", "Void Torrent") else empty("5") end
+				spell("4", "Void Eruption")
+				spell("5", "Devouring Plague")
 				if talent[4][2] then spell("CE", "Psychic Scream") elseif talent[4][3] then spell("CE", "Psychic Horror") else empty("CE") end
 
-				spell("C", "Devouring Plague")
+				if talent[6][1] then spell("C", "Damnation") elseif talent[6][3] then spell("C", "Void Torrent") else empty("C") end
 				if talent[3][3] then spell("SC", "Searing Nightmare") else empty("SC") end
 				spell("Q", "Mind Sear")
 				macro("E", "C03") -- Shadow Word: Pain/Power Word: Shield
-				spell("G", "Void Eruption")
-				spell("V", "Power Infusion")
+				spell("G", "Power Infusion")
+				spell("V", "Shadowfiend")
 				macro("SE", "C04", 29) -- Silence
 
-				if talent[5][3] then spell("R", "Shadow Crash") else empty("R") end
+				spell("R", "Shadow Word: Death", 14)
 				spell("SR", "Dispel Magic")
 				spell("CR", "Purify Disease")
 				if talent[7][3] then spell("H", "Surrender to Madness") else empty("H") end
@@ -2173,7 +2174,7 @@ local function updateBars()
 				spell("AB3", "Mass Dispel")
 				spell("SQ", "Flash Heal")
 				macro("SV", "C06", 12) -- Shadowform
-				spell("CV", "Shadowfiend")
+				if talent[5][3] then spell("CV", "Shadow Crash") else empty("CV") end
 
 				spell("CF", "Leap of Faith")
 				empty("SF")
@@ -2236,9 +2237,11 @@ local function updateBars()
 			m("C05", 134536, "#showtooltip\n/use Pistol Shot")
 			-- Symbols of Death + Shadow Dance
 			m("C06", nil, "#showtooltip Symbols of Death\n/use Symbols of Death\n/use [nostance:1,nostance:2]Shadow Dance\n/use Cold Blood\n/use 13")
+			-- Stealth
+			m("C07", nil, "#showtooltip Stealth\n/cancelaura [nocombat]Shadow Dance\n/use !Stealth")
 
 			-- Essence
-			essence("B", "Echoing Reprimand", "Sepsis", "Serrated Bone Spike", "Flagellation")
+			essence("N", "Echoing Reprimand", "Serrated Bone Spike", "Sepsis", "Flagellation")
 
 			if spec == 1 then
 				-- Assassination
@@ -2276,7 +2279,7 @@ local function updateBars()
 				spell("CB3", "Distract")
 				empty("AB3")
 				spell("SQ", "Crimson Vial")
-				spell("SV", "Stealth")
+				macro("SV", "C07") -- Stealth
 				spell("CV", "Vanish")
 
 				empty("CF")
@@ -2318,7 +2321,7 @@ local function updateBars()
 				spell("CB3", "Distract")
 				empty("AB3")
 				spell("SQ", "Crimson Vial")
-				spell("SV", "Stealth")
+				macro("SV", "C07") -- Stealth
 				spell("CV", "Vanish")
 
 				spell("CF", "Grappling Hook")
@@ -2333,7 +2336,7 @@ local function updateBars()
 				spell("5", "Black Powder")
 				spell("CE", "Kidney Shot")
 
-				macro("C", "C06") -- Symbols of Death
+				macro("C", "C06", 29) -- Symbols of Death
 				spell("SC", "Shadow Dance")
 				spell("Q", "Shuriken Storm")
 				if talent[7][2] then spell("5", "Secret Technique") elseif talent[7][3] then spell("5", "Shuriken Tornado") else empty("E") end
@@ -2360,7 +2363,7 @@ local function updateBars()
 				spell("CB3", "Distract")
 				empty("AB3")
 				spell("SQ", "Crimson Vial")
-				spell("SV", "Stealth")
+				macro("SV", "C07") -- Stealth
 				spell("CV", "Vanish")
 
 				empty("CF")
@@ -2402,7 +2405,7 @@ local function updateBars()
 				empty("CB3")
 				empty("AB3")
 				spell("SQ", "Crimson Vial")
-				spell("SV", "Stealth", 3)
+				macro("SV", "C07", 3) -- Stealth
 				empty("CV")
 
 				empty("CF")
@@ -2432,7 +2435,7 @@ local function updateBars()
 			m("C09", nil, "#showtooltip\n/use [mod:shift]Crash Lightning;Frost Shock")
 
 			-- Essence
-			essence("B", "Vesper Totem", "Fae Transfusion", "Primordial Wave", "Chain Harvest")
+			essence("N", "Vesper Totem", "Primordial Wave", "Fae Transfusion", "Chain Harvest")
 
 			if spec == 1 then
 				-- Elemental
@@ -2470,7 +2473,7 @@ local function updateBars()
 				if talent[4][3] then spell("CB3", "Liquid Magma Totem") else empty("CB3") end
 				empty("AB3")
 				spell("SQ", "Healing Surge")
-				spell("SV", "Bloodlust")
+				if faction == "Alliance" then spell("SV", "Heroism") else spell("SV", "Bloodlust") end
 				spell("CV", "Tremor Totem")
 
 				if talent[5][3] then spell("CF", "Wind Rush Totem") else empty("CF") end
@@ -2512,7 +2515,7 @@ local function updateBars()
 				empty("CB3")
 				empty("AB3")
 				spell("SQ", "Healing Surge")
-				spell("SV", "Bloodlust")
+				if faction == "Alliance" then spell("SV", "Heroism") else spell("SV", "Bloodlust") end
 				spell("CV", "Tremor Totem")
 
 				if talent[5][2] then spell("CF", "Feral Lunge") elseif talent[5][3] then spell("CF", "Wind Rush Totem") else empty("CF") end
@@ -2554,7 +2557,7 @@ local function updateBars()
 				if talent[4][2] then spell("CB3", "Earthen Wall Totem") elseif talent[4][3] then spell("CB3", "Ancestral Protection Totem") else empty("CB3") end
 				spell("AB3", "Spirit Link Totem")
 				spell("SQ", "Healing Surge")
-				spell("SV", "Bloodlust")
+				if faction == "Alliance" then spell("SV", "Heroism") else spell("SV", "Bloodlust") end
 				spell("CV", "Tremor Totem")
 
 				if talent[5][3] then spell("CF", "Wind Rush Totem") else empty("CF") end
@@ -2612,7 +2615,7 @@ local function updateBars()
 			m("C02", nil, "#showtooltip\n/use [pet:Felguard/Wrathguard]Felstorm;[pet:Felhunter/Observer]Devour Magic;[pet:Imp/Fel Imp]Flee;[pet:Succubus/Shivarra]Lesser Invisibility;[pet:Voidwalker/Voidlord]Shadow Bulwark;[nospec:2,talent:6/3]Grimoire of Sacrifice;Command Demon")
 			
 			-- Essence
-			essence("B", false, false, false, false)
+			essence("N", false, false, false, false)
 
 			if spec == 1 then
 				-- Affliction
@@ -2790,7 +2793,7 @@ local function updateBars()
 			m("C01", nil, "#showtooltip Pummel\n/stopcasting\n/stopcasting\n/cast Pummel")
 
 			-- Essence
-			essence("B", false, false, false, false)
+			essence("N", false, false, false, false)
 
 			if spec == 1 then
 				-- Arms
@@ -2908,7 +2911,7 @@ local function updateBars()
 
 				spell("T", "Intimidating Shout")
 				spell("ST", "Hamstring")
-				empty("CT")
+				spell("CT", "Shockwave")
 				empty("CB3")
 				spell("AB3", "Heroic Leap")
 				spell("SQ", "Victory Rush")
@@ -2970,7 +2973,7 @@ local function updateBars()
 		macro("SG", "G030", 10)
 		macro("6", "G026")
 		macro("7", "G027")
-		signature("SB")
+		signature("SN")
 		racial("AE")
 		macro("SX", "G029")
 		macro("X", "G028")
@@ -2985,21 +2988,21 @@ local function updateBars()
 			for k, v in pairs(C_SpecializationInfo.GetAllSelectedPvpTalentIDs()) do
 				i = i + 1
 				if i == 1 then
-					pvptalent("N", v)
+					pvptalent("J", v)
 					pvp1 = true
 				elseif i == 2 then
-					pvptalent("SN", v)
+					pvptalent("SJ", v)
 					pvp2 = true
 				elseif i == 3 then
-					pvptalent("CN", v)
+					pvptalent("CJ", v)
 					pvp3 = true
 				end
 			end
 		end
 
-		if not pvp1 then empty("N") end
-		if not pvp2 then empty("SN") end
-		if not pvp3 then empty("CN") end
+		if not pvp1 then empty("J") end
+		if not pvp2 then empty("SJ") end
+		if not pvp3 then empty("CJ") end
 		-----
 	end
 end
@@ -3080,6 +3083,15 @@ local function eventHandler(self, event)
 			frame:UnregisterEvent("PLAYER_REGEN_ENABLED")
 			updateBars()
 		elseif loaded then
+			if throttled then
+				return
+			else
+				throttled = true
+				C_Timer.After(1, function()
+					throttled = false
+				end)
+			end
+
 			C_Timer.After(1, updateBars)
 		end
 	end
