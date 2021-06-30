@@ -1,7 +1,7 @@
-## Interface: 90005
+## Interface: 90100
 ## Title: !Placer
 ## Notes: Places action bara data
 ## Author: Leo Bolin
-## Version: 9.0.5
+## Version: 9.1.0
 
 Placer.lua
