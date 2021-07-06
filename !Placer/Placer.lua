@@ -2273,7 +2273,7 @@ local function updateBars()
 			-- Pistol Shot
 			m("C05", 134536, "#showtooltip\n/use Pistol Shot")
 			-- Symbols of Death + Shadow Dance
-			m("C06", nil, "#showtooltip Symbols of Death\n/use Symbols of Death\n/use [nostance:1,nostance:2]Shadow Dance\n/use Cold Blood\n/use 13")
+			m("C06", nil, "#showtooltip Symbols of Death\n/use Symbols of Death\n/use [nostance:1,nostance:2]Shadow Dance\n/use 13")
 			-- Stealth
 			m("C07", nil, "#showtooltip Stealth\n/cancelaura [btn:2]Stealth;[nocombat]Shadow Dance\n/use [nobtn:2]!Stealth")
 
