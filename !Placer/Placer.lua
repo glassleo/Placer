@@ -192,7 +192,7 @@ local function spell(slotName, spellName, requiredLevel)
 	local todo = "place"
 
 	if level >= requiredLevel then
-		if actionType == "spell" and actionDataId == spellId then
+		if actionType == "spell" and spellId and actionDataId == spellId then
 			todo = nil
 		end
 	else
@@ -206,7 +206,7 @@ local function spell(slotName, spellName, requiredLevel)
 		ClearCursor()
 
 		-- Some spells have multiple spell IDs depending on talents or stance, attempt to pick up any
-		-- Get spell IDs in game, Wowhead usually lists wrong IDs: /dump GetSpellInfo("Thrash")
+		-- /dump GetSpellInfo("Spell Name")
 		if spellName == "Command Pet" then
 			spellById(slotId, 272651) -- Always same ID
 		elseif spellName == "Wildfire Bomb" then
@@ -266,6 +266,8 @@ local function spell(slotName, spellName, requiredLevel)
 			spellId = 310143
 		elseif spellName == "Death and Decay" then
 			spellId = 43265
+		elseif spellName == "Unstable Affliction" then
+			spellById(slotId, 316099) -- Correct ID
 		end
 
 		-- Place spell
@@ -530,6 +532,8 @@ local function updateBars()
 		SetCVar("mapFade", 0)
 		SetCVar("whisperMode", "inline")
 		SetCVar("autoLootDefault", 1)
+		SetCVar("displaySpellActivationOverlays", 0)
+		SetCVar("worldPreloadNonCritical", 0)
 
 		-- Local Variables
 		local name = UnitName("player")
@@ -609,16 +613,16 @@ local function updateBars()
 			if spec == 1 then
 				-- Blood
 				spell("1", "Marrowrend")
-				spell("2", "Heart Strike")
-				spell("3", "Death Coil")
-				spell("4", "Death Strike")
+				spell("2", "Blood Boil")
+				spell("3", "Heart Strike")
+				spell("4", "Death and Decay")
 				if talent[2][3] then spell("5", "Consumption") else empty("5") end
 				spell("CE", "Asphyxiate")
 
 				spell("C", "Rune Tap")
 				if talent[3][3] then spell("SC", "Blood Tap") else empty("SC") end
-				spell("Q", "Blood Boil")
-				spell("E", "Death and Decay")
+				spell("Q", "Death Strike")
+				spell("E", "Death's Caress")
 				spell("G", "Dancing Rune Weapon")
 				if talent[4][3] then spell("V", "Mark of Blood") else empty("V") end
 				macro("SE", "C01") -- Mind Freeze
@@ -626,7 +630,7 @@ local function updateBars()
 				spell("R", "Dark Command")
 				spell("SR", "Death Grip")
 				macro("CR", "C03", 32) -- Gorefiend's Grasp @player
-				spell("H", "Death's Caress")
+				spell("H", "Death Coil")
 				macro("SH", "C04", 32) -- Gorefiend's Grasp @target
 
 				spell("F1", "Anti-Magic Shell")
@@ -703,7 +707,7 @@ local function updateBars()
 				if talent[2][3] then spell("SC", "Unholy Blight") else empty("SC") end
 				spell("Q", "Epidemic")
 				spell("E", "Outbreak")
-				if talent[7][2] then spell("G", "Summon Gargoyle") elseif talent[7][3] then spell("G", "Unholy Assault") else empty("G") end
+				if level < 29 then spell("G", "Raise Dead") elseif talent[7][2] then spell("G", "Summon Gargoyle") elseif talent[7][3] then spell("G", "Unholy Assault") else empty("G") end
 				spell("V", "Dark Transformation")
 				macro("SE", "C01") -- Mind Freeze
 
@@ -795,7 +799,7 @@ local function updateBars()
 				macro("1", "C01") -- Demon's Bite
 				spell("2", "Chaos Strike")
 				spell("3", "Blade Dance")
-				spell("4", "Immolation Aura")
+				spell("4", "Eye Beam")
 				if talent[7][3] then spell("5", "Fel Barrage") else empty("5") end
 				spell("CE", "Chaos Nova")
 
@@ -806,7 +810,7 @@ local function updateBars()
 				macro("G", "C02") -- Metamorphosis @player
 				if talent[5][3] then spell("V", "Essence Break") else empty("V") end
 				macro("SE", "C04") -- Disrupt
-				spell("E", "Eye Beam")
+				spell("E", "Immolation Aura")
 				spell("R", "Torment")
 				spell("SR", "Consume Magic")
 				empty("CR")
@@ -837,15 +841,15 @@ local function updateBars()
 				spell("1", "Shear")
 				spell("2", "Soul Cleave")
 				spell("3", "Demon Spikes")
-				spell("4", "Immolation Aura")
-				if talent[7][3] then spell("5", "Bulk Extraction") else empty("5") end
+				spell("4", "Sigil of Flame")
+				if talent[3][3] then spell("5", "Spirit Bomb") else empty("5") end
 				spell("CE", "Sigil of Misery")
 
 				if talent[1][3] then spell("C", "Felblade") else empty("C") end
 				empty("SC")
-				if talent[3][3] then spell("Q", "Spirit Bomb") else empty("Q") end
-				spell("E", "Sigil of Flame")
-				spell("G", "Metamorphosis")
+				if talent[6][3] then spell("Q", "Soul Barrier") else empty("Q") end
+				spell("E", "Immolation Aura")
+				if talent[7][3] then spell("G", "Bulk Extraction") else empty("G") end
 				spell("V", "Fel Devastation")
 				macro("SE", "C04") -- Disrupt
 
@@ -856,7 +860,7 @@ local function updateBars()
 				empty("SH")
 
 				spell("F1", "Fiery Brand")
-				if talent[6][3] then spell("F2", "Soul Barrier") else empty("F2") end
+				spell("F2", "Metamorphosis")
 				empty("F3")
 				empty("F4")
 				empty("F5")
@@ -2025,13 +2029,13 @@ local function updateBars()
 				spell("1", "Crusader Strike")
 				spell("2")
 				spell("3", "Judgment")
-				empty("4")
+				spell("4", "Shield of the Righteous")
 				empty("5")
 				spell("CE", "Hammer of Justice")
 
 				empty("C")
 				empty("SC")
-				empty("Q")
+				spell("Q", "Word of Glory")
 				spell("E", "Consecration")
 				empty("G")
 				empty("V")
@@ -2040,7 +2044,7 @@ local function updateBars()
 				empty("R")
 				empty("SR")
 				empty("CR")
-				spell("H", "Word of Glory")
+				empty("H")
 				empty("SH")
 
 				empty("F1")
@@ -2456,8 +2460,8 @@ local function updateBars()
 			m("C01", nil, "#showtooltip\n/use [nospec:2,harm]Lightning Bolt;[spec:3][nospec:3,help]Healing Surge;[spec:2]Primal Strike;Lightning Bolt")
 			-- Healing Wave/Lava Burst
 			m("C02", nil, "#showtooltip\n/use [harm]Lava Burst;Healing Wave")
-			-- Chain Heal/Chain Lightning/Lightning Bolt
-			m("C03", nil, "#showtooltip\n/use [harm,nospec:2]Chain Lightning;[spec:3][help]Chain Heal;[nospec:2][mod:shift]Chain Lightning;Lightning Bolt")
+			-- Chain Heal/Chain Lightning/Crash Lightning
+			m("C03", nil, "#showtooltip\n/use [harm,spec:2]Crash Lightning;[harm]Chain Lightning;[spec:3][help]Chain Heal;[spec:2]Crash Lightning;Chain Lightning")
 			-- Wind Shear/Earth Shield
 			m("C04", nil, "#showtooltip [spec:3,help][nospec:3,talent:3/2,help]Earth Shield;Wind Shear\n/stopcasting\n/stopcasting\n/use [spec:3,help][nospec:3,talent:3/2,help]Earth Shield;Wind Shear")
 			-- Riptide/Flame Shock
@@ -2520,14 +2524,15 @@ local function updateBars()
 				-- Enhancement
 				macro("1", "C01") -- Stormstrike/Healing Surge
 				spell("2", "Lava Lash")
-				if level >= 24 then macro("3", "C03") else spell("3", "Lightning Bolt") end -- Lightning Bolt/Chain Lightning/Chain Heal
-				spell("4", "Frost Shock")
-				if talent[6][2] then spell("5", "Stormkeeper") elseif talent[6][3] then spell("5", "Sundering") else empty("5") end
+				if level >= 38 then macro("3", "C03") else spell("3", "Chain Heal") end -- Crash Lightning/Chain Heal
+				spell("4", "Lightning Bolt")
+				spell("5", "Chain Lightning")
 				spell("CE", "Capacitor Totem")
 
-				if talent[2][3] then spell("C", "Ice Strike") else empty("C") end
+				spell("C", "Frost Shock")
+				if talent[2][3] then spell("SC", "Ice Strike") else empty("SC") end
 				if talent[1][3] then spell("SC", "Elemental Blast") else empty("SC") end
-				spell("Q", "Crash Lightning")
+				if talent[6][2] then spell("Q", "Stormkeeper") elseif talent[6][3] then spell("Q", "Sundering") else empty("Q") end
 				spell("E", "Flame Shock")
 				spell("G", "Feral Spirit")
 				if talent[7][2] then spell("V", "Earthen Spike") elseif talent[7][3] then spell("V", "Ascendance") else empty("V") end
@@ -2662,10 +2667,10 @@ local function updateBars()
 				spell("2", "Malefic Rapture")
 				spell("3", "Unstable Affliction")
 				spell("4", "Agony")
-				if talent[4][2] then spell("5", "Phantom Singularity") elseif talent[4][3] then spell("5", "Vile Taint") else empty("5") end
+				if talent[6][2] then spell("5", "Haunt") else empty("5") end
 				spell("CE", "Shadowfury")
 
-				if talent[6][2] then spell("C", "Haunt") else empty("C") end
+				if talent[4][2] then spell("C", "Phantom Singularity") elseif talent[4][3] then spell("C", "Vile Taint") else empty("C") end
 				if talent[2][3] then spell("SC", "Siphon Life") else empty("SC") end
 				spell("Q", "Seed of Corruption")
 				spell("E", "Corruption")
