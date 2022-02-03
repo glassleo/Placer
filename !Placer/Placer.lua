@@ -1591,7 +1591,7 @@ local function updateBars()
 				macro("SE", "C01") -- Counterspell
 
 				if talent[3][3] then spell("R", "Rune of Power") else empty("R") end
-				macro("SR", "Spellsteal")
+				spell("SR", "Spellsteal")
 				spell("CR", "Remove Curse")
 				spell("H", "Fire Blast")
 				empty("SH")
