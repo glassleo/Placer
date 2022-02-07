@@ -1377,6 +1377,8 @@ local function updateBars()
 			m("C05", nil, "#showtooltip\n/use [@pet,dead][nopet]Revive Pet;Mend Pet")
 			-- Tranquilizing Shot
 			m("C06", 132323, "#showtooltip\n/use Tranquilizing Shot")
+			-- Aspect of the Turtle
+			m("C07", nil, "#showtooltip\n/use !Aspect of the Turtle")
 
 			-- Essence
 			essence("N", "Resonating Arrow", "Death Chakram", "Wild Spirits", "Flayed Shot")
@@ -1405,7 +1407,7 @@ local function updateBars()
 				empty("SH")
 
 				spell("F1", "Exhilaration")
-				spell("F2", "Aspect of the Turtle")
+				macro("F2", "C07", 8)-- Aspect of the Turtle
 				macro("F3", "G020", 22) -- Exotic Ability
 				if talent[3][3] then spell("F4", "Camouflage") else empty("F4") end
 				spell("F5", "Aspect of the Chameleon")
@@ -1449,7 +1451,7 @@ local function updateBars()
 				empty("SH")
 
 				spell("F1", "Exhilaration")
-				spell("F2", "Aspect of the Turtle")
+				macro("F2", "C07", 8)-- Aspect of the Turtle
 				empty("F3")
 				if talent[3][3] then spell("F4", "Camouflage") else empty("F4") end
 				spell("F5", "Aspect of the Chameleon")
@@ -1493,7 +1495,7 @@ local function updateBars()
 				empty("SH")
 
 				spell("F1", "Exhilaration")
-				spell("F2", "Aspect of the Turtle")
+				macro("F2", "C07", 8)-- Aspect of the Turtle
 				empty("F3")
 				if talent[3][3] then spell("F4", "Camouflage") else empty("F4") end
 				spell("F5", "Aspect of the Chameleon")
@@ -1537,7 +1539,7 @@ local function updateBars()
 				empty("SH")
 
 				spell("F1", "Exhilaration")
-				empty("F2", "Aspect of the Turtle")
+				macro("F2", "C07", 8)-- Aspect of the Turtle
 				empty("F3")
 				empty("F4")
 				empty("F5")
@@ -2609,14 +2611,14 @@ local function updateBars()
 
 				custom("T", "Hex", 41)
 				spell("ST", "Earthbind Totem")
-				spell("CT", "Thunderstorm")
+				empty("CT")
 				empty("AT")
-				if talent[4][3] then spell("CB3", "Liquid Magma Totem") else empty("CB3") end
+				spell("CB3", "Thunderstorm")
 				spell("SQ", "Healing Surge")
 				if faction == "Alliance" then spell("SV", "Heroism") else spell("SV", "Bloodlust") end
 				spell("CV", "Tremor Totem")
 
-				empty("AB3")
+				if talent[4][3] then spell("AB3", "Liquid Magma Totem") else empty("AB3") end
 				empty("AF")
 				if talent[5][3] then spell("CF", "Wind Rush Totem") else empty("CF") end
 				spell("SF", "Spiritwalker's Grace")
