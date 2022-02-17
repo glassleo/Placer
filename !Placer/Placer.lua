@@ -2164,7 +2164,7 @@ local function updateBars()
 			-- Power Word: Shield @player
 			m("C07", nil, "#showtooltip Power Word: Shield\n/use [@player]Power Word: Shield")
 			-- Body and Soul - Power Word: Shield @player
-			m("C08", 537099, "#showtooltip Power Word: Shield\n/use [@player]Power Word: Shield")
+			m("C08", 537099, "#showtooltip\n/use [@player]Power Word: Shield")
 			-- Dispersion
 			m("C09", nil, "#showtooltip\n/use !Dispersion")
 			-- Binding Heal/Shadow Word: Death
