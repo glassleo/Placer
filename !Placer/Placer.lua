@@ -2167,8 +2167,6 @@ local function updateBars()
 			m("C08", 537099, "#showtooltip\n/use [@player]Power Word: Shield")
 			-- Dispersion
 			m("C09", nil, "#showtooltip\n/use !Dispersion")
-			-- Binding Heal/Shadow Word: Death
-			m("C10", nil, "#showtooltip\n/use [harm]Shadow Word: Death;[talent:5/2]Binding Heal;Shadow Word: Death")
 			-- Mind Control
 			m("C11", 1718004, "#showtooltip\n/use Mind Control")
 			-- Devouring Plague/Searing Nightmare
@@ -2240,7 +2238,7 @@ local function updateBars()
 				spell("G", "Power Infusion")
 				spell("SE", "Guardian Spirit")
 
-				if talent[5][2] then macro("R", "C10", 14) else spell("R", "Shadow Word: Death") end
+				spell("R", "Shadow Word: Death")
 				spell("SR", "Dispel Magic")
 				spell("CR", "Purify")
 				spell("H", "Power Word: Shield")
