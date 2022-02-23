@@ -1,8 +1,8 @@
-## Interface: 90105
+## Interface: 90200
 ## Title: !Placer
 ## Notes: Places action bara data
-## Author: Leo Bolin
-## Version: 9.1.5
+## Author: Leo
+## Version: 9.2.0
 ## OptionalDeps: !Automagic
 
 Placer.lua
