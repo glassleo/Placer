@@ -2761,9 +2761,9 @@ local function updateBars()
 			-- Warlock Macros
 
 			-- Pet Primary
-			m("C01", nil, "#showtooltip\n/use [pet:Felguard/Wrathguard]Axe Toss;[pet:Felhunter/Observer]Spell Lock;[pet:Succubus/Shivarra]Seduction;[pet:Voidwalker/Voidlord,nobtn:2]Suffering;[nobtn:2]Command Demon\n/petautocasttoggle [btn:2]Suffering")
+			m("C01", nil, "#showtooltip\n/use [pet:Felguard/Wrathguard]Axe Toss;[pet:Felhunter/Observer]Spell Lock;[pet:Sayaad/Shivarra]Seduction;[pet:Voidwalker/Voidlord,nobtn:2]Suffering;[nobtn:2]Command Demon\n/petautocasttoggle [btn:2]Suffering")
 			-- Pet Secondary
-			m("C02", nil, "#showtooltip\n/use [pet:Felguard/Wrathguard]Felstorm;[pet:Felhunter/Observer]Devour Magic;[pet:Imp/Fel Imp]Flee;[pet:Succubus/Shivarra]Lesser Invisibility;[pet:Voidwalker/Voidlord]Shadow Bulwark;[nospec:2,talent:6/3]Grimoire of Sacrifice;Command Demon")
+			m("C02", nil, "#showtooltip\n/use [pet:Felguard/Wrathguard]Felstorm;[pet:Felhunter/Observer]Devour Magic;[pet:Imp/Fel Imp]Flee;[pet:Sayaad/Shivarra]Lesser Invisibility;[pet:Voidwalker/Voidlord]Shadow Bulwark;[nospec:2,talent:6/3]Grimoire of Sacrifice;Command Demon")
 			-- Emergency Felhunter Interrupt
 			m("C03", 136174, "#showtooltip [pet:Felhunter/Observer]Spell Lock;Fel Domination\n/use [pet:Felhunter/Observer]Spell Lock;Fel Domination\n/use [nopet:Felhunter/Observer]Summon Felhunter")
 
