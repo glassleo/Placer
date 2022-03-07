@@ -497,7 +497,7 @@ local function custom(slotName, spellName, requiredLevel)
 	requiredLevel = requiredLevel or 1
 	local level = UnitLevel("player")
 	local slotId = slotNames[slotName]
-	local name,_ = UnitName("player")
+	local name = UnitName("player")
 	local hexId = { ["Frog"] = 51514, ["Compy"] = 210873, ["Spider"] = 211004, ["Snake"] = 211010, ["Cockroach"] = 211015, ["Skeletal Hatchling"] = 269352, ["Zandalari Tendonripper"] = 277778, ["Wicker Mongrel"] = 277784, }
 	local polyId = { ["Sheep"] = 118, ["Pig"] = 28272, ["Turtle"] = 28271, ["Black Cat"] = 61305, ["Rabbit"] = 61721, ["Monkey"] = 161354, ["Porcupine"] = 126819, ["Penguin"] = 161355, ["Polar Bear Cub"] = 161353, ["Direhorn"] = 277787, ["Bumblebee"] = 277792, }
 
@@ -2173,6 +2173,8 @@ local function updateBars()
 			m("C12", nil, "#showtooltip\n/use [mod:shift,talent:3/3]Searing Nightmare;Devouring Plague")
 			-- Mindbender
 			m("C13", 1386549, "#showtooltip\n/use Shadowfiend")
+			-- Power Infusion
+			m("C14", nil, "#showtooltip Power Infusion\n/targetexact Rosham-Bloodfeather\n/use Power Infusion\n/targetlasttarget")
 
 			-- Essence
 			essence("N", "Boon of the Ascended", "Unholy Nova", "Fae Guardians", "Mindgames")
@@ -2235,7 +2237,7 @@ local function updateBars()
 				spell("Q", "Holy Nova")
 				if level >= 12 then macro("E", "C03") else spell("E", "Shadow Word: Pain") end -- Renew/Shadow Word: Pain
 				spell("V", "Holy Word: Sanctify")
-				spell("G", "Power Infusion")
+				if name == "Noicha " then macro("G", "C14") else spell("G", "Power Infusion") end
 				spell("SE", "Guardian Spirit")
 
 				spell("R", "Shadow Word: Death")
