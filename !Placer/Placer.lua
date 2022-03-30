@@ -2174,7 +2174,7 @@ local function updateBars()
 			-- Mindbender
 			m("C13", 1386549, "#showtooltip\n/use Shadowfiend")
 			-- Power Infusion
-			m("C14", nil, "#showtooltip Power Infusion\n/targetexact Rosham-Bloodfeather\n/use Power Infusion\n/targetlasttarget")
+			m("C14", nil, "#showtooltip Power Infusion\n/targetexact Voidlisa\n/use Power Infusion\n/targetlasttarget")
 
 			-- Essence
 			essence("N", "Boon of the Ascended", "Unholy Nova", "Fae Guardians", "Mindgames")
@@ -2237,7 +2237,7 @@ local function updateBars()
 				spell("Q", "Holy Nova")
 				if level >= 12 then macro("E", "C03") else spell("E", "Shadow Word: Pain") end -- Renew/Shadow Word: Pain
 				spell("V", "Holy Word: Sanctify")
-				if name == "Noicha " then macro("G", "C14") else spell("G", "Power Infusion") end
+				if name == "Noicha" then macro("G", "C14") else spell("G", "Power Infusion") end
 				spell("SE", "Guardian Spirit")
 
 				spell("R", "Shadow Word: Death")
