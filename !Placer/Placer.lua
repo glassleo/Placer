@@ -2174,7 +2174,7 @@ local function updateBars()
 			-- Mindbender
 			m("C13", 1386549, "#showtooltip\n/use Shadowfiend")
 			-- Power Infusion
-			m("C14", nil, "#showtooltip Power Infusion\n/targetexact Voidlisa\n/use Power Infusion\n/targetlasttarget")
+			m("C14", nil, "#showtooltip\n/use [@focus,help,nodead][help,nodead][@player]Power Infusion")
 
 			-- Essence
 			essence("N", "Boon of the Ascended", "Unholy Nova", "Fae Guardians", "Mindgames")
@@ -2192,7 +2192,7 @@ local function updateBars()
 				if talent[6][2] then spell("SC", "Divine Star") elseif talent[6][3] then spell("SC", "Halo") else empty("SC") end
 				spell("Q", "Mind Sear")
 				macro("E", "C03") -- Shadow Word: Pain/Power Word: Shield
-				spell("G", "Power Infusion")
+				macro("G", "C14", 58) -- Power Infusion
 				if talent[3][2] then macro("V", "C13") else spell("V", "Shadowfiend") end
 				spell("SE", "Pain Suppression")
 
@@ -2237,7 +2237,7 @@ local function updateBars()
 				spell("Q", "Holy Nova")
 				if level >= 12 then macro("E", "C03") else spell("E", "Shadow Word: Pain") end -- Renew/Shadow Word: Pain
 				spell("V", "Holy Word: Sanctify")
-				if name == "Noicha" then macro("G", "C14") else spell("G", "Power Infusion") end
+				macro("G", "C14", 58) -- Power Infusion
 				spell("SE", "Guardian Spirit")
 
 				spell("R", "Shadow Word: Death")
@@ -2280,7 +2280,7 @@ local function updateBars()
 				if talent[5][3] then spell("SC", "Shadow Crash") else empty("SC") end
 				spell("Q", "Mind Sear")
 				macro("E", "C03") -- Shadow Word: Pain/Power Word: Shield
-				spell("G", "Power Infusion")
+				macro("G", "C14", 58) -- Power Infusion
 				if talent[6][2] then macro("V", "C13") else spell("V", "Shadowfiend") end
 				macro("SE", "C04", 29) -- Silence
 
