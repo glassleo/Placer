@@ -37,10 +37,11 @@ local poly = {
 	["Carolyn"] = "Turtle",
 	["Eska"] 	= "Rabbit",
 	["Ling"] 	= "Porcupine",
+	["Felix"]   = "Rabbit",
 }
 
 -- Hex
--- Frog, Compy, Spider, Snake, Cockroach, Skeletal Hatchling, Zandalari Tendonripper, Wicker Mongrel
+-- Frog, Compy, Living Honey, Spider, Snake, Cockroach, Skeletal Hatchling, Zandalari Tendonripper, Wicker Mongrel
 local hex = {
 	-- Alliance
 	["Octavia"] = "Spider",
