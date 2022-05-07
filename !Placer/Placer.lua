@@ -1962,10 +1962,12 @@ local function updateBars()
 			m("C01", nil, "#showtooltip\n/use [harm]Crusader Strike;Flash of Light")
 			-- Holy Light/Judgment
 			m("C02", nil, "#showtooltip\n/use [harm]Judgment;Holy Light")
-			-- Light of the Martyr/Hammer of Wrath
-			m("C03", nil, "#showtooltip\n/use [harm]Hammer of Wrath;Light of the Martyr")
+			-- Light of the Martyr/Shield of the Righteous
+			m("C03", nil, "#showtooltip\n/use [equipped:shield,harm]Shield of the Righteous;Light of the Martyr")
 			-- Rebuke
 			m("C04", nil, "#showtooltip Rebuke\n/stopcasting\n/stopcasting\n/use Rebuke")
+			-- Beacon of Faith/Hammer of Wrath
+			m("C05", nil, "#showtooltip\n/use [harm]Hammer of Wrath;[talent:7/2]Beacon of Faith;Hammer of Wrath")
 
 			-- Essence
 			essence("N", "Divine Toll", "Vanquisher's Hammer", "Blessing of the Seasons", "Ashen Hallow")
@@ -1975,12 +1977,12 @@ local function updateBars()
 				macro("1", "C01") -- Flash of Light/Crusader Strike
 				if level >= 11 then macro("2", "C02") else spell("2", "Judgment") end -- Holy Light/Judgment
 				spell("3", "Holy Shock")
-				if level >= 46 then macro("4", "C03") else spell("4", "Light of the Martyr") end -- Light of the Martyr/Hammer of Wrath
+				if level >= 46 then macro("4", "C03") else spell("4", "Light of the Martyr") end -- Light of the Martyr/Shield of the Righteous
 				spell("5", "Light of Dawn")
 				spell("CE", "Hammer of Justice")
 
-				spell("C", "Beacon of Light")
-				if talent[7][2] then spell("SC", "Beacon of Faith") else empty("SC") end
+				if talent[7][2] then macro("C", "C05") else spell("C", "Hammer of Wrath") end
+				spell("SC", "Beacon of Light")
 				spell("Q", "Word of Glory")
 				spell("E", "Consecration")
 				spell("G", "Avenging Wrath")
