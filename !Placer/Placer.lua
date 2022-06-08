@@ -462,8 +462,7 @@ local function signature(slotName)
 	local _, _, _, _, _, _, venthyr = GetSpellInfo("Door of Shadows")
 
 	if kyrian then
-		macro(slotName, "G032")
-		spell("Hidden 1", "Summon Steward")
+		spell(slotName, "Summon Steward")
 	elseif nightfae then
 		spell(slotName, "Soulshape")
 	elseif necrolord then
@@ -592,7 +591,7 @@ local function updateBars()
 
 
 		if class == "DEATHKNIGHT" then
-			-- Death Knight Macros
+			--! Death Knight
 			
 			-- Mind Freeze
 			m("C01", nil, "#showtooltip Mind Freeze\n#showtooltip Mind Freeze\n/stopcasting\n/stopcasting\n/use Mind Freeze")
@@ -615,7 +614,7 @@ local function updateBars()
 			essence("N", "Shackle the Unworthy", "Abomination Limb", (spec == 2 and "Death and Decay" or false), "Swarming Mist")
 
 			if spec == 1 then
-				-- Blood
+				--! Blood Death Knight
 				spell("1", "Marrowrend")
 				spell("2", "Blood Boil")
 				spell("3", "Heart Strike")
@@ -628,6 +627,7 @@ local function updateBars()
 				if talent[1][2] then spell("Q", "Blooddrinker") elseif talent[1][3] then spell("Q", "Tombstone") else empty("Q") end
 				spell("E", "Death's Caress")
 				spell("G", "Dancing Rune Weapon")
+				empty("SG")
 				if talent[4][3] then spell("V", "Mark of Blood") else empty("V") end
 				macro("SE", "C01") -- Mind Freeze
 
@@ -659,7 +659,7 @@ local function updateBars()
 				spell("SF", "Death's Advance")
 				if talent[5][3] then macro("F", "C02") else empty("F") end -- Wraith Walk
 			elseif spec == 2 then
-				-- Frost
+				--! Frost Death Knight
 				spell("1", "Frost Strike")
 				spell("2", "Obliterate")
 				spell("3", "Remorseless Winter")
@@ -672,6 +672,7 @@ local function updateBars()
 				if talent[4][3] then spell("Q", "Frostscythe") else empty("Q") end
 				spell("E", "Howling Blast")
 				spell("G", "Empower Rune Weapon")
+				empty("SG")
 				spell("V", "Pillar of Frost")
 				macro("SE", "C01") -- Mind Freeze
 
@@ -703,7 +704,7 @@ local function updateBars()
 				spell("SF", "Death's Advance")
 				if talent[5][2] then macro("F", "C02") else empty("F") end -- Wraith Walk
 			elseif spec == 3 then
-				-- Unholy
+				--! Unholy Death Knight
 				spell("1", "Festering Strike")
 				spell("2", "Scourge Strike")
 				spell("3", "Death Coil")
@@ -716,6 +717,7 @@ local function updateBars()
 				spell("Q", "Epidemic")
 				spell("E", "Outbreak")
 				if level < 29 then spell("G", "Raise Dead") elseif talent[7][2] then spell("G", "Summon Gargoyle") elseif talent[7][3] then spell("G", "Unholy Assault") else empty("G") end
+				empty("SG")
 				spell("V", "Dark Transformation")
 				macro("SE", "C01") -- Mind Freeze
 
@@ -748,7 +750,7 @@ local function updateBars()
 				spell("SF", "Death's Advance")
 				if talent[5][2] then macro("F", "C02") else empty("F") end -- Wraith Walk
 			else
-				-- No Spec
+				--! Untalented Death Knight
 				empty("1")
 				empty("2")
 				empty("3")
@@ -761,6 +763,7 @@ local function updateBars()
 				empty("Q")
 				empty("E")
 				empty("G")
+				empty("SG")
 				empty("V")
 				empty("SE")
 
@@ -793,7 +796,7 @@ local function updateBars()
 				empty("F")
 			end
 		elseif class == "DEMONHUNTER" then
-			-- Demon Hunter Macros
+			--! Demon Hunter
 			
 			-- Felblade/Demon's Bite
 			m("C01", nil, "#showtooltip\n/use [talent:1/3,talent:2/3]Felblade;Demon's Bite")
@@ -808,7 +811,7 @@ local function updateBars()
 			essence("N", "Elysian Decree", false, "The Hunt", "Sinful Brand")
 
 			if spec == 1 then
-				-- Havoc
+				--! Havoc Demon Hunter
 				macro("1", "C01") -- Demon's Bite
 				spell("2", "Chaos Strike")
 				spell("3", "Blade Dance")
@@ -821,6 +824,7 @@ local function updateBars()
 				if talent[3][3] then spell("Q", "Glaive Tempest") else empty("Q") end
 				
 				macro("G", "C02") -- Metamorphosis @player
+				empty("SG")
 				if talent[5][3] then spell("V", "Essence Break") else empty("V") end
 				macro("SE", "C04") -- Disrupt
 				spell("E", "Immolation Aura")
@@ -852,7 +856,7 @@ local function updateBars()
 				spell("SF", "Vengeful Retreat")
 				spell("F", "Fel Rush")
 			elseif spec == 2 then
-				-- Vengeance
+				--! Vengeance Demon Hunter
 				spell("1", "Shear")
 				spell("2", "Soul Cleave")
 				spell("3", "Demon Spikes")
@@ -865,6 +869,7 @@ local function updateBars()
 				if talent[7][3] then spell("Q", "Bulk Extraction") else empty("Q") end
 				spell("E", "Immolation Aura")
 				spell("G", "Metamorphosis")
+				empty("SG")
 				spell("V", "Fel Devastation")
 				macro("SE", "C04") -- Disrupt
 
@@ -896,7 +901,7 @@ local function updateBars()
 				empty("SF")
 				spell("F", "Infernal Strike")
 			else
-				-- No Spec
+				--! Untalented Demon Hunter
 				spell("1", "Demon's Bite")
 				spell("2", "Chaos Strike")
 				spell("3", "Blade Dance")
@@ -909,6 +914,7 @@ local function updateBars()
 				empty("Q")
 				spell("E", "Immolation Aura")
 				empty("G")
+				empty("SG")
 				empty("V")
 				spell("SE", "Disrupt")
 
@@ -941,7 +947,7 @@ local function updateBars()
 				spell("F", "Fel Rush")
 			end
 		elseif class == "DRUID" then
-			-- Druid Macros
+			--! Druid
 			
 			-- Wrath/Regrowth
 			m("C01", nil, "#showtooltip\n/use [help]Regrowth;[spec:1][spec:2,notalent:3/3][spec:3,notalent:3/3][spec:4,talent:3/1,form:4][harm]Wrath;Regrowth")
@@ -974,7 +980,7 @@ local function updateBars()
 			-- Treant Form
 			m("C15", nil, "#showtooltip Treant Form\n/stopcasting\n/stopcasting\n/use [nospec:1,talent:3/1,noform:5][nospec:1,notalent:3/1,noform:4][spec:1,noform:5]Treant Form")
 			-- Prowl
-			m("C16", nil, "#showtooltip\n/cancelaura [btn:2]Prowl\n/use [nobtn:2]!Prowl")
+			m("C16", nil, "#showtooltip\n/cancelaura Travel Form\n/cancelaura [btn:2]Prowl\n/use [nobtn:2]!Prowl")
 			-- Wild Charge
 			m("C17", nil, "#showtooltip\n/cancelform [help,form]\n/use Wild Charge")
 			-- Primal Wrath/Rip
@@ -984,7 +990,7 @@ local function updateBars()
 			essence("N", "Kindred Spirits", "Adaptive Swarm", "Convoke the Spirits", "Ravenous Frenzy")
 
 			if spec == 1 then
-				-- Balance
+				--! Balance Druid
 				macro("1", "C01")
 				macro("2", "C02")
 				if level >= 12 then macro("3", "C03") else empty("3") end
@@ -997,6 +1003,7 @@ local function updateBars()
 				spell("Q", "Starfall")
 				macro("E", "C05") -- Moonfire/Rejuvenation
 				spell("G", "Celestial Alignment")
+				if talent[4][3] then spell("SG", "Heart of the Wild") else empty("SG") end
 				if talent[1][2] then spell("V", "Warrior of Elune") elseif talent[1][3] then spell("V", "Force of Nature") else empty("V") end
 				macro("SE", "C09", 26) -- Solar Beam
 
@@ -1012,6 +1019,7 @@ local function updateBars()
 				if talent[3][2] then spell("Bear Q", "Frenzied Regeneration") else empty("Bear Q") end
 				empty("Bear E")
 				empty("Bear G")
+				if talent[4][3] then spell("Bear SG", "Heart of the Wild") else empty("Bear SG") end
 				empty("Bear V")
 				macro("Bear SE", "C09", 26) -- Solar Beam
 
@@ -1027,6 +1035,7 @@ local function updateBars()
 				if talent[3][2] then spell("Cat Q", "Thrash") else empty("Cat Q") end
 				if talent[3][1] then macro("Cat E", "C05") else empty("Cat E") end -- Rake
 				empty("Cat G")
+				if talent[4][3] then spell("Cat SG", "Heart of the Wild") else empty("Cat SG") end
 				empty("Cat V")
 				macro("Cat SE", "C09", 26) -- Solar Beam
 
@@ -1040,7 +1049,7 @@ local function updateBars()
 				macro("F2", "C11") -- Bear Form
 				empty("F3")
 				empty("F4")
-				if talent[4][3] then spell("F5", "Heart of the Wild") else empty("F5") end
+				empty("F5")
 				macro("CQ", "C06") -- Flap
 
 				spell("T", "Cyclone")
@@ -1058,7 +1067,7 @@ local function updateBars()
 				spell("SF", "Stampeding Roar", 43)
 				macro("F", "C10") -- Dash
 			elseif spec == 2 then
-				-- Feral
+				--! Feral Druid
 				macro("1", "C01")
 				if talent[3][1] then spell("2", "Starfire") elseif talent[3][3] then spell("2", "Swiftmend") else empty("2") end
 				if talent[3][1] then spell("3", "Starsurge") elseif talent[3][3] then spell("3", "Wild Growth") else empty("3") end
@@ -1071,6 +1080,7 @@ local function updateBars()
 				empty("Q")
 				macro("E", "C05") -- Moonfire/Rejuvenation
 				empty("G")
+				if talent[4][3] then spell("SG", "Heart of the Wild") else empty("SG") end
 				empty("V")
 				macro("SE", "C09", 26) -- Skull Bash
 
@@ -1086,6 +1096,7 @@ local function updateBars()
 				if talent[3][2] then spell("Bear Q", "Frenzied Regeneration") else empty("Bear Q") end
 				empty("Bear E")
 				empty("Bear G")
+				if talent[4][3] then spell("Bear SG", "Heart of the Wild") else empty("Bear SG") end
 				empty("Bear V")
 				macro("Bear SE", "C09", 26) -- Skull Bash
 
@@ -1101,6 +1112,7 @@ local function updateBars()
 				spell("Cat Q", "Thrash", 11)
 				macro("Cat E", "C05") -- Rake/Rejuvenation
 				spell("Cat G", "Berserk")
+				if talent[4][3] then spell("Cat SG", "Heart of the Wild") else empty("Cat SG") end
 				spell("Cat V", "Tiger's Fury")
 				macro("Cat SE", "C09", 26) -- Skull Bash
 
@@ -1114,7 +1126,7 @@ local function updateBars()
 				macro("F2", "C11") -- Bear Form
 				spell("F3", "Survival Instincts")
 				empty("F4")
-				if talent[4][3] then spell("F5", "Heart of the Wild") else empty("F5") end
+				empty("F5")
 				if talent[3][1] then macro("CQ", "C06") else empty("CQ") end -- Moonkin Form/Flap
 
 				spell("T", "Cyclone")
@@ -1132,7 +1144,7 @@ local function updateBars()
 				spell("SF", "Stampeding Roar", 43)
 				macro("F", "C10") -- Dash
 			elseif spec == 3 then
-				-- Guardian
+				--! Guardian Druid
 				macro("1", "C01")
 				if talent[3][1] then spell("2", "Starfire") elseif talent[3][3] then spell("2", "Swiftmend") else empty("2") end
 				if talent[3][1] then spell("3", "Starsurge") elseif talent[3][3] then spell("3", "Wild Growth") else empty("3") end
@@ -1145,6 +1157,7 @@ local function updateBars()
 				empty("Q")
 				macro("E", "C05") -- Moonfire/Rejuvenation
 				empty("G")
+				if talent[4][3] then spell("SG", "Heart of the Wild") else empty("SG") end
 				empty("V")
 				macro("SE", "C09", 26) -- Skull Bash
 
@@ -1160,6 +1173,7 @@ local function updateBars()
 				spell("Bear Q", "Frenzied Regeneration")
 				macro("Bear E", "C05") -- Moonfire/Rejuvenation
 				spell("Bear G", "Berserk")
+				if talent[4][3] then spell("Bear SG", "Heart of the Wild") else empty("Bear SG") end
 				empty("Bear V")
 				macro("Bear SE", "C09", 26) -- Skull Bash
 
@@ -1175,6 +1189,7 @@ local function updateBars()
 				spell("Cat Q", "Thrash", 11)
 				if talent[3][2] then macro("Cat E", "C05") else empty("Cat E") end
 				empty("Cat G")
+				if talent[4][3] then spell("Cat SG", "Heart of the Wild") else empty("Cat SG") end
 				empty("Cat V")
 				macro("Cat SE", "C09", 26) -- Skull Bash
 
@@ -1188,7 +1203,7 @@ local function updateBars()
 				spell("F2", "Survival Instincts")
 				if talent[7][3] then spell("F3", "Pulverize") else empty("F3") end
 				empty("F4")
-				if talent[4][3] then spell("F5", "Heart of the Wild") else empty("F5") end
+				empty("F5")
 				if talent[3][1] then macro("CQ", "C06") else empty("CQ") end -- Moonkin Form/Flap
 
 				spell("T", "Cyclone")
@@ -1206,19 +1221,20 @@ local function updateBars()
 				spell("SF", "Stampeding Roar", 43)
 				macro("F", "C10") -- Dash
 			elseif spec == 4 then
-				-- Restoration
+				--! Restoration Druid
 				macro("1", "C01") -- Regrowth/Wrath
 				macro("2", "C02", 11) -- Swiftmend/Starfire
 				macro("3", "C03", 34) -- Wild Growth/Starsurge
 				if level >= 23 then macro("4", "C04") else spell("4", "Lifebloom") end -- Lifebloom/Sunfire
-				spell("5", "Efflorescence")
+				if talent[1][2] then spell("5", "Nourish") elseif talent[1][3] then spell("5", "Cenarion Ward") else empty("5") end
 				if talent[4][1] then spell("CE", "Mighty Bash") else empty("CE") end
 
 				if talent[6][3] then spell("C", "Overgrowth") else empty("C") end
 				macro("SC", "C08", 42) -- Innervate
-				if talent[1][2] then spell("Q", "Nourish") elseif talent[1][3] then spell("Q", "Cenarion Ward") else empty("Q") end
+				spell("Q", "Efflorescence")
 				macro("E", "C05") -- Rejuvenation/Moonfire
 				if talent[5][3] then spell("G", "Incarnation: Tree of Life") else empty("G") end
+				if talent[4][3] then spell("SG", "Heart of the Wild") else empty("SG") end
 				spell("V", "Nature's Swiftness")
 				spell("SE", "Ironbark")
 
@@ -1233,7 +1249,8 @@ local function updateBars()
 				macro("Bear SC", "C08", 42) -- Innervate
 				if talent[3][3] then spell("Bear Q", "Frenzied Regeneration") else empty("Bear Q") end
 				empty("Bear E")
-				empty("Bear G")
+				if talent[5][3] then spell("Bear G", "Incarnation: Tree of Life") else empty("Bear G") end
+				if talent[4][3] then spell("Bear SG", "Heart of the Wild") else empty("Bear SG") end
 				spell("Bear V", "Nature's Swiftness")
 				spell("Bear SE", "Ironbark")
 
@@ -1248,7 +1265,8 @@ local function updateBars()
 				macro("Cat SC", "C08", 42) -- Innervate
 				if talent[3][3] then spell("Cat Q", "Thrash") else empty("Cat Q") end
 				if talent[3][2] then macro("Cat E", "C05") else empty("Cat E") end -- Rake
-				empty("Cat G")
+				if talent[5][3] then spell("Cat G", "Incarnation: Tree of Life") else empty("Cat G") end
+				if talent[4][3] then spell("Cat SG", "Heart of the Wild") else empty("Cat SG") end
 				spell("Cat V", "Nature's Swiftness")
 				spell("Cat SE", "Ironbark")
 
@@ -1262,7 +1280,7 @@ local function updateBars()
 				macro("F2", "C11") -- Bear Form
 				spell("F3", "Tranquility")
 				if talent[7][3] then spell("F4", "Flourish") else empty("F4") end
-				if talent[4][3] then spell("F5", "Heart of the Wild") else empty("F5") end
+				empty("F5")
 				if talent[3][1] then macro("CQ", "C06") else empty("CQ") end -- Moonkin Form/Flap
 
 				spell("T", "Cyclone")
@@ -1280,7 +1298,7 @@ local function updateBars()
 				spell("SF", "Stampeding Roar", 43)
 				macro("F", "C10") -- Dash
 			else
-				-- No Spec
+				--! Untalented Druid
 				spell("1", "Wrath")
 				empty("2")
 				empty("3")
@@ -1293,6 +1311,7 @@ local function updateBars()
 				empty("Q")
 				spell("E", "Moonfire", 2)
 				empty("G")
+				empty("SG")
 				empty("V")
 				empty("SE")
 
@@ -1308,6 +1327,7 @@ local function updateBars()
 				empty("Cat Q")
 				empty("Cat E")
 				empty("Cat G")
+				empty("Cat SG")
 				empty("Cat V")
 				empty("Cat SE")
 
@@ -1323,6 +1343,7 @@ local function updateBars()
 				empty("Bear Q")
 				empty("Bear E")
 				empty("Bear G")
+				empty("Bear SG")
 				empty("Bear V")
 				empty("Bear SE")
 
@@ -1359,12 +1380,10 @@ local function updateBars()
 			-- All Druid Specs
 			macro("Bear 6", "G026")
 			macro("Bear 7", "G027")
-			macro("Bear SG", "G030")
 			macro("Cat 6", "G026")
 			macro("Cat 7", "G027")
-			macro("Cat SG", "G030")
 		elseif class == "HUNTER" then
-			-- Hunter Macros
+			--! Hunter
 
 			-- Counter Shot/Muzzle
 			m("C01", nil, "#showtooltip [spec:3]Muzzle;Counter Shot\n/stopcasting\n/stopcasting\n/use [spec:3]Muzzle;Counter Shot")
@@ -1385,7 +1404,7 @@ local function updateBars()
 			essence("N", "Resonating Arrow", "Death Chakram", "Wild Spirits", "Flayed Shot")
 
 			if spec == 1 then
-				-- Beast Mastery
+				--! Beast Mastery Hunter
 				if level < 14 then spell("1", "Arcane Shot") else spell("1", "Cobra Shot") end
 				if level < 12 then spell("2", "Steady Shot") else spell("2", "Barbed Shot") end
 				macro("3", "C03") -- Kill Command
@@ -1398,6 +1417,7 @@ local function updateBars()
 				spell("Q", "Multi-Shot")
 				if talent[4][3] then spell("E", "A Murder of Crows") else empty("E") end
 				spell("G", "Aspect of the Wild")
+				empty("SG")
 				spell("V", "Bestial Wrath")
 				macro("SE", "C01", 18) -- Counter Shot
 
@@ -1429,7 +1449,7 @@ local function updateBars()
 				spell("SF", "Disengage")
 				spell("F", "Aspect of the Cheetah")
 			elseif spec == 2 then
-				-- Marksmanship
+				--! Marksmanship Hunter
 				spell("1", "Arcane Shot")
 				spell("2", "Steady Shot")
 				spell("3", "Aimed Shot")
@@ -1442,6 +1462,7 @@ local function updateBars()
 				spell("Q", "Multi-Shot")
 				if talent[1][2] then spell("E", "Serpent Sting") elseif talent[1][3] then spell("E", "A Murder of Crows") else empty("E") end
 				spell("G", "Trueshot")
+				empty("SG")
 				if talent[6][3] then spell("V", "Double Tap") else empty("V") end
 				macro("SE", "C01", 18) -- Counter Shot
 
@@ -1473,7 +1494,7 @@ local function updateBars()
 				spell("SF", "Disengage")
 				spell("F", "Aspect of the Cheetah")
 			elseif spec == 3 then
-				-- Survival
+				--! Survival Hunter
 				spell("1", "Raptor Strike")
 				spell("2", "Wildfire Bomb")
 				macro("3", "C03", 11) -- Kill Command
@@ -1486,6 +1507,7 @@ local function updateBars()
 				spell("Q", "Carve")
 				spell("E", "Serpent Sting")
 				spell("G", "Coordinated Assault")
+				empty("SG")
 				spell("V", "Aspect of the Eagle")
 				macro("SE", "C01", 18) -- Muzzle
 
@@ -1517,7 +1539,7 @@ local function updateBars()
 				spell("SF", "Disengage")
 				spell("F", "Aspect of the Cheetah")
 			else
-				-- No Spec
+				--! Untalented Hunter
 				if level >= 2 then spell("1", "Arcane Shot") else spell("1", "Steady Shot") end
 				if level >= 2 then spell("2", "Steady Shot") else empty("2") end
 				empty("3")
@@ -1530,6 +1552,7 @@ local function updateBars()
 				empty("Q")
 				empty("E")
 				empty("G")
+				empty("SG")
 				empty("V")
 				empty("SE")
 
@@ -1562,7 +1585,7 @@ local function updateBars()
 				spell("F", "Aspect of the Cheetah")
 			end
 		elseif class == "MAGE" then
-			-- Mage Macros
+			--! Mage
 
 			-- Counterspell
 			m("C01", nil, "#showtooltip Counterspell\n/stopcasting\n/stopcasting\n/use Counterspell")
@@ -1577,7 +1600,7 @@ local function updateBars()
 			essence("N", "Radiant Spark", "Deathborne", "Shifting Power", "Mirrors of Torment")
 
 			if spec == 1 then
-				-- Arcane
+				--! Arcane Mage
 				spell("1", "Arcane Blast")
 				spell("2", "Arcane Missiles")
 				spell("3", "Arcane Barrage")
@@ -1590,6 +1613,7 @@ local function updateBars()
 				spell("Q", "Arcane Explosion")
 				if talent[4][3] then spell("E", "Nether Tempest") else empty("E") end
 				spell("G", "Arcane Power")
+				empty("SG")
 				spell("V", "Presence of Mind")
 				macro("SE", "C01") -- Counterspell
 
@@ -1621,7 +1645,7 @@ local function updateBars()
 				empty("SF")
 				spell("F", "Blink")
 			elseif spec == 2 then
-				-- Fire
+				--! Fire Mage
 				spell("1", "Fireball")
 				spell("2", "Fire Blast")
 				spell("3", "Pyroblast")
@@ -1634,6 +1658,7 @@ local function updateBars()
 				spell("Q", "Flamestrike")
 				if talent[6][3] then spell("E", "Living Bomb") else empty("E") end
 				spell("G", "Combustion")
+				empty("SG")
 				empty("V")
 				macro("SE", "C01") -- Counterspell
 
@@ -1665,7 +1690,7 @@ local function updateBars()
 				spell("SF", "Scorch")
 				spell("F", "Blink")
 			elseif spec == 3 then
-				-- Frost
+				--! Frost Mage
 				spell("1", "Frostbolt")
 				spell("2", "Ice Lance")
 				spell("3", "Flurry")
@@ -1678,6 +1703,7 @@ local function updateBars()
 				spell("Q", "Blizzard")
 				if talent[1][3] then spell("E", "Ice Nova") else empty("E") end
 				spell("G", "Icy Veins")
+				empty("SG")
 				if talent[7][2] then spell("V", "Ray of Frost") elseif talent[7][3] then spell("V", "Glacial Spike") else empty("V") end
 				macro("SE", "C01") -- Counterspell
 
@@ -1709,7 +1735,7 @@ local function updateBars()
 				if talent[2][3] then spell("SF", "Ice Floes") else empty("SF") end
 				spell("F", "Blink")
 			else
-				-- No Spec
+				--! Untalented Mage
 				spell("1", "Frostbolt")
 				spell("2", "Fire Blast")
 				empty("3")
@@ -1722,6 +1748,7 @@ local function updateBars()
 				spell("Q", "Arcane Explosion")
 				empty("E")
 				empty("G")
+				empty("SG")
 				empty("V")
 				if level >= 7 then macro("SE", "C01") else empty("SE") end -- Counterspell
 
@@ -1754,7 +1781,7 @@ local function updateBars()
 				spell("F", "Blink")
 			end
 		elseif class == "MONK" then
-			-- Monk Macros
+			--! Monk
 
 			-- Soothing Mist/Tiger Palm
 			m("C01", nil, "#showtooltip\n/use [harm]Tiger Palm;Soothing Mist")
@@ -1779,7 +1806,7 @@ local function updateBars()
 			essence("N", "Weapons of Order", "Bonedust Brew", "Faeline Stomp", "Fallen Order")
 
 			if spec == 1 then
-				-- Brewmaster
+				--! Brewmaster Monk
 				spell("1", "Tiger Palm")
 				spell("2", "Keg Smash")
 				spell("3", "Blackout Kick")
@@ -1792,6 +1819,7 @@ local function updateBars()
 				spell("Q", "Spinning Crane Kick")
 				spell("E", "Breath of Fire")
 				macro("G", "C06", 42) -- Invoke Niuzao, the Black Ox
+				empty("SG")
 				if talent[3][3] then spell("V", "Black Ox Brew") else empty("V") end
 				macro("SE", "C04", 18) -- Spear Hand Strike
 
@@ -1823,7 +1851,7 @@ local function updateBars()
 				spell("SF", "Transcendence: Transfer")
 				spell("F", "Roll")
 			elseif spec == 2 then
-				-- Mistweaver
+				--! Mistweaver Monk
 				if level >= 17 then macro("1", "C01") else spell("1", "Tiger Palm") end -- Soothing Mist/Tiger Palm
 				if level >= 12 then macro("2", "C02") else spell("2", "Rising Sun Kick") end -- Eneveloping Mist/Rising Sun Kick
 				macro("3", "C03") -- Vivify/Blackout Kick
@@ -1836,6 +1864,7 @@ local function updateBars()
 				spell("Q", "Spinning Crane Kick")
 				spell("E", "Renewing Mist")
 				spell("G", "Invoke Yu'lon, the Jade Serpent")
+				empty("SG")
 				spell("V", "Thunder Focus Tea")
 				spell("SE", "Life Cocoon")
 
@@ -1867,7 +1896,7 @@ local function updateBars()
 				spell("SF", "Transcendence: Transfer")
 				spell("F", "Roll")
 			elseif spec == 3 then
-				-- Windwalker
+				--! Windwalker Monk
 				spell("1", "Tiger Palm")
 				spell("2", "Rising Sun Kick")
 				spell("3", "Blackout Kick")
@@ -1880,6 +1909,7 @@ local function updateBars()
 				spell("Q", "Spinning Crane Kick")
 				if talent[7][2] then spell("E", "Whirling Dragon Punch") else empty("E") end
 				macro("G", "C06", 42) -- Invoke Xuen, the White Tiger
+				empty("SG")
 				spell("V", "Storm, Earth, and Fire")
 				macro("SE", "C04", 18) -- Spear Hand Strike
 
@@ -1911,7 +1941,7 @@ local function updateBars()
 				spell("SF", "Transcendence: Transfer")
 				spell("F", "Roll")
 			else
-				-- No Spec
+				--! Untalented Monk
 				spell("1", "Tiger Palm")
 				empty("2")
 				spell("3", "Blackout Kick")
@@ -1924,6 +1954,7 @@ local function updateBars()
 				spell("Q", "Spinning Crane Kick")
 				empty("E")
 				empty("G")
+				empty("SG")
 				empty("V")
 				empty("SE")
 
@@ -1956,7 +1987,7 @@ local function updateBars()
 				spell("F", "Roll")
 			end
 		elseif class == "PALADIN" then
-			-- Paladin Macros
+			--! Paladin
 
 			-- Flash of Light/Crusader Strike
 			m("C01", nil, "#showtooltip\n/use [harm]Crusader Strike;Flash of Light")
@@ -1973,7 +2004,7 @@ local function updateBars()
 			essence("N", "Divine Toll", "Vanquisher's Hammer", "Blessing of the Seasons", "Ashen Hallow")
 
 			if spec == 1 then
-				-- Holy
+				--! Holy Paladin
 				macro("1", "C01") -- Flash of Light/Crusader Strike
 				if level >= 11 then macro("2", "C02") else spell("2", "Judgment") end -- Holy Light/Judgment
 				spell("3", "Holy Shock")
@@ -1986,6 +2017,7 @@ local function updateBars()
 				spell("Q", "Word of Glory")
 				spell("E", "Consecration")
 				spell("G", "Avenging Wrath")
+				empty("SG")
 				if talent[5][2] then spell("V", "Holy Avenger") elseif talent[5][3] then spell("V", "Seraphim") else empty("V") end
 				if talent[1][2] then spell("SE", "Bestow Faith") elseif talent[1][3] then spell("SE", "Light's Hammer") else empty("SE") end
 
@@ -2017,7 +2049,7 @@ local function updateBars()
 				spell("SF", "Blessing of Freedom")
 				spell("F", "Divine Steed")
 			elseif spec == 2 then
-				-- Protection
+				--! Protection Paladin
 				spell("1", "Crusader Strike")
 				spell("2", "Avenger's Shield")
 				spell("3", "Judgment")
@@ -2030,6 +2062,7 @@ local function updateBars()
 				spell("Q", "Word of Glory")
 				spell("E", "Consecration")
 				spell("G", "Avenging Wrath")
+				empty("SG")
 				if talent[5][2] then spell("V", "Holy Avenger") elseif talent[5][3] then spell("V", "Seraphim") else empty("V") end
 				macro("SE", "C04", 27) -- Rebuke
 
@@ -2061,7 +2094,7 @@ local function updateBars()
 				spell("SF", "Blessing of Freedom")
 				spell("F", "Divine Steed")
 			elseif spec == 3 then
-				-- Retribution
+				--! Retribution Paladin
 				spell("1", "Crusader Strike")
 				spell("2", "Blade of Justice")
 				spell("3", "Judgment")
@@ -2074,6 +2107,7 @@ local function updateBars()
 				spell("Q", "Divine Storm")
 				spell("E", "Consecration")
 				spell("G", "Avenging Wrath")
+				empty("SG")
 				if talent[5][2] then spell("V", "Holy Avenger") elseif talent[5][3] then spell("V", "Seraphim") else empty("V") end
 				macro("SE", "C04", 27) -- Rebuke
 
@@ -2105,7 +2139,7 @@ local function updateBars()
 				spell("SF", "Blessing of Freedom")
 				spell("F", "Divine Steed")
 			else
-				-- No Spec
+				--! Untalented Paladin
 				spell("1", "Crusader Strike")
 				spell("2")
 				spell("3", "Judgment")
@@ -2118,6 +2152,7 @@ local function updateBars()
 				spell("Q", "Word of Glory")
 				spell("E", "Consecration")
 				empty("G")
+				empty("SG")
 				empty("V")
 				empty("SE")
 
@@ -2150,7 +2185,7 @@ local function updateBars()
 				empty("F")
 			end
 		elseif class == "PRIEST" then
-			-- Priest Macros
+			--! Priest
 
 			-- Flash Heal/Smite/Shadow Mend
 			m("C01", nil, "#showtooltip\n/use [spec:2,harm]Smite;[spec:2]Flash Heal;[help]Flash Heal;Smite")
@@ -2183,7 +2218,7 @@ local function updateBars()
 			essence("N", "Boon of the Ascended", "Unholy Nova", "Fae Guardians", "Mindgames")
 
 			if spec == 1 then
-				-- Discipline
+				--! Discipline Priest
 				macro("1", "C01")
 				spell("2", "Mind Blast")
 				spell("3", "Penance")
@@ -2196,6 +2231,7 @@ local function updateBars()
 				spell("Q", "Mind Sear")
 				macro("E", "C03") -- Shadow Word: Pain/Power Word: Shield
 				macro("G", "C14", 58) -- Power Infusion
+				spell("SG", "Rapture")
 				if talent[3][2] then macro("V", "C13") else spell("V", "Shadowfiend") end
 				spell("SE", "Pain Suppression")
 
@@ -2218,7 +2254,7 @@ local function updateBars()
 				spell("AT", "Mind Soothe")
 				if talent[4][3] then spell("CB3", "Shining Force") else empty("CB3") end
 				spell("SQ", "Flash Heal")
-				spell("SV", "Rapture")
+				macro("SV", "C07") -- Power Word: Shield @player
 				spell("CV", "Fade")
 
 				spell("AB3", "Mass Dispel")
@@ -2227,7 +2263,7 @@ local function updateBars()
 				if talent[2][3] then spell("SF", "Angelic Feather") else empty("SF") end -- Angelic Feather
 				if talent[2][1] then macro("F", "C08") elseif talent[2][3] then macro("F", "C05") else empty("F") end -- Body and Soul/Angelic Feather @player
 			elseif spec == 2 then
-				-- Holy
+				--! Holy Priest
 				macro("1", "C01") -- Flash Heal/Smite
 				if level >= 15 then macro("2", "C02") else spell("2", "Mind Blast") end -- Heal/Holy Fire
 				spell("3", "Prayer of Healing")
@@ -2241,6 +2277,7 @@ local function updateBars()
 				if level >= 12 then macro("E", "C03") else spell("E", "Shadow Word: Pain") end -- Renew/Shadow Word: Pain
 				spell("V", "Holy Word: Sanctify")
 				macro("G", "C14", 58) -- Power Infusion
+				empty("SG")
 				spell("SE", "Guardian Spirit")
 
 				spell("R", "Shadow Word: Death")
@@ -2271,7 +2308,7 @@ local function updateBars()
 				if talent[2][3] then spell("SF", "Angelic Feather") else empty("SF") end -- Angelic Feather
 				if talent[2][2] then macro("F", "C08") elseif talent[2][3] then macro("F", "C05") else empty("F") end -- Body and Soul/Angelic Feather @player
 			elseif spec == 3 then
-				-- Shadow
+				--! Shadow Priest
 				if level >= 15 then spell("1", "Vampiric Touch") else spell("1", "Smite") end
 				spell("2", "Smite", 15)
 				spell("3", "Mind Blast")
@@ -2284,6 +2321,7 @@ local function updateBars()
 				spell("Q", "Mind Sear")
 				macro("E", "C03") -- Shadow Word: Pain/Power Word: Shield
 				macro("G", "C14", 58) -- Power Infusion
+				empty("SG")
 				if talent[6][2] then macro("V", "C13") else spell("V", "Shadowfiend") end
 				macro("SE", "C04", 29) -- Silence
 
@@ -2315,7 +2353,7 @@ local function updateBars()
 				empty("SF")
 				if talent[2][1] then macro("F", "C08") else macro("F", "C07") end -- Power Word: Shield @player
 			else
-				-- No Spec
+				--! Untalented Priest
 				spell("1", "Smite")
 				spell("2", "Mind Blast")
 				empty("3")
@@ -2328,6 +2366,7 @@ local function updateBars()
 				empty("Q")
 				if level >= 4 then macro("E", "C03") else spell("E", "Shadow Word: Pain") end
 				empty("G")
+				empty("SG")
 				empty("V")
 				empty("SE")
 
@@ -2360,7 +2399,7 @@ local function updateBars()
 				empty("F")
 			end
 		elseif class == "ROGUE" then
-			-- Rogue Macros
+			--! Rogue
 
 			-- Sinister Strike/Ambush/Backstab/Shadowstrike
 			m("C01", nil, "#showtooltip\n/use [stance:1][stance:2]Ambush;Sinister Strike")
@@ -2381,7 +2420,7 @@ local function updateBars()
 			essence("N", "Echoing Reprimand", "Serrated Bone Spike", "Sepsis", "Flagellation")
 
 			if spec == 1 then
-				-- Assassination
+				--! Assassination Rogue
 				macro("1", "C01") -- Mutilate/Ambush
 				spell("2", "Rupture")
 				spell("3", "Eviscerate")
@@ -2394,6 +2433,7 @@ local function updateBars()
 				spell("Q", "Fan of Knives")
 				spell("E", "Garrote")
 				spell("G", "Vendetta")
+				empty("SG")
 				if talent[3][3] then spell("V", "Marked for Death") else empty("V") end
 				macro("SE", "C04") -- Kick
 
@@ -2425,7 +2465,7 @@ local function updateBars()
 				spell("SF", "Shadowstep")
 				spell("F", "Sprint")
 			elseif spec == 2 then
-				-- Outlaw
+				--! Outlaw Rogue
 				macro("1", "C01") -- Sinister Strike/Ambush
 				macro("2", "C05", 12) -- Pistol Shot
 				spell("3", "Eviscerate")
@@ -2438,6 +2478,7 @@ local function updateBars()
 				spell("Q", "Blade Flurry")
 				spell("E", "Between the Eyes")
 				spell("G", "Adrenaline Rush")
+				empty("SG")
 				if talent[3][3] then spell("V", "Marked for Death") else empty("V") end
 				macro("SE", "C04") -- Kick
 
@@ -2469,7 +2510,7 @@ local function updateBars()
 				empty("SF")
 				spell("F", "Sprint")
 			elseif spec == 3 then
-				-- Subtlety
+				--! Subtlety Rogue
 				macro("1", "C01") -- Backstab/Shadowstrike
 				spell("2", "Rupture")
 				spell("3", "Eviscerate")
@@ -2482,6 +2523,7 @@ local function updateBars()
 				spell("Q", "Shuriken Storm")
 				if talent[7][2] then spell("E", "Secret Technique") elseif talent[7][3] then spell("E", "Shuriken Tornado") else empty("E") end
 				spell("G", "Shadow Blades")
+				empty("SG")
 				if talent[3][3] then spell("V", "Marked for Death") else empty("V") end
 				macro("SE", "C04") -- Kick
 
@@ -2513,7 +2555,7 @@ local function updateBars()
 				spell("SF", "Shadowstep")
 				spell("F", "Sprint")
 			else
-				-- No Spec
+				--! Untalented Rogue
 				if level >= 7 then macro("1", "C01") else spell("1", "Sinister Strike") end -- Sinister Strike/Backstab
 				empty("2")
 				spell("3", "Eviscerate")
@@ -2526,6 +2568,7 @@ local function updateBars()
 				empty("Q")
 				empty("E")
 				empty("G")
+				empty("SG")
 				empty("V")
 				macro("SE", "C04", 6) -- Kick
 
@@ -2558,7 +2601,7 @@ local function updateBars()
 				spell("F", "Sprint")
 			end
 		elseif class == "SHAMAN" then
-			-- Shaman Macros
+			--! Shaman
 
 			-- Healing Surge/Lightning Bolt/Stormstrike
 			m("C01", nil, "#showtooltip\n/use [nospec:2,harm]Lightning Bolt;[spec:3][nospec:3,help]Healing Surge;[spec:2]Primal Strike;Lightning Bolt")
@@ -2596,7 +2639,8 @@ local function updateBars()
 				spell("Q", "Earthquake")
 				spell("E", "Flame Shock")
 				macro("G", "C06", 34) -- Fire Elemental
-				if talent[7][2] then spell("V", "Stormkeeper") elseif talent[7][3] then spell("V", "Ascendance") else empty("V") end
+				if talent[7][3] then spell("SG", "Ascendance") else empty("SG") end
+				if talent[7][2] then spell("V", "Stormkeeper") else empty("V") end
 				macro("SE", "C04", 12) -- Wind Shear/Earth Shield
 
 				empty("R")
@@ -2627,7 +2671,7 @@ local function updateBars()
 				spell("SF", "Spiritwalker's Grace")
 				spell("F", "Ghost Wolf")
 			elseif spec == 2 then
-				-- Enhancement
+				--! Enhancement Shaman
 				macro("1", "C01") -- Stormstrike/Healing Surge
 				spell("2", "Lava Lash")
 				if level >= 38 then macro("3", "C03") else spell("3", "Chain Heal") end -- Crash Lightning/Chain Heal
@@ -2638,16 +2682,17 @@ local function updateBars()
 				spell("C", "Frost Shock")
 				if talent[2][3] then spell("SC", "Ice Strike") else empty("SC") end
 				if talent[1][3] then spell("SC", "Elemental Blast") else empty("SC") end
-				if talent[6][2] then spell("Q", "Stormkeeper") elseif talent[6][3] then spell("Q", "Sundering") else empty("Q") end
+				if talent[4][3] then spell("Q", "Fire Nova") else empty("Q") end
 				spell("E", "Flame Shock")
 				spell("G", "Feral Spirit")
-				if talent[7][2] then spell("V", "Earthen Spike") elseif talent[7][3] then spell("V", "Ascendance") else empty("V") end
+				if talent[7][2] then spell("SG", "Earthen Spike") elseif talent[7][3] then spell("SG", "Ascendance") else empty("SG") end
+				if talent[6][2] then spell("V", "Stormkeeper") elseif talent[6][3] then spell("V", "Sundering") else empty("V") end
 				macro("SE", "C04", 12) -- Wind Shear/Earth Shield
 
 				spell("R", "Windfury Totem")
 				spell("SR", "Purge")
 				spell("CR", "Cleanse Spirit")
-				if talent[4][3] then spell("H", "Fire Nova") else empty("H") end
+				if (talent[7][2] or talent[7][3]) and talent[4][3] then spell("H", "Fire Nova") else empty("H") end
 				empty("SH")
 
 				spell("F1", "Astral Shift")
@@ -2672,7 +2717,7 @@ local function updateBars()
 				spell("SF", "Spirit Walk")
 				spell("F", "Ghost Wolf")
 			elseif spec == 3 then
-				-- Restoration
+				--! Restoration Shaman
 				macro("1", "C01") -- Lightning Bolt/Healing Surge
 				if level >= 27 then macro("2", "C02") else spell("2", "Lava Burst") end -- Healing Wave/Lava Burst
 				if level >= 24 then macro("3", "C03") else spell("3", "Chain Heal") end -- Chain Lightning/Chain Heal
@@ -2685,7 +2730,8 @@ local function updateBars()
 				if talent[2][3] then spell("Q", "Surge of Earth") else empty("Q") end
 				macro("E", "C05") -- Riptide/Flame Shock
 				spell("G", "Healing Stream Totem")
-				if talent[7][2] then spell("V", "Wellspring") elseif talent[7][3] then spell("V", "Ascendance") else empty("G") end
+				if talent[7][3] then spell("SG", "Ascendance") else empty("SG") end
+				if talent[7][2] then spell("V", "Wellspring") else empty("V") end
 				macro("SE", "C04", 12) -- Wind Shear/Earth Shield
 
 				spell("R", "Frost Shock")
@@ -2716,7 +2762,7 @@ local function updateBars()
 				spell("SF", "Spiritwalker's Grace")
 				spell("F", "Ghost Wolf")
 			else
-				-- No Spec
+				--! Untalented Shaman
 				spell("1", "Lightning Bolt")
 				spell("2", "Primal Strike")
 				empty("3")
@@ -2729,6 +2775,7 @@ local function updateBars()
 				empty("Q")
 				spell("E", "Flame Shock")
 				empty("G")
+				empty("SG")
 				empty("V")
 				empty("SE")
 
@@ -2761,7 +2808,7 @@ local function updateBars()
 				spell("F", "Ghost Wolf")
 			end
 		elseif class == "WARLOCK" then
-			-- Warlock Macros
+			--! Warlock
 
 			-- Pet Primary
 			m("C01", nil, "#showtooltip\n/use [pet:Felguard/Wrathguard]Axe Toss;[pet:Felhunter/Observer]Spell Lock;[pet:Succubus/Incubus/Shivarra]Seduction;[pet:Voidwalker/Voidlord,nobtn:2]Suffering;[nobtn:2]Command Demon\n/petautocasttoggle [btn:2]Suffering")
@@ -2774,7 +2821,7 @@ local function updateBars()
 			essence("N", "Scouring Tithe", "Decimating Bolt", "Soul Rot", "Impending Catastrophe")
 
 			if spec == 1 then
-				-- Affliction
+				--! Affliction Warlock
 				spell("1", "Shadow Bolt")
 				spell("2", "Malefic Rapture")
 				spell("3", "Unstable Affliction")
@@ -2787,6 +2834,7 @@ local function updateBars()
 				spell("Q", "Seed of Corruption")
 				spell("E", "Corruption")
 				spell("G", "Summon Darkglare")
+				empty("SG")
 				if talent[7][3] then spell("V", "Dark Soul: Misery") else empty("V") end
 				macro("SE", "C01", 29) -- Pet Primary
 
@@ -2818,7 +2866,7 @@ local function updateBars()
 				spell("SF", "Demonic Circle: Teleport")
 				if talent[3][2] then spell("F", "Burning Rush") else empty("F") end
 			elseif spec == 2 then
-				-- Demonology
+				--! Demonology Warlock
 				spell("1", "Shadow Bolt")
 				spell("2", "Demonbolt")
 				spell("3", "Call Dreadstalkers")
@@ -2831,6 +2879,7 @@ local function updateBars()
 				spell("Q", "Implosion")
 				if talent[2][2] then spell("E", "Power Siphon") elseif talent[2][3] then spell("E", "Doom") else empty("E") end
 				spell("G", "Summon Demonic Tyrant")
+				empty("SG")
 				if talent[7][3] then spell("V", "Nether Portal") else empty("V") end
 				macro("SE", "C01", 17) -- Pet Primary
 
@@ -2862,7 +2911,7 @@ local function updateBars()
 				spell("SF", "Demonic Circle: Teleport")
 				if talent[3][2] then spell("F", "Burning Rush") else empty("F") end
 			elseif spec == 3 then
-				-- Destruction
+				--! Destruction Warlock
 				if level >= 11 then spell("1", "Immolate") else spell("1", "Corruption") end
 				spell("2", "Incinerate")
 				spell("3", "Chaos Bolt")
@@ -2875,6 +2924,7 @@ local function updateBars()
 				spell("Q", "Rain of Fire")
 				spell("E", "Havoc")
 				spell("G", "Summon Infernal")
+				empty("SG")
 				if talent[7][2] then spell("V", "Channel Demonfire") elseif talent[7][3] then spell("V", "Dark Soul: Instability") else empty("V") end
 				macro("SE", "C01", 29) -- Pet Primary
 
@@ -2906,7 +2956,7 @@ local function updateBars()
 				spell("SF", "Demonic Circle: Teleport")
 				if talent[3][2] then spell("F", "Burning Rush") else empty("F") end
 			else
-				-- No Spec
+				--! Untalented Warlock
 				spell("1", "Shadow Bolt")
 				empty("2")
 				empty("3")
@@ -2919,6 +2969,7 @@ local function updateBars()
 				empty("Q")
 				spell("E", "Corruption")
 				empty("G")
+				empty("SG")
 				empty("V")
 				empty("SE")
 
@@ -2951,7 +3002,7 @@ local function updateBars()
 				empty("F")
 			end
 		elseif class == "WARRIOR" then
-			-- Warrior Macros
+			--! Warrior
 
 			-- Pummel
 			m("C01", nil, "#showtooltip Pummel\n/stopcasting\n/stopcasting\n/use Pummel")
@@ -2964,7 +3015,7 @@ local function updateBars()
 			essence("N", "Spear of Bastion", "Conqueror's Banner", "Ancient Aftershock", false)
 
 			if spec == 1 then
-				-- Arms
+				--! Arms Warrior
 				spell("1", "Colossus Smash")
 				spell("2", "Mortal Strike")
 				spell("3", "Execute")
@@ -2977,6 +3028,7 @@ local function updateBars()
 				spell("Q", "Whirlwind")
 				if talent[3][3] then spell("E", "Rend") else empty("E") end
 				if talent[6][2] then spell("G", "Avatar") elseif talent[6][3] then spell("G", "Deadly Calm") else empty("G") end
+				empty("SG")
 				spell("V", "Bladestorm")
 				macro("SE", "C01") -- Pummel
 
@@ -3008,7 +3060,7 @@ local function updateBars()
 				spell("SF", "Berserker Rage")
 				spell("F", "Heroic Leap")
 			elseif spec == 2 then
-				-- Fury
+				--! Fury Warrior
 				spell("1", "Bloodthirst")
 				if level >= 12 then spell("2", "Raging Blow") else spell("2", "Slam") end
 				spell("3", "Execute")
@@ -3021,6 +3073,7 @@ local function updateBars()
 				spell("Q", "Whirlwind")
 				if talent[3][3] then spell("E", "Onslaught") else empty("E") end
 				spell("G", "Recklessness")
+				empty("SG")
 				if talent[6][2] then spell("V", "Dragon Roar") elseif talent[6][3] then spell("V", "Bladestorm") else empty("V") end
 				macro("SE", "C01") -- Pummel
 
@@ -3052,7 +3105,7 @@ local function updateBars()
 				spell("SF", "Berserker Rage")
 				spell("F", "Heroic Leap")
 			elseif spec == 3 then
-				-- Protection
+				--! Protection Warrior
 				spell("1", "Shield Slam")
 				if level >= 12 then spell("2", "Revenge") else spell("2", "Slam") end
 				spell("3", "Execute")
@@ -3065,6 +3118,7 @@ local function updateBars()
 				spell("Q", "Ignore Pain")
 				if talent[1][3] then empty("E") else spell("E", "Devastate") end
 				spell("G", "Avatar")
+				empty("SG")
 				if talent[3][3] then spell("V", "Dragon Roar") else empty("V") end
 				macro("SE", "C01") -- Pummel
 
@@ -3096,7 +3150,7 @@ local function updateBars()
 				spell("SF", "Berserker Rage")
 				spell("F", "Heroic Leap")
 			else
-				-- No Spec
+				--! Untalented Warrior
 				spell("1", "Slam")
 				spell("2", "Victory Rush")
 				spell("3", "Execute")
@@ -3109,6 +3163,7 @@ local function updateBars()
 				spell("Q", "Whirlwind")
 				empty("E")
 				empty("G")
+				empty("SG")
 				empty("V")
 				macro("SE", "C01", 7)
 
@@ -3144,14 +3199,12 @@ local function updateBars()
 
 
 		-- All Classes
-		macro("SG", "G030", 10)
-		macro("6", "G026")
-		macro("7", "G027")
+		macro("6", "G026") -- Trinket 1
+		macro("7", "G027") -- Trinket 2
 		signature("SN")
 		racial("AE")
-		macro("SX", "G029")
-		macro("X", "G028")
-		macro("Hidden 2", "G034")
+		macro("SX", "G029") -- Tonic
+		macro("X", "G028") -- Healthstone
 
 		
 		-- PvP Talents
