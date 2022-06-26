@@ -1647,19 +1647,19 @@ local function updateBars()
 			elseif spec == 2 then
 				--! Fire Mage
 				spell("1", "Fireball")
-				spell("2", "Fire Blast")
 				spell("3", "Pyroblast")
+				spell("3", "Fire Blast")
 				spell("4", "Phoenix Flames")
 				if talent[7][3] then spell("5", "Meteor") else empty("5") end
 				spell("CE", "Frost Nova")
 
-				spell("C", "Dragon's Breath")
+				spell("C", "Scorch")
 				empty("SC")
 				spell("Q", "Flamestrike")
 				if talent[6][3] then spell("E", "Living Bomb") else empty("E") end
 				spell("G", "Combustion")
 				empty("SG")
-				empty("V")
+				spell("V", "Dragon's Breath")
 				macro("SE", "C01") -- Counterspell
 
 				if talent[3][3] then spell("R", "Rune of Power") else empty("R") end
@@ -1687,7 +1687,7 @@ local function updateBars()
 				empty("AB3")
 				empty("AF")
 				spell("CF", "Alter Time")
-				spell("SF", "Scorch")
+				empty("SF")
 				spell("F", "Blink")
 			elseif spec == 3 then
 				--! Frost Mage
