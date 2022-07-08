@@ -1595,6 +1595,8 @@ local function updateBars()
 			m("C03", 1698698, "#showtooltip\n/use Freeze")
 			-- Ice barrier
 			m("C04", 135843, "#showtooltip\n/use Ice Barrier")
+			-- Mana Gem
+			m("C05", 134132, "#showtooltip\n/use Mana Gem\n/use Conjure Mana Gem")
 
 			-- Essence
 			essence("N", "Radiant Spark", "Deathborne", "Shifting Power", "Mirrors of Torment")
@@ -1609,7 +1611,7 @@ local function updateBars()
 				spell("CE", "Frost Nova")
 
 				spell("C", "Evocation")
-				macro("SC", "G036", 17) -- Mana Gem
+				macro("SC", "C05", 17) -- Mana Gem
 				spell("Q", "Arcane Explosion")
 				if talent[4][3] then spell("E", "Nether Tempest") else empty("E") end
 				spell("G", "Arcane Power")
