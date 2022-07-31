@@ -44,13 +44,7 @@ local poly = {
 -- Frog, Compy, Living Honey, Spider, Snake, Cockroach, Skeletal Hatchling, Zandalari Tendonripper, Wicker Mongrel
 local hex = {
 	-- Alliance
-	["Octavia"] = "Spider",
-	["Tracyanne"]="Frog",
-	["Torvald"] = "Cockroach",
-	["Pavla"] 	= "Frog",
-	["Florence"]= "Wicker Mongrel",
-	["Berg"] 	= "Frog",
-	["Song"] 	= "Frog",
+	["Ellika"] = "Living Honey",
 	-- Horde
 	["Sandy"] 	= "Cockroach",
 	["Krosh"] 	= "Frog",
@@ -498,7 +492,7 @@ local function custom(slotName, spellName, requiredLevel)
 	local level = UnitLevel("player")
 	local slotId = slotNames[slotName]
 	local name = UnitName("player")
-	local hexId = { ["Frog"] = 51514, ["Compy"] = 210873, ["Spider"] = 211004, ["Snake"] = 211010, ["Cockroach"] = 211015, ["Skeletal Hatchling"] = 269352, ["Zandalari Tendonripper"] = 277778, ["Wicker Mongrel"] = 277784, }
+	local hexId = { ["Frog"] = 51514, ["Compy"] = 210873, ["Spider"] = 211004, ["Snake"] = 211010, ["Cockroach"] = 211015, ["Skeletal Hatchling"] = 269352, ["Zandalari Tendonripper"] = 277778, ["Wicker Mongrel"] = 277784, ["Living Honey"] = 309328, }
 	local polyId = { ["Sheep"] = 118, ["Pig"] = 28272, ["Turtle"] = 28271, ["Black Cat"] = 61305, ["Rabbit"] = 61721, ["Monkey"] = 161354, ["Porcupine"] = 126819, ["Penguin"] = 161355, ["Polar Bear Cub"] = 161353, ["Direhorn"] = 277787, ["Bumblebee"] = 277792, }
 
 	if level >= requiredLevel then
@@ -2727,7 +2721,7 @@ local function updateBars()
 				if talent[6][2] then spell("5", "Downpour") else empty("5") end
 				spell("CE", "Capacitor Totem")
 
-				spell("C", "Mana Tide Totem")
+				spell("C", "Frost Shock")
 				if talent[1][3] then spell("SC", "Unleash Life") else empty("SC") end
 				if talent[2][3] then spell("Q", "Surge of Earth") else empty("Q") end
 				macro("E", "C05") -- Riptide/Flame Shock
@@ -2736,7 +2730,7 @@ local function updateBars()
 				if talent[7][2] then spell("V", "Wellspring") else empty("V") end
 				macro("SE", "C04", 12) -- Wind Shear/Earth Shield
 
-				spell("R", "Frost Shock")
+				spell("R", "Mana Tide Totem")
 				spell("SR", "Purge")
 				spell("CR", "Purify Spirit")
 				empty("H")
