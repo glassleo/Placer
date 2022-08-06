@@ -631,8 +631,8 @@ local function updateBars()
 				spell("H", "Death Coil")
 				macro("SH", "C04", 32) -- Gorefiend's Grasp @target
 
-				spell("F1", "Rune Tap")
-				spell("F2", "Anti-Magic Shell")
+				spell("F1", "Anti-Magic Shell")
+				spell("F2", "Rune Tap")
 				spell("F3", "Icebound Fortitude")
 				spell("F4", "Vampiric Blood")
 				if talent[6][2] then spell("F5", "Death Pact") else empty("F5") end
