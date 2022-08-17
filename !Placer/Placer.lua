@@ -1550,7 +1550,7 @@ local function updateBars()
 				empty("V")
 				empty("SE")
 
-				empty("R")
+				macro("R", "C02") -- Growl
 				empty("SR")
 				empty("CR")
 				empty("H")
