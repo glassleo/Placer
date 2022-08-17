@@ -1,8 +1,8 @@
-## Interface: 90205
-## Title: !Placer
+## Interface: 90207
+## Title: Placer
 ## Notes: Places action bara data
 ## Author: Leo
-## Version: 9.2.5
+## Version: 9.2.7
 ## OptionalDeps: !Automagic
 
 Placer.lua
