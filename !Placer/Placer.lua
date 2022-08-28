@@ -609,9 +609,9 @@ local function updateBars()
 
 			if spec == 1 then
 				--! Blood Death Knight
-				spell("1", "Marrowrend")
+				if level >= 11 then spell("1", "Marrowrend") else spell("1", "Heart Strike") end
 				spell("2", "Blood Boil")
-				spell("3", "Heart Strike")
+				spell("3", "Heart Strike", 11)
 				spell("4", "Death and Decay")
 				spell("5", "Death Strike")
 				spell("CE", "Asphyxiate")
@@ -654,8 +654,8 @@ local function updateBars()
 				if talent[5][3] then macro("F", "C02") else empty("F") end -- Wraith Walk
 			elseif spec == 2 then
 				--! Frost Death Knight
-				spell("1", "Frost Strike")
-				spell("2", "Obliterate")
+				if level >= 14 then spell("1", "Obliterate") else spell("1", "Howling Blast") end
+				if level >= 11 then spell("2", "Frost Strike") else spell("2", "Death Coil") end
 				spell("3", "Remorseless Winter")
 				spell("4", "Frostwyrm's Fury")
 				if talent[7][3] then spell("5", "Breath of Sindragosa") else empty("5") end
@@ -664,7 +664,7 @@ local function updateBars()
 				if talent[6][2] then spell("C", "Hypothermic Presence") elseif talent[6][3] then spell("C", "Glacial Advance") else empty("C") end
 				if talent[2][3] then spell("SC", "Horn of Winter") else empty("SC") end
 				if talent[4][3] then spell("Q", "Frostscythe") else empty("Q") end
-				spell("E", "Howling Blast")
+				spell("E", "Howling Blast", 14)
 				spell("G", "Empower Rune Weapon")
 				empty("SG")
 				spell("V", "Pillar of Frost")
@@ -673,7 +673,7 @@ local function updateBars()
 				spell("R", "Dark Command")
 				spell("SR", "Death Grip")
 				empty("CR")
-				spell("H", "Death Coil")
+				spell("H", "Death Coil", 11)
 				if covenant == 3 then empty("SH") else spell("SH", "Death and Decay") end
 
 				spell("F1", "Anti-Magic Shell")
@@ -745,10 +745,10 @@ local function updateBars()
 				if talent[5][2] then macro("F", "C02") else empty("F") end -- Wraith Walk
 			else
 				--! Untalented Death Knight
-				empty("1")
+				spell("1", "Rune Strike")
 				empty("2")
-				empty("3")
-				empty("4")
+				spell("3", "Death Coil")
+				spell("4", "Death and Decay")
 				empty("5")
 				empty("CE")
 
@@ -759,10 +759,10 @@ local function updateBars()
 				empty("G")
 				empty("SG")
 				empty("V")
-				empty("SE")
+				macro("SE", "C01") -- Mind Freeze
 
-				empty("R")
-				empty("SR")
+				spell("R", "Dark Command")
+				spell("SR", "Death Grip")
 				empty("CR")
 				empty("H")
 				empty("SH")
@@ -779,7 +779,7 @@ local function updateBars()
 				empty("CT")
 				empty("AT")
 				empty("CB3")
-				empty("SQ")
+				spell("SQ", "Death Strike")
 				empty("SV")
 				empty("CV")
 
@@ -817,7 +817,7 @@ local function updateBars()
 				empty("SC")
 				if talent[3][3] then spell("Q", "Glaive Tempest") else empty("Q") end
 				
-				macro("G", "C02") -- Metamorphosis @player
+				if IsSpellKnown(191427) then macro("G", "C02") else empty("G") end -- Metamorphosis @player
 				empty("SG")
 				if talent[5][3] then spell("V", "Essence Break") else empty("V") end
 				macro("SE", "C04") -- Disrupt
@@ -841,7 +841,7 @@ local function updateBars()
 				empty("AT")
 				empty("CB3")
 				empty("SQ")
-				macro("SV", "C03") -- Metamorphosis Leap
+				if IsSpellKnown(191427) then macro("SV", "C03") else empty("SV") end -- Metamorphosis Leap
 				spell("CV", "Spectral Sight")
 
 				empty("AB3")
@@ -1550,7 +1550,7 @@ local function updateBars()
 				empty("V")
 				empty("SE")
 
-				macro("R", "C02") -- Growl
+				macro("R", "C02", 10) -- Growl
 				empty("SR")
 				empty("CR")
 				empty("H")
@@ -1568,7 +1568,7 @@ local function updateBars()
 				empty("CT")
 				empty("AT")
 				empty("CB3")
-				macro("SQ", "C05") -- Mend Pet/Revive Pet
+				macro("SQ", "C05", 5) -- Mend Pet/Revive Pet
 				spell("SV", "Tame Beast")
 				spell("CV", "Feign Death")
 
@@ -1643,7 +1643,7 @@ local function updateBars()
 			elseif spec == 2 then
 				--! Fire Mage
 				spell("1", "Fireball")
-				spell("3", "Pyroblast")
+				spell("2", "Pyroblast")
 				spell("3", "Fire Blast")
 				spell("4", "Phoenix Flames")
 				if talent[7][3] then spell("5", "Meteor") else empty("5") end
@@ -1651,7 +1651,7 @@ local function updateBars()
 
 				spell("C", "Scorch")
 				empty("SC")
-				spell("Q", "Flamestrike")
+				if level >= 17 then spell("Q", "Flamestrike") else spell("Q", "Arcane Explosion") end
 				if talent[6][3] then spell("E", "Living Bomb") else empty("E") end
 				spell("G", "Combustion")
 				empty("SG")
@@ -1662,7 +1662,7 @@ local function updateBars()
 				spell("SR", "Spellsteal")
 				spell("CR", "Remove Curse")
 				empty("H")
-				spell("SH", "Arcane Explosion")
+				spell("SH", "Arcane Explosion", 17)
 
 				spell("F1", "Blazing Barrier")
 				macro("F2", "C02", 22) -- Ice Block
@@ -1696,7 +1696,7 @@ local function updateBars()
 
 				if talent[4][3] then spell("C", "Ebonbolt") else empty("C") end
 				empty("SC")
-				spell("Q", "Blizzard")
+				if level >= 14 then spell("Q", "Flamestrike") else spell("Q", "Blizzard") end
 				if talent[1][3] then spell("E", "Ice Nova") else empty("E") end
 				spell("G", "Icy Veins")
 				empty("SG")
@@ -1707,7 +1707,7 @@ local function updateBars()
 				spell("SR", "Spellsteal")
 				spell("CR", "Remove Curse")
 				spell("H", "Fire Blast")
-				spell("SH", "Arcane Explosion")
+				spell("SH", "Arcane Explosion", 14)
 
 				macro("F1", "C04", 11) -- Ice Barrier
 				macro("F2", "C02", 22) -- Ice Block
@@ -2194,7 +2194,7 @@ local function updateBars()
 			-- Angelic Feather/Body and Soul
 			m("C05", 537020, "#showtooltip [spec:1,talent:2/3][spec:2]Angelic Feather;Power Word: Shield\n/use [spec:1,talent:2/3,@player][spec:2,@player]Angelic Feather;[@player]Power Word: Shield")
 			-- Shadowform
-			m("C06", nil, "#showtooltip Shadowform\n/use [nostance]Shadowform")
+			m("C06", nil, "#showtooltip Shadowform\n/cancelaura [btn:2]Shadowform\n/use [nostance,nobtn:2]Shadowform")
 			-- Power Word: Shield @player
 			m("C07", nil, "#showtooltip Power Word: Shield\n/use [@player]Power Word: Shield")
 			-- Body and Soul - Power Word: Shield @player
@@ -2759,10 +2759,10 @@ local function updateBars()
 				spell("F", "Ghost Wolf")
 			else
 				--! Untalented Shaman
-				spell("1", "Lightning Bolt")
-				spell("2", "Primal Strike")
+				if level >= 2 then spell("1", "Primal Strike") else spell("1", "Lightning Bolt") end
+				empty("2")
 				empty("3")
-				empty("4")
+				if level >= 2 then spell("4", "Lightning Bolt") else empty("4") end
 				empty("5")
 				empty("CE")
 
