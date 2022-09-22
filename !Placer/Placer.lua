@@ -1044,7 +1044,7 @@ local function updateBars()
 				empty("F3")
 				empty("F4")
 				empty("F5")
-				macro("CQ", "C06") -- Flap
+				macro("CQ", "C06", 21) -- Flap
 
 				spell("T", "Cyclone")
 				spell("ST", "Entangling Roots")
@@ -1121,7 +1121,7 @@ local function updateBars()
 				spell("F3", "Survival Instincts")
 				empty("F4")
 				empty("F5")
-				if talent[3][1] then macro("CQ", "C06") else empty("CQ") end -- Moonkin Form/Flap
+				if talent[3][1] then macro("CQ", "C06", 21) else empty("CQ") end -- Moonkin Form/Flap
 
 				spell("T", "Cyclone")
 				spell("ST", "Entangling Roots")
@@ -1954,7 +1954,7 @@ local function updateBars()
 				empty("V")
 				empty("SE")
 
-				empty("R")
+				spell("R", "Provoke")
 				empty("SR")
 				empty("CR")
 				spell("H", "Crackling Jade Lightning")
@@ -2369,7 +2369,7 @@ local function updateBars()
 				empty("R")
 				empty("SR")
 				empty("CR")
-				empty("H")
+				spell("H", "Power Word: Shield")
 				empty("SH")
 
 				spell("F1", "Fade")
@@ -2898,7 +2898,7 @@ local function updateBars()
 				empty("AT")
 				spell("CB3", "Demonic Circle")
 				spell("SQ", "Drain Life")
-				macro("SV", "C02", 10) -- Pet Secondary
+				macro("SV", "C02", 12) -- Pet Secondary
 				macro("CV", "C03", 23) -- Emergency Felhunter Interrupt
 
 				empty("AB3")
@@ -3012,8 +3012,8 @@ local function updateBars()
 
 			if spec == 1 then
 				--! Arms Warrior
-				spell("1", "Colossus Smash")
-				spell("2", "Mortal Strike")
+				if level >= 19 then spell("1", "Colossus Smash") else spell("1", "Mortal Strike") end
+				spell("2", "Mortal Strike", 19)
 				spell("3", "Execute")
 				if level < 12 then spell("4", "Slam") else spell("4", "Overpower") end
 				if level < 12 then empty("5") elseif talent[5][3] then spell("5", "Cleave") else spell("5", "Slam") end
@@ -3060,7 +3060,7 @@ local function updateBars()
 				spell("1", "Bloodthirst")
 				if level >= 12 then spell("2", "Raging Blow") else spell("2", "Slam") end
 				spell("3", "Execute")
-				if level >= 19 then spell("4", "Rampage") else spell("4", "Slam") end
+				if level >= 19 then spell("4", "Rampage") else spell("4", "Slam", 12) end
 				if talent[7][3] then spell("5", "Siegebreaker") else empty("5") end
 				if talent[2][3] then spell("CE", "Storm Bolt") else empty("CE") end
 
@@ -3148,7 +3148,7 @@ local function updateBars()
 			else
 				--! Untalented Warrior
 				spell("1", "Slam")
-				spell("2", "Victory Rush")
+				empty("2")
 				spell("3", "Execute")
 				empty("4")
 				empty("5")
