@@ -6,6 +6,7 @@ frame:RegisterEvent("PLAYER_LOGIN")
 frame:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
 frame:RegisterEvent("PLAYER_LEVEL_UP")
 frame:RegisterUnitEvent("PLAYER_SPECIALIZATION_CHANGED", "player")
+frame:RegisterEvent("TRAIT_CONFIG_UPDATED")
 
 local loaded = false
 local throttled = false
@@ -353,7 +354,7 @@ end
 
 local function usable(slotName, macroName, inventorySlot)
 	local _,class = UnitClass("player")
-	local spec = GetSpecialization()
+	local spec = GetSpecialization() or 5
 	local role = "dps"
 	if (class == "DEATHKNIGHT" and spec == 1) or (class == "DEMONHUNTER" and spec == 2) or (class == "DRUID" and spec == 3) or (class == "MONK" and spec == 1) or (class == "PALADIN" and spec == 2) or (class == "WARRIOR" and spec == 3) then
 		role = "tank"
@@ -534,7 +535,7 @@ local function updateBars()
 		local _,class = UnitClass("player")
 		local faction = UnitFactionGroup("player")
 		local level = UnitLevel("player")
-		local spec = GetSpecialization()
+		local spec = GetSpecialization() or 5
 		local talent = {}
 		local timewalking = false
 		local covenant = C_Covenants and C_Covenants.GetActiveCovenantID() or 0
@@ -1384,7 +1385,7 @@ local function updateBars()
 			-- Growl
 			m("C02", 132270, "#showtooltip Growl\n/use [nobtn:2]Growl\n/petautocasttoggle [btn:2]Growl")
 			-- Kill Command
-			m("C03", nil, "#showtooltip Kill Command\n/petattack\n/petassist\n/use Kill Command")
+			m("C03", nil, "#showtooltip Kill Command\n/petattack\n/petassist\n/petattack\n/use Kill Command")
 			-- Misdirection
 			m("C04", nil, "#showtooltip Misdirection\n/use [@focus,help][help][@pet,exists][]Misdirection")
 			-- Mend Pet/Revive Pet
@@ -3012,11 +3013,11 @@ local function updateBars()
 
 			if spec == 1 then
 				--! Arms Warrior
-				if level >= 19 then spell("1", "Colossus Smash") else spell("1", "Mortal Strike") end
-				spell("2", "Mortal Strike", 19)
+				spell("1", "Mortal Strike")
+				if level < 12 then spell("2", "Slam") else spell("2", "Overpower") end
 				spell("3", "Execute")
-				if level < 12 then spell("4", "Slam") else spell("4", "Overpower") end
-				if level < 12 then empty("5") elseif talent[5][3] then spell("5", "Cleave") else spell("5", "Slam") end
+				if level < 12 then empty("4") elseif talent[5][3] then spell("4", "Cleave") else spell("4", "Slam") end
+				spell("5", "Colossus Smash")
 				if talent[2][3] then spell("CE", "Storm Bolt") else empty("CE") end
 
 				if talent[1][3] then spell("C", "Skullsplitter") else empty("C") end
