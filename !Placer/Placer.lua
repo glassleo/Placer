@@ -1,80 +1,17 @@
-SLASH_PLACER1 = "/placer"
+local Placer = CreateFrame("FRAME", "Placer")
 
-local frame = CreateFrame("FRAME", "Placer")
-
-frame:RegisterEvent("PLAYER_LOGIN")
-frame:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
-frame:RegisterEvent("PLAYER_LEVEL_UP")
-frame:RegisterUnitEvent("PLAYER_SPECIALIZATION_CHANGED", "player")
-frame:RegisterEvent("TRAIT_CONFIG_UPDATED")
+Placer:RegisterEvent("PLAYER_LOGIN")
+Placer:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
+Placer:RegisterEvent("PLAYER_LEVEL_UP")
+Placer:RegisterEvent("TRAIT_CONFIG_UPDATED")
+Placer:RegisterEvent("LEARNED_SPELL_IN_TAB")
 
 local loaded = false
-local throttled = false
-
-
--- Polymorph
--- Sheep, Pig, Turtle, Black Cat, Rabbit, Monkey, Porcupine, Polar Bear Cub, Direhorn, Bumblebee
-local poly = {
-	-- Alliance
-	["Gloria"] 	= "Sheep",
-	["Wes"] 	= "Bumblebee",
-	["Prue"] 	= "Polar Bear Cub",
-	["See"] 	= "Sheep",
-	["Norah"] 	= "Bumblebee",
-	["Ki"] 		= "Black Cat",
-	["Gunn"] 	= "Pig",
-	["Debbie"] 	= "Rabbit",
-	["Patricia"]= "Bumblebee",
-	["Lum"] 	= "Bumblebee",
-	["En"] 		= "Porcupine",
-	["Floyd"] 	= "Rabbit",
-	-- Horde
-	["Aguna"] 	= "Pig",
-	["Hazel"] 	= "Black Cat",
-	["Zoom"] 	= "Monkey",
-	["Bab"] 	= "Black Cat",
-	["Joan"] 	= "Direhorn",
-	["Arx"] 	= "Sheep",
-	["Carolyn"] = "Turtle",
-	["Eska"] 	= "Rabbit",
-	["Ling"] 	= "Porcupine",
-	["Felix"]   = "Rabbit",
-}
-
--- Hex
--- Frog, Compy, Living Honey, Spider, Snake, Cockroach, Skeletal Hatchling, Zandalari Tendonripper, Wicker Mongrel
-local hex = {
-	-- Alliance
-	["Ellika"] = "Living Honey",
-	-- Horde
-	["Sandy"] 	= "Cockroach",
-	["Krosh"] 	= "Frog",
-	["Echo"] 	= "Compy",
-	["Myu"] 	= "Frog",
-	["Flerm"] 	= "Cockroach",
-	["Eeo"] 	= "Zandalari Tendonripper",
-	["Veka"] 	= "Spider",
-	["Zap"] 	= "Snake",
-	["Spoon"] 	= "Cockroach",
-	["Denzel"] 	= "Cockroach",
-	["Chai"] 	= "Frog",
-}
-
--- Treant Form
-local treant = {
-	["Frango"] = true,
-}
-
+local locked = false
 
 local slotNames = {
-	["1"] = 1,
-	["2"] = 2,
-	["3"] = 3,
-	["4"] = 4,
-	["5"] = 5,
-	["6"] = 6,
-	["7"] = 7,
-	["CE"] = 8,
+	------ Left ------
+	-- Top
 	["N"] = 13,
 	["SN"] = 14,
 	["R"] = 15,
@@ -83,6 +20,29 @@ local slotNames = {
 	["H"] = 18,
 	["SH"] = 19,
 	["AE"] = 20,
+
+	-- Middle
+	["C"] = 61,
+	["SC"] = 62,
+	["Q"] = 63,
+	["E"] = 64,
+	["G"] = 65,
+	["SG"] = 66,
+	["CG"] = 67,
+	["SE"] = 68,
+
+	-- Bottom
+	["1"] = 1,
+	["2"] = 2,
+	["3"] = 3,
+	["4"] = 4,
+	["5"] = 5,
+	["6"] = 6,
+	["V"] = 7,
+	["CE"] = 8,
+
+	------ Right ------
+	-- Top
 	["J"] = 25,
 	["SJ"] = 26,
 	["CJ"] = 27,
@@ -91,6 +51,8 @@ local slotNames = {
 	["CF"] = 30,
 	["SF"] = 31,
 	["F"] = 32,
+
+	-- Middle
 	["T"] = 37,
 	["ST"] = 38,
 	["CT"] = 39,
@@ -99,59 +61,68 @@ local slotNames = {
 	["SQ"] = 42,
 	["SV"] = 43,
 	["CV"] = 44,
+
+	-- Bottom
 	["F1"] = 49,
 	["F2"] = 50,
 	["F3"] = 51,
 	["F4"] = 52,
 	["F5"] = 53,
-	["CQ"] = 54,
-	["SX"] = 55,
-	["X"] = 56,
-	["C"] = 61,
-	["SC"] = 62,
-	["Q"] = 63,
-	["E"] = 64,
-	["G"] = 65,
-	["SG"] = 66,
-	["V"] = 67,
-	["SE"] = 68,
-	-- Bear Form
-	["Bear 1"] = 97,
-	["Bear 2"] = 98,
-	["Bear 3"] = 99,
-	["Bear 4"] = 100,
-	["Bear 5"] = 101,
-	["Bear 6"] = 102,
-	["Bear 7"] = 103,
-	["Bear CE"] = 104,
-	["Bear C"] = 85,
-	["Bear SC"] = 86,
-	["Bear Q"] = 87,
-	["Bear E"] = 88,
-	["Bear G"] = 89,
-	["Bear SG"] = 90,
-	["Bear V"] = 91,
-	["Bear SE"] = 92,
-	-- Cat Form
-	["Cat 1"] = 73,
-	["Cat 2"] = 74,
-	["Cat 3"] = 75,
-	["Cat 4"] = 76,
-	["Cat 5"] = 77,
-	["Cat 6"] = 78,
-	["Cat 7"] = 79,
-	["Cat CE"] = 80,
-	["Cat C"] = 109,
-	["Cat SC"] = 110,
-	["Cat Q"] = 111,
-	["Cat E"] = 112,
-	["Cat G"] = 113,
-	["Cat SG"] = 114,
-	["Cat V"] = 115,
-	["Cat SE"] = 116,
-	-- Hidden
-	["Hidden 1"] = 9,
-	["Hidden 2"] = 10,
+	["F6"] = 54,
+	["CQ"] = 55,
+
+	------ Cat Form ------
+	-- Middle
+	["C C"] = 109,
+	["C SC"] = 110,
+	["C Q"] = 111,
+	["C E"] = 112,
+	["C G"] = 113,
+	["C SG"] = 114,
+	["C CG"] = 115,
+	["C SE"] = 116,
+
+	-- Bottom
+	["C 1"] = 73,
+	["C 2"] = 74,
+	["C 3"] = 75,
+	["C 4"] = 76,
+	["C 5"] = 77,
+	["C 6"] = 78,
+	["C V"] = 79,
+	["C CE"] = 80,
+	
+	------ Bear Form ------
+	-- Middle
+	["B C"] = 85,
+	["B SC"] = 86,
+	["B Q"] = 87,
+	["B E"] = 88,
+	["B G"] = 89,
+	["B SG"] = 90,
+	["B CG"] = 91,
+	["B SE"] = 92,
+
+	-- Bottom
+	["B 1"] = 97,
+	["B 2"] = 98,
+	["B 3"] = 99,
+	["B 4"] = 100,
+	["B 5"] = 101,
+	["B 6"] = 102,
+	["B V"] = 103,
+	["B CE"] = 104,
+
+	------ Dragonriding ------
+	-- Bottom
+	["D 1"] = 145,
+	["D 2"] = 146,
+	["D 3"] = 147,
+	["D 4"] = 148,
+	["D 5"] = 149,
+	["D 6"] = 150,
+	["D V"] = 151,
+	["D CE"] = 152,
 }
 
 
@@ -184,16 +155,183 @@ local function spellById(slotId, spellId)
 	end
 end
 
+-- /dump GetActionInfo(1)
+--! Spell Name to ID
+local spellNameToId = {
+	-- Death Knight
+	["Abomination Limb"] = 383269,
+	["Raise Dead"] = 46584,
+	["Summon Gargoyle"] = 49206,
+	-- Demon Hunter
+	["Demon Blades"] = 203555,
+	["Elysian Decree"] = 390163,
+	["Sigil of Chains"] = 202138,
+	["Sigil of Flame"] = 204596,
+	["Sigil of Misery"] = 207684,
+	["Sigil of Silence"] = 202137,
+	["The Hunt"] = 370965,
+	-- Druid
+	["Adaptive Swarm"] = 391888,
+	["Celestial Alignment"] = 194223,
+	["Convoke the Spirits"] = 391528,
+	["New Moon"] = 274281,
+	["Stampeding Roar"] = 106898,
+	["Swipe"] = 213764,
+	["Thrash"] = 106832,
+	["Wild Charge"] = 102401,
+	-- Evoker
+	["Eternity Surge"] = 359073,
+	["Fire Breath"] = 357208,
+	["Spiritbloom"] = 367226,
+	-- Hunter
+	["Cobra Shot"] = 193455,
+	["Death Chakram"] = 375891,
+	["Fury of the Eagle"] = 203415,
+	["Wailing Arrow"] = 392060,
+	["Wildfire Bomb"] = 259495,
+	-- Mage
+	["Polymorph"] = 118,
+	["Radiant Spark"] = 376103,
+	["Shifting Power"] = 382440,
+	-- Monk
+	["Bonedust Brew"] = 386276,
+	["Faeline Stomp"] = 388193,
+	["Weapons of Order"] = 387184,
+	-- Paladin
+	["Blessing of the Seasons"] = 388007,
+	["Divine Toll"] = 375576,
+	["Wake of Ashes"] = 255937,
+	-- Priest
+	["Apotheosis"] = 200183,
+	["Body and Soul"] = 64129,
+	["Holy Word: Salvation"] = 265202,
+	["Mindgames"] = 375901,
+	["Symbol of Hope"] = 64901,
+	-- Rogue
+	["Audacity"] = 381845,
+	["Blindside"] = 328085,
+	["Echoing Reprimand"] = 385616,
+	["Flagellation"] = 384631,
+	["Sepsis"] = 385408,
+	["Serrated Bone Knife"] = 385424,
+	["Stealth"] = 1784,
+	-- Shaman
+	["Hex"] = 51514,
+	["Primal Elementalist"] = 117013,
+	["Primordial Wave"] = 375982,
+	-- Warlock
+	["Command Demon"] = 119898,
+	["Demonic Circle"] = 48018,
+	["Demonic Circle: Teleport"] = 48020,
+	["Shadow Bolt"] = 686,
+	["Soul Rot"] = 386997,
+	--Warrior
+	["Annihilator"] = 383916,
+	["Blood and Thunder"] = 384277,
+	["Devastator"] = 236279,
+	["Execute"] = 163201,
+	["Fervor of Battle"] = 202316,
+	["Spear of Bastion"] = 376079,
+}
+
+local function known(spell)
+	local spellId
+	local exact = false
+
+	if type(spell) == "number" then
+		spellId = spell
+		exact = true
+	else
+		if spellNameToId[spell] then
+			spellId = spellNameToId[spell]
+		else
+			spellId = select(7, GetSpellInfo(spell))
+		end
+	end
+
+	if not spellId then return false end
+
+	return IsPlayerSpell(spellId) or IsSpellKnown(spellId, true)
+end
+
 local function spell(slotName, spellName, requiredLevel)
 	requiredLevel = requiredLevel or 1
 	local level = UnitLevel("player")
+	local name = GetUnitName("player", false)
+	local realm = GetRealmName()
+	local custom = Automagic and Automagic.Characters and Automagic.Characters[name.."-"..realm] or Automagic.Characters[name] or {}
 	local slotId = slotNames[slotName]
-	local _, _, _, _, _, _, spellId = GetSpellInfo(spellName)
+	local spellId
+	if type(spellName) == "number" then
+		spellId = spellName
+	elseif spellNameToId[spellName] then
+		spellId = spellNameToId[spellName]
+	else
+		spellId = select(7, GetSpellInfo(spellName))
+	end
 	local actionType, actionDataId, actionSubtype = GetActionInfo(slotId)
 	local todo = "place"
 
-	if spellName == "Blessing of the Seasons" then
+	if spellName == "Polymorph" then
+		local variants = {
+			["Black Cat"] = 61305,
+			["Bumblebee"] = 277792,
+			["Direhorn"] = 277787,
+			["Monkey"] = 161354,
+			["Penguin"] = 161355,
+			["Pig"] = 28272,
+			["Polar Bear Cub"] = 161353,
+			["Porcupine"] = 126819,
+			["Rabbit"] = 61721,
+			["Sheep"] = 118,
+			["Turtle"] = 28271,
+		}
+
+		spellId = variants[custom["polymorph"] or ""] or variants["Sheep"]
+
+		if not known(spellId) then
+			spellId = variants["Sheep"]
+		end
+
+		if actionType == "spell" and actionDataId == spellId then
+			todo = nil
+		end
+	elseif spellName == "Hex" then
+		local variants = {
+			["Cockroach"] = 211015,
+			["Compy"] = 210873,
+			["Frog"] = 51514,
+			["Living Honey"] = 309328,
+			["Skeletal Hatchling"] = 269352,
+			["Snake"] = 211010,
+			["Spider"] = 211004,
+			["Wicker Mongrel"] = 277784,
+			["Zandalari Tendonripper"] = 277778,
+		}
+
+		spellId = variants[custom["hex"] or ""] or variants["Frog"]
+
+		if not known(spellId) then
+			spellId = variants["Frog"]
+		end
+
+		if actionType == "spell" and actionDataId == spellId then
+			todo = nil
+		end
+	elseif spellName == "Blessing of the Seasons" then
 		if actionType == "spell" and (actionDataId == 328622 or actionDataId == 328281 or actionDataId == 328282 or actionDataId == 328620) then
+			todo = nil
+		end
+	elseif spellName == "New Moon" then
+		if actionType == "spell" and (actionDataId == 274281 or actionDataId == 274282 or actionDataId == 274283) then
+			todo = nil
+		end
+	elseif spellName == "Thrash" then
+		if actionType == "spell" and (actionDataId == 106830 or actionDataId == 77758 or actionDataId == 106832) then
+			todo = nil
+		end
+	elseif spellName == "Swipe" then
+		if actionType == "spell" and (actionDataId == 213764 or actionDataId == 213771 or actionDataId == 106785) then
 			todo = nil
 		end
 	elseif level >= requiredLevel then
@@ -204,75 +342,18 @@ local function spell(slotName, spellName, requiredLevel)
 		todo = "clear"
 	end
 
-	if todo == "place" then
+	if todo == "clear" or not known(spellName) then
+		-- Clear action button
+		PickupAction(slotId)
+		ClearCursor()
+	elseif todo == "place" then
 		-- Place spell
 		PickupAction(slotId)
 		ClearCursor()
 
 		-- Some spells have multiple spell IDs depending on talents or stance, attempt to pick up any
-		-- /dump GetSpellInfo("Spell Name")
-		if spellName == "Command Pet" then
-			spellById(slotId, 272651) -- Always same ID
-		elseif spellName == "Wildfire Bomb" then
-			spellById(slotId, 259495) -- Always same ID
-		elseif spellName == "Wild Charge" then
-			spellById(slotId, 102401) -- Always same ID
-		elseif spellName == "Honorable Medallion" then
-			spellById(slotId, 195710) -- Always same ID
-		elseif spellName == "Execute" then
-			spellById(slotId, 163201) -- Arms
-			spellById(slotId, 5308) -- Fury
-		elseif spellName == "Swipe" then
-			spellById(slotId, 213771) -- Feral or Guardian spec or affinity
-			spellById(slotId, 213764) -- other spec or affinity
-			spellById(slotId, 106785) -- Affinity+Cat Form
-		elseif spellName == "Thrash" then
-			spellById(slotId, 77758) -- Feral or Guardian spec or affinity
-			spellById(slotId, 106832) -- other spec or affinity
-		elseif spellName == "Moonfire" then
-			spellById(slotId, 8921) -- no form
-			spellById(slotId, 155625) -- Feral Cat Form
-		elseif spellName == "Stampeding Roar" then
-			spellById(slotId, 77761) -- Bear Form
-			spellById(slotId, 77764) -- Cat Form
-			spellById(slotId, 106898) -- no form or other forms
-		elseif spellName == "Sigil of Flame" then
-			spellById(slotId, 204513) -- Concentrated Sigils
-			spellById(slotId, 204596) -- other talents
-		elseif spellName == "Sigil of Silence" then
-			spellById(slotId, 207682) -- Concentrated Sigils
-			spellById(slotId, 202137) -- other talents
-		elseif spellName == "Sigil of Misery" then
-			spellById(slotId, 202140) -- Concentrated Sigils
-			spellById(slotId, 207684) -- other talents
-		elseif spellName == "Multi-Shot" then
-			spellById(slotId, 240711) -- Sidewinders
-			spellById(slotId, 2643) -- Multi-Shot
-		elseif spellName == "Shadow Word: Death" then
-			spellById(slotId, 199911) -- Reaper of Souls
-			spellById(slotId, 32379) -- other talents
-		elseif spellName == "Stealth" then
-			spellById(slotId, 115191) -- Subterfuge
-			spellById(slotId, 1784) -- other talents
-		elseif spellName == "Summon Doomguard" then
-			spellById(slotId, 157757) -- Grimoire of Supremacy
-			spellById(slotId, 18540) -- other talents
-		elseif spellName == "Summon Infernal" then
-			spellById(slotId, 157898) -- Grimoire of Supremacy
-			spellById(slotId, 1122) -- other talents
-		elseif spellName == "Guardian of Ancient Kings" then
-			spellById(slotId, 86659) -- GetSpellInfo() returns the wrong spell ID, this is the correct one
-		elseif spellName == "Void Eruption" then
-			spellById(slotId, 228260) -- Void Eruption
-		elseif spellName == "Mind Control" then
-			spellById(slotId, 605) -- Dominant Mind talent returns wrong spell ID
-		elseif spellName == "Soulshape" then
-			spellId = 310143
-		elseif spellName == "Death and Decay" then
-			spellId = 43265
-		elseif spellName == "Unstable Affliction" then
-			spellById(slotId, 316099) -- Correct ID
-		elseif spellName == "Blessing of the Seasons" then
+		-- /dump (select(7, GetSpellInfo("Name")))
+		if spellName == "Blessing of the Seasons" then
 			spellById(slotId, 328282) -- Blessing of Spring
 			spellById(slotId, 328620) -- Blessing of Summer
 			spellById(slotId, 328622) -- Blessing of Autumn
@@ -282,10 +363,6 @@ local function spell(slotName, spellName, requiredLevel)
 		-- Place spell
 		PickupSpell(spellId)
 		PlaceAction(slotId)
-		ClearCursor()
-	elseif todo == "clear" then
-		-- Clear action button
-		PickupAction(slotId)
 		ClearCursor()
 	end
 end
@@ -316,14 +393,13 @@ local function toy(slotName, toyId, requiredLevel)
 	end
 end
 
-local function macro(slotName, macroName, requiredLevel)
-	requiredLevel = requiredLevel or 1
+local function macro(slotName, macroName, requiredSpell)
 	local level = UnitLevel("player")
 	local slotId = slotNames[slotName]
 	local actionType = GetActionInfo(slotId)
 	local todo = "place"
 
-	if level >= requiredLevel then
+	if not requiredSpell or requiredSpell and known(requiredSpell) then
 		if actionType == "macro" then
 			local actionText = GetActionText(slotId)
 			if macroName == actionText then
@@ -349,40 +425,6 @@ local function macro(slotName, macroName, requiredLevel)
 		-- Clear action button
 		PickupAction(slotId)
 		ClearCursor()
-	end
-end
-
-local function usable(slotName, macroName, inventorySlot)
-	local _,class = UnitClass("player")
-	local spec = GetSpecialization() or 5
-	local role = "dps"
-	if (class == "DEATHKNIGHT" and spec == 1) or (class == "DEMONHUNTER" and spec == 2) or (class == "DRUID" and spec == 3) or (class == "MONK" and spec == 1) or (class == "PALADIN" and spec == 2) or (class == "WARRIOR" and spec == 3) then
-		role = "tank"
-	elseif (class == "DRUID" and spec == 4) or (class == "MONK" and spec == 2) or (class == "PALADIN" and spec == 1) or (class == "PRIEST" and spec ~= 3) or (class == "SHAMAN" and spec == 2) then
-		role = "healer"
-	end
-	local banned = false
-
-	local slotId = slotNames[slotName]
-
-	local itemLink = GetInventoryItemLink("player", inventorySlot)
-	local itemSpell = GetItemSpell(itemLink)
-
-	if role == "tank" and itemSpell == "Dusk Powder" then
-		banned = true
-	elseif role == "tank" and itemSpell == "Gloaming Powder" then
-		banned = true
-	elseif role == "tank" and itemSpell == "Twilight Powder" then
-		banned = true
-	end
-
-	if itemSpell and not banned then
-		-- Place macro
-		print("place", slotName, macroName, itemSpell)
-		macro(slotName, macroName)
-	else
-		print("empty", slotName, itemSpell)
-		empty(slotName)
 	end
 end
 
@@ -441,6 +483,7 @@ local function racial(slotName)
 		["Vulpera"] = "Bag of Tricks",
 		["Worgen"] = "Darkflight",
 		["ZandalariTroll"] = "Regeneratin'",
+		["Dracthyr"] = "Tail Swipe",
 	}
 
 	if racials[race] then
@@ -450,113 +493,32 @@ local function racial(slotName)
 	end
 end
 
-local function signature(slotName)
-	local _, _, _, _, _, _, kyrian = GetSpellInfo("Summon Steward")
-	local _, _, _, _, _, _, nightfae = GetSpellInfo("Soulshape")
-	local _, _, _, _, _, _, necrolord = GetSpellInfo("Fleshcraft")
-	local _, _, _, _, _, _, venthyr = GetSpellInfo("Door of Shadows")
+local function UpdateBars(event)
+	--print(event) -- Debug
 
-	if kyrian then
-		spell(slotName, "Summon Steward")
-	elseif nightfae then
-		spell(slotName, "Soulshape")
-	elseif necrolord then
-		spell(slotName, "Fleshcraft")
-	elseif venthyr then
-		spell(slotName, "Door of Shadows")
-	else
-		empty(slotName)
-	end
-end
-
-local function essence(slotName, kyrianSpell, necrolordSpell, nightfaeSpell, venthyrSpell)
-	local covenant = C_Covenants and C_Covenants.GetActiveCovenantID() or 0
-	local essence = select(7, GetSpellInfo("Concentrated Flame"))
-
-	if covenant == 1 then
-		if kyrianSpell then spell(slotName, kyrianSpell) else empty(slotName) end
-	elseif covenant == 4 then
-		if necrolordSpell then spell(slotName, necrolordSpell) else empty(slotName) end
-	elseif covenant == 3 then
-		if nightfaeSpell then spell(slotName, nightfaeSpell) else empty(slotName) end
-	elseif covenant == 2 then
-		if venthyrSpell then spell(slotName, venthyrSpell) else empty(slotName) end
-	elseif essence then
-		spell(slotName, "Heart Essence")
-	else
-		empty(slotName)
-	end
-end
-
-local function custom(slotName, spellName, requiredLevel)
-	requiredLevel = requiredLevel or 1
-	local level = UnitLevel("player")
-	local slotId = slotNames[slotName]
-	local name = UnitName("player")
-	local hexId = { ["Frog"] = 51514, ["Compy"] = 210873, ["Spider"] = 211004, ["Snake"] = 211010, ["Cockroach"] = 211015, ["Skeletal Hatchling"] = 269352, ["Zandalari Tendonripper"] = 277778, ["Wicker Mongrel"] = 277784, ["Living Honey"] = 309328, }
-	local polyId = { ["Sheep"] = 118, ["Pig"] = 28272, ["Turtle"] = 28271, ["Black Cat"] = 61305, ["Rabbit"] = 61721, ["Monkey"] = 161354, ["Porcupine"] = 126819, ["Penguin"] = 161355, ["Polar Bear Cub"] = 161353, ["Direhorn"] = 277787, ["Bumblebee"] = 277792, }
-
-	if level >= requiredLevel then
-		if spellName == "Hex" then
-			if hex[name] and IsSpellKnown(hexId[hex[name]]) then
-				spellById(slotId, hexId[hex[name]])
-			else
-				spellById(slotId, hexId["Frog"])
-			end
-		elseif spellName == "Polymorph" then
-			if poly[name] and IsSpellKnown(polyId[poly[name]]) then
-				spellById(slotId, polyId[poly[name]])
-			else
-				spellById(slotId, polyId["Sheep"])
-			end
-		end
-	else
-		empty(slotName)
-	end
-end
-
-
-local function updateBars()
 	if InCombatLockdown() then
-		frame:RegisterEvent("PLAYER_REGEN_ENABLED")
+		Placer:RegisterEvent("PLAYER_REGEN_ENABLED")
 	else
 		-- Update Global Pet Macros
 		if Automagic then Automagic.UpdatePets() end
 
-		-- CVars
-		SetCVar("mapFade", 0)
-		SetCVar("whisperMode", "inline")
-		SetCVar("autoLootDefault", 1)
-		SetCVar("displaySpellActivationOverlays", 0)
-		SetCVar("worldPreloadNonCritical", 0)
-
 		-- Local Variables
-		local name = UnitName("player")
+		local name = GetUnitName("player", false)
+		local realm = GetRealmName()
 		local _,class = UnitClass("player")
 		local faction = UnitFactionGroup("player")
 		local level = UnitLevel("player")
 		local spec = GetSpecialization() or 5
-		local talent = {}
 		local timewalking = false
 		local covenant = C_Covenants and C_Covenants.GetActiveCovenantID() or 0
-
-		-- Calculate talents
-		for i = 1, 7 do
-			local k1, k2, k3 = false, false, false -- Legion talent rings use the 11th return value instead of the 4th
-			talent[i] = {}
-			_, _, _, talent[i][1], _, _, _, _, _, _, k1 = GetTalentInfo(i, 1, 1)
-			if k1 then talent[i][1] = true end
-			_, _, _, talent[i][2], _, _, _, _, _, _, k2 = GetTalentInfo(i, 2, 1)
-			if k2 then talent[i][2] = true end
-			_, _, _, talent[i][3], _, _, _, _, _, _, k3 = GetTalentInfo(i, 3, 1)
-			if k3 then talent[i][3] = true end
-		end
+		local configID = C_ClassTalents.GetLastSelectedSavedConfigID(PlayerUtil.GetCurrentSpecID())
+		local loadout = configID and C_Traits.GetConfigInfo(configID).name or "Unknown"
+		local custom = Automagic and Automagic.Characters and Automagic.Characters[name.."-"..realm] or Automagic.Characters[name] or {}
 
 		-- Timewalking/Party Sync
 		if level ~= UnitEffectiveLevel("player") then
 			timewalking = true
 		end
-
 
 		-- Replace Character Macros
 		local _, numCharMacros = GetNumMacros()
@@ -569,7 +531,7 @@ local function updateBars()
 				if mi >= 10 then
 					mp = ""
 				end
-				EditMacro(i, "C"..mp..mi, "inv_misc_questionmark", "", 1, 1)
+				EditMacro(i, "C"..mp..mi, "INV_MISC_QUESTIONMARK", "", 1, 1)
 			end
 		end
 
@@ -580,1189 +542,2042 @@ local function updateBars()
 				if mi >= 10 then
 					mp = ""
 				end
-				CreateMacro("C"..mp..mi, "inv_misc_questionmark", "", 1, 1)
+				CreateMacro("C"..mp..mi, "INV_MISC_QUESTIONMARK", "", 1, 1)
 			end
 		end
 
-
+		-- Action Bar Data
 		if class == "DEATHKNIGHT" then
 			--! Death Knight
-			
-			-- Mind Freeze
-			m("C01", nil, "#showtooltip Mind Freeze\n#showtooltip Mind Freeze\n/stopcasting\n/stopcasting\n/use Mind Freeze")
-			-- Wraith Walk
-			m("C02", nil, "#showtooltip Wraith Walk\n/use !Wraith Walk")
-			-- Gorefiend's Grasp @player
-			m("C03", nil, "#showtooltip Gorefiend's Grasp\n/use [@player]Gorefiend's Grasp")
-			-- Gorefiend's Grasp @target
-			m("C04", 1037260, "#showtooltip Gorefiend's Grasp\n/use [@target]Gorefiend's Grasp")
-			-- Leap
-			m("C05", 237569, "#showtooltip\n/use Leap")
-			-- Huddle
-			m("C06", 237533, "#showtooltip\n/use Huddle")
-			-- Gnaw
-			m("C07", 237524, "#showtooltip\n/use Gnaw")
-			-- Sacrificial Pact
-			m("C08", 136133, "#showtooltip\n/use [pet]Sacrificial Pact;Raise Dead")
-
-			-- Essence
-			essence("N", "Shackle the Unworthy", "Abomination Limb", (spec == 2 and "Death and Decay" or false), "Swarming Mist")
 
 			if spec == 1 then
 				--! Blood Death Knight
-				if level >= 11 then spell("1", "Marrowrend") else spell("1", "Heart Strike") end
-				spell("2", "Blood Boil")
-				spell("3", "Heart Strike", 11)
-				spell("4", "Death and Decay")
-				spell("5", "Death Strike")
-				spell("CE", "Asphyxiate")
+				
+				------ Macros ------
 
-				if talent[3][3] then spell("C", "Blood Tap") else empty("C") end
-				if talent[7][3] then spell("SC", "Bonestorm") else empty("SC") end
-				if talent[1][2] then spell("Q", "Blooddrinker") elseif talent[1][3] then spell("Q", "Tombstone") else empty("Q") end
-				spell("E", "Death's Caress")
-				spell("G", "Dancing Rune Weapon")
-				empty("SG")
-				if talent[4][3] then spell("V", "Mark of Blood") else empty("V") end
-				macro("SE", "C01") -- Mind Freeze
+				-- Rune Strike / Death Coil
+				m("C03", nil, "#showtooltip\n/use [mod:shift]Death Coil;Rune Strike")
 
+				-- Mind Freeze
+				m("C08", nil, "#showtooltip Mind Freeze\n#showtooltip Mind Freeze\n/stopcasting\n/stopcasting\n/use Mind Freeze")
+
+				-- Gorefiend's Grasp @player
+				m("C09", nil, "#showtooltip Gorefiend's Grasp\n/use [@player]Gorefiend's Grasp")
+
+				-- Gorefiend's Grasp @target
+				m("C10", 1037260, "#showtooltip Gorefiend's Grasp\n/use [@target]Gorefiend's Grasp")
+
+				-- Wraith Walk
+				m("C13", nil, "#showtooltip Wraith Walk\n/use !Wraith Walk")
+
+				
+				------ Left ------
+				-- Top
+				spell("N", "Abomination Limb")
+				spell("SN", "Soul Reaper")
 				spell("R", "Dark Command")
 				spell("SR", "Death Grip")
-				macro("CR", "C03", 32) -- Gorefiend's Grasp @player
-				spell("H", "Death Coil")
-				macro("SH", "C04", 32) -- Gorefiend's Grasp @target
+				macro("CR", "C09", "Gorefiend's Grasp")
+				empty("H")
+				empty("SH")
+				racial("AE")
 
-				spell("F1", "Anti-Magic Shell")
-				spell("F2", "Rune Tap")
-				spell("F3", "Icebound Fortitude")
-				spell("F4", "Vampiric Blood")
-				if talent[6][2] then spell("F5", "Death Pact") else empty("F5") end
-				spell("CQ", "Path of Frost")
+				-- Middle
+				spell("C", "Blood Tap")
+				spell("SC", "Bonestorm")
+				if known("Mark of Blood") then spell("Q", "Mark of Blood") else spell("Q", "Tombstone") end
+				spell("E", "Death's Caress")
+				spell("G", "Dancing Rune Weapon")
+				spell("SG", "Empower Rune Weapon")
+				macro("SE", "C08", "Mind Freeze")
 
-				spell("T", "Chains of Ice")
-				empty("ST")
-				spell("CT", "Control Undead")
-				empty("AT")
-				spell("CB3", "Anti-Magic Zone")
-				if talent[2][3] then spell("SQ", "Consumption") else empty("SQ") end
-				spell("SV", "Raise Dead")
-				spell("CV", "Sacrificial Pact")
+				-- Bottom
+				spell("1", "Marrowrend")
+				spell("2", "Blood Boil")
+				macro("3", "C03")
+				spell("4", "Death and Decay")
+				spell("5", "Death Strike")
+				if known("Blooddrinker") then spell("6", "Blooddrinker") else spell("6", "Consumption") end
+				spell("V", "Rune Tap")
+				spell("CE", "Asphyxiate")
 
+				------ Right ------
+				-- Top
 				empty("AB3")
 				empty("AF")
 				spell("CF", "Lichborne")
 				spell("SF", "Death's Advance")
-				if talent[5][3] then macro("F", "C02") else empty("F") end -- Wraith Walk
+				macro("F", "C13", "Wraith Walk")
+
+				-- Middle
+				spell("T", "Chains of Ice")
+				spell("ST", "Blinding Sleet")
+				spell("CT", "Control Undead")
+				empty("AT")
+				macro("CB3", "C10", "Gorefiend's Grasp")
+				spell("SQ", "Death Strike")
+				macro("SV", "G014", "Raise Dead")
+				spell("CV", "Sacrificial Pact")
+
+				-- Bottom
+				spell("F1", "Anti-Magic Shell")
+				spell("F2", "Icebound Fortitude")
+				spell("F3", "Anti-Magic Zone")
+				spell("F4", "Vampiric Blood")
+				spell("F5", "Death Pact")
+				empty("F6")
+				spell("CQ", "Path of Frost")
+
 			elseif spec == 2 then
 				--! Frost Death Knight
-				if level >= 14 then spell("1", "Obliterate") else spell("1", "Howling Blast") end
-				if level >= 11 then spell("2", "Frost Strike") else spell("2", "Death Coil") end
-				spell("3", "Remorseless Winter")
-				spell("4", "Frostwyrm's Fury")
-				if talent[7][3] then spell("5", "Breath of Sindragosa") else empty("5") end
-				if talent[3][2] then spell("CE", "Asphyxiate") elseif talent [3][3] then spell("CE", "Blinding Sleet") else empty("CE") end
+				
+				------ Macros ------
 
-				if talent[6][2] then spell("C", "Hypothermic Presence") elseif talent[6][3] then spell("C", "Glacial Advance") else empty("C") end
-				if talent[2][3] then spell("SC", "Horn of Winter") else empty("SC") end
-				if talent[4][3] then spell("Q", "Frostscythe") else empty("Q") end
-				spell("E", "Howling Blast", 14)
-				spell("G", "Empower Rune Weapon")
-				empty("SG")
-				spell("V", "Pillar of Frost")
-				macro("SE", "C01") -- Mind Freeze
+				-- Frost Strike / Death Coil
+				m("C03", nil, "#showtooltip\n/use [help][mod:shift]Death Coil;Frost Strike")
 
+				-- Breath of Sindragosa
+				m("C06", nil, "#showtooltip\n/use !Breath of Sindragosa")
+
+				-- Mind Freeze
+				m("C08", nil, "#showtooltip Mind Freeze\n#showtooltip Mind Freeze\n/stopcasting\n/stopcasting\n/use Mind Freeze")
+
+				-- Wraith Walk
+				m("C13", nil, "#showtooltip Wraith Walk\n/use !Wraith Walk")
+				
+				
+				------ Left ------
+				-- Top
+				spell("N", "Abomination Limb")
+				spell("SN", "Soul Reaper")
 				spell("R", "Dark Command")
 				spell("SR", "Death Grip")
 				empty("CR")
-				spell("H", "Death Coil", 11)
-				if covenant == 3 then empty("SH") else spell("SH", "Death and Decay") end
+				empty("H")
+				empty("SH")
+				racial("AE")
 
-				spell("F1", "Anti-Magic Shell")
-				spell("F2", "Icebound Fortitude")
-				if talent[5][3] then spell("F3", "Death Pact") else empty("F3") end
-				empty("F4")
-				empty("F5")
-				spell("CQ", "Path of Frost")
+				-- Middle
+				spell("C", "Horn of Winter")
+				spell("SC", "Chill Streak")
+				spell("Q", "Frostscythe")
+				spell("E", "Howling Blast")
+				spell("G", "Frostwyrm's Fury")
+				spell("SG", "Empower Rune Weapon")
+				macro("SE", "C08", "Mind Freeze")
 
-				spell("T", "Chains of Ice")
-				empty("ST")
-				spell("CT", "Control Undead")
-				empty("AT")
-				spell("CB3", "Anti-Magic Zone")
-				spell("SQ", "Death Strike")
-				spell("SV", "Raise Dead")
-				spell("CV", "Sacrificial Pact")
+				-- Bottom
+				spell("1", "Rune Strike")
+				spell("2", "Remorseless Winter")
+				if known("Frost Strike") then macro("3", "C03") else spell("3", "Death Coil") end
+				spell("4", "Death and Decay")
+				spell("5", "Glacial Advance")
+				macro("6", "C06", "Breath of Sindragosa")
+				spell("V", "Pillar of Frost")
+				spell("CE", "Asphyxiate")
 
+				------ Right ------
+				-- Top
 				empty("AB3")
 				empty("AF")
 				spell("CF", "Lichborne")
 				spell("SF", "Death's Advance")
-				if talent[5][2] then macro("F", "C02") else empty("F") end -- Wraith Walk
+				macro("F", "C13", "Wraith Walk")
+
+				-- Middle
+				spell("T", "Chains of Ice")
+				spell("ST", "Blinding Sleet")
+				spell("CT", "Control Undead")
+				empty("AT")
+				empty("CB3")
+				spell("SQ", "Death Strike")
+				macro("SV", "G014", "Raise Dead")
+				spell("CV", "Sacrificial Pact")
+
+				-- Bottom
+				spell("F1", "Anti-Magic Shell")
+				spell("F2", "Icebound Fortitude")
+				spell("F3", "Anti-Magic Zone")
+				empty("F4")
+				spell("F5", "Death Pact")
+				empty("F6")
+				spell("CQ", "Path of Frost")
+
 			elseif spec == 3 then
 				--! Unholy Death Knight
-				spell("1", "Festering Strike")
+				
+				------ Macros ------
+
+				-- Mind Freeze
+				m("C08", nil, "#showtooltip Mind Freeze\n#showtooltip Mind Freeze\n/stopcasting\n/stopcasting\n/use Mind Freeze")
+
+				-- Gnaw
+				m("C09", 237524, "#showtooltip\n/use [nobtn:2]Gnaw\n/petautocasttoggle [btn:2]Gnaw")
+
+				-- Huddle
+				m("C10", 237533, "#showtooltip\n/use Huddle")
+
+				-- Wraith Walk
+				m("C13", nil, "#showtooltip Wraith Walk\n/use !Wraith Walk")
+				
+				
+				------ Left ------
+				-- Top
+				spell("N", "Abomination Limb")
+				spell("SN", "Vile Contagion")
+				spell("R", "Dark Command")
+				spell("SR", "Death Grip")
+				macro("CR", "C09", 46584) -- 46584 is permanent Raise Dead
+				empty("H")
+				empty("SH")
+				racial("AE")
+
+				-- Middle
+				spell("C", "Unholy Assault")
+				spell("SC", "Unholy Blight")
+				spell("Q", "Epidemic")
+				spell("E", "Outbreak")
+				spell("G", "Summon Gargoyle")
+				spell("SG", "Empower Rune Weapon")
+				macro("SE", "C08", "Mind Freeze")
+
+				-- Bottom
+				spell("1", "Rune Strike")
 				spell("2", "Scourge Strike")
 				spell("3", "Death Coil")
 				spell("4", "Death and Decay")
-				spell("5", "Apocalypse")
-				if talent[3][3] then spell("CE", "Asphyxiate") else empty("CE") end
-
-				if talent[4][3] then spell("C", "Soul Reaper") else empty("C") end
-				if talent[2][3] then spell("SC", "Unholy Blight") else empty("SC") end
-				spell("Q", "Epidemic")
-				spell("E", "Outbreak")
-				if level < 29 then spell("G", "Raise Dead") elseif talent[7][2] then spell("G", "Summon Gargoyle") elseif talent[7][3] then spell("G", "Unholy Assault") else empty("G") end
-				empty("SG")
+				spell("5", "Soul Reaper")
+				spell("6", "Apocalypse")
 				spell("V", "Dark Transformation")
-				macro("SE", "C01") -- Mind Freeze
+				spell("CE", "Asphyxiate")
 
-				spell("R", "Dark Command")
-				spell("SR", "Death Grip")
-				macro("CR", "C07", 29) -- Gnaw
-				empty("H")
-				empty("SH")
-
-				spell("F1", "Anti-Magic Shell")
-				spell("F2", "Icebound Fortitude")
-				if talent[5][3] then spell("F3", "Death Pact") else empty("F3") end
-				empty("F4")
-				macro("F5", "C06", 29) -- Huddle
-				spell("CQ", "Path of Frost")
-
-				spell("T", "Chains of Ice")
-				empty("ST")
-				spell("CT", "Control Undead")
-				macro("AT", "C05", 29) -- Leap
-				spell("CB3", "Anti-Magic Zone")
-				spell("SQ", "Death Strike")
-				spell("SV", "Army of the Dead")
-				spell("CV", "Sacrificial Pact")
-				
-
+				------ Right ------
+				-- Top
 				empty("AB3")
 				empty("AF")
 				spell("CF", "Lichborne")
 				spell("SF", "Death's Advance")
-				if talent[5][2] then macro("F", "C02") else empty("F") end -- Wraith Walk
+				macro("F", "C13", "Wraith Walk")
+
+				-- Middle
+				spell("T", "Chains of Ice")
+				spell("ST", "Blinding Sleet")
+				spell("CT", "Control Undead")
+				empty("AT")
+				empty("CB3")
+				spell("SQ", "Death Strike")
+				if not known(46584) then macro("SV", "G014") else spell("SV", "Army of the Dead") end
+				spell("CV", "Sacrificial Pact")
+
+				-- Bottom
+				spell("F1", "Anti-Magic Shell")
+				spell("F2", "Icebound Fortitude")
+				spell("F3", "Anti-Magic Zone")
+				empty("F4")
+				spell("F5", "Death Pact")
+				if level < 22 then empty("F6") else macro("F6", "C10", 46584) end
+				empty("F6")
+				spell("CQ", "Path of Frost")
+
 			else
-				--! Untalented Death Knight
+				--! Unspecialized Death Knight
+				
+				------ Left ------
+				-- Top
+				empty("N")
+				empty("SN")
+				spell("R", "Dark Command")
+				empty("SR")
+				empty("CR")
+				empty("H")
+				empty("SH")
+				racial("AE")
+
+				-- Middle
+				empty("C")
+				empty("SC")
+				empty("Q")
+				empty("E")
+				empty("G")
+				empty("SG")
+				empty("SE")
+
+				-- Bottom
 				spell("1", "Rune Strike")
 				empty("2")
 				spell("3", "Death Coil")
 				spell("4", "Death and Decay")
 				empty("5")
+				empty("6")
+				empty("V")
 				empty("CE")
 
-				empty("C")
-				empty("SC")
-				empty("Q")
-				empty("E")
-				empty("G")
-				empty("SG")
-				empty("V")
-				macro("SE", "C01") -- Mind Freeze
+				------ Right ------
+				-- Top
+				empty("AB3")
+				empty("AF")
+				spell("CF", "Lichborne")
+				spell("SF", "Death's Advance")
+				empty("F")
 
-				spell("R", "Dark Command")
-				spell("SR", "Death Grip")
-				empty("CR")
-				empty("H")
-				empty("SH")
-
-				empty("F1")
-				empty("F2")
-				empty("F3")
-				empty("F4")
-				empty("F5")
-				empty("CQ")
-
+				-- Middle
 				empty("T")
 				empty("ST")
 				empty("CT")
 				empty("AT")
 				empty("CB3")
-				spell("SQ", "Death Strike")
+				empty("SQ")
 				empty("SV")
 				empty("CV")
 
-				empty("AB3")
-				empty("AF")
-				empty("CF")
-				empty("SF")
-				empty("F")
+				-- Bottom
+				empty("F1")
+				empty("F2")
+				empty("F3")
+				empty("F4")
+				empty("F5")
+				empty("F6")
+				empty("CQ")
+
 			end
 		elseif class == "DEMONHUNTER" then
 			--! Demon Hunter
-			
-			-- Felblade/Demon's Bite
-			m("C01", nil, "#showtooltip\n/use [talent:1/3,talent:2/3]Felblade;Demon's Bite")
-			-- Metamorphosis @player
-			m("C02", nil, "#showtooltip Metamorphosis\n/use [@player]Metamorphosis")
-			-- Metamorphosis
-			m("C03", 1344650, "#showtooltip\n/use Metamorphosis")
-			-- Disrupt
-			m("C04", nil, "#showtooltip Disrupt\n/stopcasting\n/stopcasting\n/use Disrupt")
-
-			-- Essence
-			essence("N", "Elysian Decree", false, "The Hunt", "Sinful Brand")
 
 			if spec == 1 then
 				--! Havoc Demon Hunter
-				macro("1", "C01") -- Demon's Bite
-				spell("2", "Chaos Strike")
-				spell("3", "Blade Dance")
-				spell("4", "Eye Beam")
-				if talent[7][3] then spell("5", "Fel Barrage") else empty("5") end
-				spell("CE", "Chaos Nova")
-
-				if talent[1][3] and not talent[2][3] then spell("C", "Felblade") else empty("C") end
-				empty("SC")
-				if talent[3][3] then spell("Q", "Glaive Tempest") else empty("Q") end
 				
-				if IsSpellKnown(191427) then macro("G", "C02") else empty("G") end -- Metamorphosis @player
-				empty("SG")
-				if talent[5][3] then spell("V", "Essence Break") else empty("V") end
-				macro("SE", "C04") -- Disrupt
-				spell("E", "Immolation Aura")
+				------ Macros ------
+
+				-- Disrupt
+				m("C08", nil, "#showtooltip Disrupt\n/stopcasting\n/stopcasting\n/use Disrupt")
+
+				-- Metamorphosis @player
+				m("C13", nil, "#showtooltip Metamorphosis\n/use [@player]Metamorphosis")
+
+				-- Metamorphosis
+				m("C14", 1344650, "#showtooltip\n/use Metamorphosis")
+				
+				
+				------ Left ------
+				-- Top
+				empty("N")
+				empty("SN")
 				spell("R", "Torment")
 				spell("SR", "Consume Magic")
 				empty("CR")
-				spell("H", "Throw Glaive")
+				empty("H")
 				empty("SH")
+				racial("AE")
 
-				spell("F1", "Blur")
-				if talent[4][3] then spell("F2", "Netherwalk") else empty("F2") end
-				spell("F3", "Darkness")
-				empty("F4")
-				empty("F5")
-				empty("CQ")
+				-- Middle
+				spell("C", "Throw Glaive")
+				spell("SC", "Essence Break")
+				if known("Demon Blades") then empty("Q") else spell("Q", "Felblade") end
+				spell("E", "Sigil of Flame")
+				macro("G", "C13", "Metamorphosis")
+				spell("SG", "The Hunt")
+				macro("SE", "C08", "Disrupt")
 
-				spell("T", "Imprison")
-				empty("ST")
-				if talent[6][3] then spell("CT", "Fel Eruption") else empty("CT") end
-				empty("AT")
-				empty("CB3")
-				empty("SQ")
-				if IsSpellKnown(191427) then macro("SV", "C03") else empty("SV") end -- Metamorphosis Leap
-				spell("CV", "Spectral Sight")
+				-- Bottom
+				if known("Demon Blades") and known("Felblade") then spell("1", "Felblade") else spell("1", "Demon's Bite") end
+				spell("2", "Immolation Aura")
+				spell("3", "Blade Dance")
+				spell("4", "Chaos Strike")
+				spell("5", "Eye Beam")
+				if known("Glaive Tempest") then spell("6", "Glaive Tempest") else spell("6", "Fel Barrage") end
+				spell("V", "Elysian Decree")
+				spell("CE", "Chaos Nova")
 
+				------ Right ------
+				-- Top
 				empty("AB3")
 				empty("AF")
 				empty("CF")
 				spell("SF", "Vengeful Retreat")
 				spell("F", "Fel Rush")
-			elseif spec == 2 then
-				--! Vengeance Demon Hunter
-				spell("1", "Shear")
-				spell("2", "Soul Cleave")
-				spell("3", "Demon Spikes")
-				spell("4", "Sigil of Flame")
-				if talent[3][3] then spell("5", "Spirit Bomb") else empty("5") end
-				spell("CE", "Sigil of Misery")
 
-				if talent[1][3] then spell("C", "Felblade") else empty("C") end
-				empty("SC")
-				if talent[7][3] then spell("Q", "Bulk Extraction") else empty("Q") end
-				spell("E", "Immolation Aura")
-				spell("G", "Metamorphosis")
-				empty("SG")
-				spell("V", "Fel Devastation")
-				macro("SE", "C04") -- Disrupt
-
-				spell("R", "Torment")
-				spell("SR", "Consume Magic")
-				if talent[5][3] then spell("CR", "Sigil of Chains") else empty("CR") end
-				spell("H", "Throw Glaive")
-				empty("SH")
-
-				spell("F1", "Fiery Brand")
-				if talent[6][3] then spell("F2", "Soul Barrier") else empty("F2") end
-				empty("F3")
-				empty("F4")
-				empty("F5")
-				empty("CQ")
-
+				-- Middle
 				spell("T", "Imprison")
-				spell("ST", "Sigil of Silence")
-				empty("CT")
+				spell("ST", "Fel Eruption")
+				spell("CT", "Sigil of Misery")
 				empty("AT")
 				empty("CB3")
+				empty("SQ")
+				macro("SV", "C14", "Metamorphosis")
+				spell("CV", "Spectral Sight")
+
+				-- Bottom
+				spell("F1", "Blur")
+				spell("F2", "Netherwalk")
+				spell("F3", "Darkness")
+				empty("F4")
+				empty("F5")
+				empty("F6")
+				empty("CQ")
+
+			elseif spec == 2 then
+				--! Vengeance Demon Hunter
+				
+				------ Macros ------
+
+				-- Disrupt
+				m("C08", nil, "#showtooltip Disrupt\n/stopcasting\n/stopcasting\n/use Disrupt")
+				
+				
+				------ Left ------
+				-- Top
+				empty("N")
+				empty("SN")
+				spell("R", "Torment")
+				spell("SR", "Consume Magic")
+				empty("CR")
+				empty("H")
+				empty("SH")
+				racial("AE")
+
+				-- Middle
+				spell("C", "Throw Glaive")
+				spell("SC", "Fel Devastation")
+				spell("Q", "Felblade")
+				spell("E", "Sigil of Flame")
+				spell("G", "Metamorphosis")
+				spell("SG", "The Hunt")
+				macro("SE", "C08", "Disrupt")
+
+				-- Bottom
+				spell("1", "Shear")
+				spell("2", "Immolation Aura")
+				spell("3", "Soul Cleave")
+				spell("4", "Demon Spikes")
+				spell("5", "Spirit Bomb")
+				spell("6", "Soul Carver")
+				spell("V", "Elysian Decree")
+				spell("CE", "Chaos Nova")
+
+				------ Right ------
+				-- Top
+				empty("AB3")
+				empty("AF")
+				empty("CF")
+				spell("SF", "Vengeful Retreat")
+				spell("F", "Infernal Strike")
+
+				-- Middle
+				spell("T", "Imprison")
+				spell("ST", "Sigil of Silence")
+				spell("CT", "Sigil of Misery")
+				empty("AT")
+				spell("CB3", "Sigil of Chains")
 				empty("SQ")
 				empty("SV")
 				spell("CV", "Spectral Sight")
 
-				empty("AB3")
-				empty("AF")
-				empty("CF")
-				empty("SF")
-				spell("F", "Infernal Strike")
+				-- Bottom
+				spell("F1", "Fiery Brand")
+				if known("Soul Barrier") then spell("F2", "Soul Barrier") else spell("F2", "Bulk Extraction") end
+				spell("F3", "Darkness")
+				empty("F4")
+				empty("F5")
+				empty("F6")
+				empty("CQ")
+
 			else
-				--! Untalented Demon Hunter
-				spell("1", "Demon's Bite")
-				spell("2", "Chaos Strike")
-				spell("3", "Blade Dance")
-				spell("4", "Eye Beam")
-				empty("5")
-				empty("CE")
+				--! Unspecialized Demon Hunter
+				
+				------ Macros ------
 
-				empty("C")
-				empty("SC")
-				empty("Q")
-				spell("E", "Immolation Aura")
-				empty("G")
-				empty("SG")
-				empty("V")
-				spell("SE", "Disrupt")
+				-- Disrupt
+				m("C08", nil, "#showtooltip Disrupt\n/stopcasting\n/stopcasting\n/use Disrupt")
 
+				
+				------ Left ------
+				-- Top
+				empty("N")
+				empty("SN")
 				spell("R", "Torment")
 				empty("SR")
 				empty("CR")
 				empty("H")
 				empty("SH")
+				racial("AE")
 
-				empty("F1")
-				empty("F2")
-				empty("F3")
-				empty("F4")
-				empty("F5")
-				empty("CQ")
+				-- Middle
+				spell("C", "Throw Glaive")
+				empty("SC")
+				empty("Q")
+				empty("E")
+				empty("G")
+				empty("SG")
+				macro("SE", "C08", "Disrupt")
 
-				empty("T")
-				empty("ST")
-				empty("CT")
-				empty("AT")
-				empty("CB3")
-				empty("SQ")
-				empty("SV")
-				spell("CV", "Spectral Sight")
+				-- Bottom
+				spell("1", "Demon's Bite")
+				spell("2", "Immolation Aura")
+				empty("3")
+				empty("4")
+				empty("5")
+				empty("6")
+				empty("V")
+				empty("CE")
 
+				------ Right ------
+				-- Top
 				empty("AB3")
 				empty("AF")
 				empty("CF")
 				empty("SF")
 				spell("F", "Fel Rush")
-			end
-		elseif class == "DRUID" then
-			--! Druid
-			
-			-- Wrath/Regrowth
-			m("C01", nil, "#showtooltip\n/use [help]Regrowth;[spec:1][spec:2,notalent:3/3][spec:3,notalent:3/3][spec:4,talent:3/1,form:4][harm]Wrath;Regrowth")
-			-- Starfire/Swiftmend
-			m("C02", nil, "#showtooltip\n/use [spec:1,talent:3/3,help][spec:4,talent:3/1,form:4,help]Swiftmend;[spec:1][spec:4,talent:3/1,stance:4][spec:4,talent:3/1,harm]Starfire;Swiftmend")
-			-- Starsurge/Wild Growth
-			m("C03", nil, "#showtooltip\n/use [spec:4,talent:3/1,form:4,help]Wild Growth;[spec:1,talent:3/3,help]Wild Growth;[spec:1][spec:4,talent:3/1,form:4][spec:4,talent:3/1,harm]Starsurge;Wild Growth")
-			-- Sunfire/Lifebloom
-			m("C04", nil, "#showtooltip\n/use [help]Lifebloom;[harm][talent:3/1,stance:4]Sunfire;Lifebloom")
-			-- Moonfire/Rake/Rejuvenation
-			m("C05", nil, "#showtooltip\n/use [nospec:4,talent:3/3,help]Rejuvenation;[spec:1,talent:3/1,form:2][spec:2,form:2][spec:3,talent:3/2,form:2][spec:4,talent:3/2,form:2]Rake;[harm][spec:3,form:1]Moonfire;[spec:4][nospec:1,nospec:4,talent:3/3]Rejuvenation;Moonfire")
-			-- Moonkin Form/Flap
-			m("C06", nil, "#showtooltip [spec:1][form:4]Flap;Moonkin Form\n/use [form:4]Flap;!Moonkin Form")
-			-- Shred/Moonfire
-			m("C07", nil, "#showtooltip\n/use [mod:shift,talent:1/3]Moonfire;Shred")
-			-- Innervate
-			m("C08", nil, "#showtooltip Innervate\n/use [@focus,help,nodead][exists,help,nodead][spec:4,@player]Innervate")
-			-- Solar Beam/Skull Bash
-			m("C09", nil, "#showtooltip [spec:1]Solar Beam;Skull Bash\n/stopcasting\n/stopcasting\n/use [spec:1]Solar Beam;[spec:2,noform:1,noform:2]Cat Form;[noform:1,noform:2]Bear Form\n/use [spec:2/3]Skull Bash")
-			-- Dash
-			m("C10", nil, "#showtooltip Dash\n/use [form:" .. (level >= 8 and "2" or "1") .. "]Dash;Cat Form")
-			-- Bear Form
-			m("C11", nil, "#showtooltip Bear Form\n/use [noform:1]Bear Form")
-			-- Cat Form
-			m("C12", nil, "#showtooltip Cat Form\n/use [noform:2]Cat Form")
-			-- Caster Form
-			m("C13", 461117, "/stopcasting\n/stopcasting\n/cancelform [noform:5]")
-			-- Moonkin Form
-			m("C14", nil, "#showtooltip Moonkin Form\n/stopcasting\n/stopcasting\n/use [noform:4]Moonkin Form")
-			-- Treant Form
-			m("C15", nil, "#showtooltip Treant Form\n/stopcasting\n/stopcasting\n/use [nospec:1,talent:3/1,noform:5][nospec:1,notalent:3/1,noform:4][spec:1,noform:5]Treant Form")
-			-- Prowl
-			m("C16", nil, "#showtooltip\n/cancelaura Travel Form\n/cancelaura [btn:2]Prowl\n/use [nobtn:2]!Prowl")
-			-- Wild Charge
-			m("C17", nil, "#showtooltip\n/cancelform [help,form]\n/use Wild Charge")
-			-- Primal Wrath/Rip
-			m("C18", nil, "#showtooltip\n/use [mod:shift,talent:6/3]Primal Wrath;Rip")
 
-			-- Essence
-			essence("N", "Kindred Spirits", "Adaptive Swarm", "Convoke the Spirits", "Ravenous Frenzy")
+				-- Middle
+				empty("T")
+				empty("ST")
+				empty("CT")
+				empty("AT")
+				empty("CB3")
+				empty("SQ")
+				empty("SV")
+				spell("CV", "Spectral Sight")
 
-			if spec == 1 then
-				--! Balance Druid
-				macro("1", "C01")
-				macro("2", "C02")
-				if level >= 12 then macro("3", "C03") else empty("3") end
-				spell("4", "Sunfire")
-				if talent[6][3] then spell("5", "Stellar Flare") else empty("5") end
-				if talent[4][1] then spell("CE", "Mighty Bash") else empty("CE") end
-
-				if talent[7][2] then spell("C", "Fury of Elune") elseif talent[7][3] then spell("C", "New Moon") else empty("C") end
-				macro("SC", "C08", 42) -- Innervate
-				spell("Q", "Starfall")
-				macro("E", "C05") -- Moonfire/Rejuvenation
-				spell("G", "Celestial Alignment")
-				if talent[4][3] then spell("SG", "Heart of the Wild") else empty("SG") end
-				if talent[1][2] then spell("V", "Warrior of Elune") elseif talent[1][3] then spell("V", "Force of Nature") else empty("V") end
-				macro("SE", "C09", 26) -- Solar Beam
-
-				spell("Bear 1", "Mangle")
-				if talent[3][2] then spell("Bear 2", "Thrash") else empty("Bear 2") end
-				if talent[3][1] then spell("Bear 3", "Swipe") else empty("Bear 3") end
-				spell("Bear 4", "Ironfur")
-				empty("Bear 5")
-				if talent[4][1] then spell("Bear CE", "Mighty Bash") else empty("Bear CE") end
-
-				empty("Bear C")
-				macro("Bear SC", "C08", 42) -- Innervate
-				if talent[3][2] then spell("Bear Q", "Frenzied Regeneration") else empty("Bear Q") end
-				empty("Bear E")
-				empty("Bear G")
-				if talent[4][3] then spell("Bear SG", "Heart of the Wild") else empty("Bear SG") end
-				empty("Bear V")
-				macro("Bear SE", "C09", 26) -- Solar Beam
-
-				spell("Cat 1", "Shred")
-				if talent[3][1] then spell("Cat 2", "Swipe") else empty("Cat 2") end
-				spell("Cat 3", "Ferocious Bite")
-				if talent[3][1] then spell("Cat 4", "Rip") else empty("Cat 4") end
-				if talent[3][1] then spell("Cat 5", "Maim") else empty("Cat 5") end
-				if talent[4][1] then spell("Cat CE", "Mighty Bash") else empty("Cat CE") end
-
-				empty("Cat C")
-				macro("Cat SC", "C08", 42) -- Innervate
-				if talent[3][2] then spell("Cat Q", "Thrash") else empty("Cat Q") end
-				if talent[3][1] then macro("Cat E", "C05") else empty("Cat E") end -- Rake
-				empty("Cat G")
-				if talent[4][3] then spell("Cat SG", "Heart of the Wild") else empty("Cat SG") end
-				empty("Cat V")
-				macro("Cat SE", "C09", 26) -- Solar Beam
-
-				spell("R", "Growl")
-				spell("SR", "Soothe")
-				spell("CR", "Remove Corruption")
-				if talent[2][2] then spell("H", "Renewal") else empty("H") end
-				spell("SH", "Hibernate")
-
-				spell("F1", "Barkskin")
-				macro("F2", "C11") -- Bear Form
+				-- Bottom
+				empty("F1")
+				empty("F2")
 				empty("F3")
 				empty("F4")
 				empty("F5")
-				macro("CQ", "C06", 21) -- Flap
+				empty("F6")
+				empty("CQ")
 
+			end
+		elseif class == "DRUID" then
+			--! Druid
+
+			if spec == 1 then
+				--! Balance Druid
+				
+				------ Macros ------
+
+				-- Wrath / Regrowth
+				m("C01", nil, "#showtooltip\n/use [help]Regrowth;Wrath")
+
+				-- Starfire / Swiftmend
+				m("C02", nil, "#showtooltip\n/use [help]Swiftmend;Starfire")
+
+				-- Starsurge / Wild Growth
+				m("C03", nil, "#showtooltip\n/use [help]Wild Growth;Starsurge")
+
+				-- Solar Beam
+				m("C06", nil, "#showtooltip Solar Beam\n/stopcasting\n/stopcasting\n/use Solar Beam")
+
+				-- Moonfire / Rejuvenation
+				m("C07", nil, "#showtooltip\n/use [help]Rejuvenation;Moonfire")
+
+				-- Skull Bash
+				m("C08", nil, "#showtooltip Skull Bash\n/stopcasting\n/stopcasting\n/use [noform:1,noform:2]Bear Form\n/use Skull Bash")
+
+				-- Celestial Alignment / Heart of the Wild
+				m("C09", nil, "#showtooltip\n/use [help]Heart of the Wild;Celestial Alignment")
+
+				-- Innervate
+				m("C10", nil, "#showtooltip Innervate\n/use [@focus,help,nodead][exists,help,nodead]Innervate")
+
+				-- Growl
+				m("C11", nil, "#showtooltip Growl\n/use [noform:1]Bear Form\n/use Growl")
+
+				-- Bear Form
+				m("C12", nil, "#showtooltip Bear Form\n/use [noform:1]Bear Form")
+
+				-- Cat Form / Dash
+				m("C13", nil, "#showtooltip Dash\n/use [form:2]Dash;Cat Form")
+
+				if known("Moonkin Form") then
+					-- Moonkin Form
+					m("C14", nil, "#showtooltip Moonkin Form\n/stopcasting\n/stopcasting\n/use [noform:4]Moonkin Form")
+				else
+					-- Caster Form
+					m("C14", 461117, "/stopcasting\n/stopcasting\n/cancelform")
+				end
+
+				-- Prowl
+				m("C15", nil, "#showtooltip\n/cancelaura Travel Form\n/cancelaura [btn:2]Prowl\n/use [nobtn:2]!Prowl")
+
+				-- Flap
+				m("C16", nil, "#showtooltip Flap\n/use [form:4]Flap;!Moonkin Form")
+
+				
+				------ Left ------
+				-- Top
+				spell("N", "Force of Nature")
+				spell("SN", "Warrior of Elune")
+				macro("R", "C11")
+				spell("SR", "Soothe")
+				spell("CR", "Remove Corruption")
+				empty("H")
+				macro("SH", "C10", "Innervate")
+				racial("AE")
+
+				-- Middle
+				if known("New Moon") then spell("C", "New Moon") else spell("C", "Fury of Elune") end
+				spell("SC", "Wild Mushroom")
+				spell("Q", "Starfall")
+				if known("Rejuvenation") then macro("E", "C07") else spell("E", "Moonfire") end
+				if known("Heart of the Wild") and known("Celestial Alignment") then macro("G", "C09") elseif known("Heart of the Wild") then spell("G", "Heart of the Wild") else spell("G", "Celestial Alignment") end
+				spell("SG", "Convoke the Spirits")
+				macro("SE", "C08", "Skull Bash")
+
+				-- Bottom
+				macro("1", "C01")
+				if known("Swiftmend") then macro("2", "C02") else spell("2", "Starfire") end
+				if known("Wild Growth") then macro("3", "C03") else spell("3", "Starsurge") end
+				spell("4", "Sunfire")
+				spell("5", "Stellar Flare")
+				macro("6", "C06", "Solar Beam")
+				spell("V", "Astral Communion")
+				if known("Incapacitating Roar") then spell("CE", "Incapacitating Roar") else spell("CE", "Mighty Bash") end
+
+				------ Cat Form ------
+				-- Middle
+				empty("C C")
+				empty("C SC")
+				spell("C Q", "Swipe")
+				if known("Rejuvenation") then macro("C E", "C07") else spell("C E", "Moonfire") end
+				spell("C G", "Heart of the Wild")
+				spell("C SG", "Convoke the Spirits")
+				macro("C SE", "C08", "Skull Bash")
+
+				-- Bottom
+				if known("Rake") then spell("C 1", "Rake") elseif known("Thrash") then spell("C 1", "Thrash") else spell("C 1", "Shred") end
+				if known("Rake") then spell("C 2", "Thrash") else empty("C 2") end
+				if known("Rake") or known("Thrash") then spell("C 3", "Shred") else empty("C 3") end
+				spell("C 4", "Rip")
+				spell("C 5", "Ferocious Bite")
+				spell("C 6", "Maim")
+				empty("C V")
+				if known("Incapacitating Roar") then spell("C CE", "Incapacitating Roar") else spell("C CE", "Mighty Bash") end
+
+				------ Bear Form ------
+				-- Middle
+				empty("B C")
+				empty("B SC")
+				spell("B Q", "Frenzied Regeneration")
+				if known("Rejuvenation") then macro("B E", "C07") else spell("B E", "Moonfire") end
+				spell("B G", "Heart of the Wild")
+				spell("B SG", "Convoke the Spirits")
+				macro("C SE", "C08", "Skull Bash")
+
+				-- Bottom
+				spell("B 1", "Mangle")
+				spell("B 2", "Thrash")
+				spell("B 3", "Swipe")
+				spell("B 4", "Ironfur")
+				empty("B 5")
+				empty("B 6")
+				empty("B V")
+				if known("Incapacitating Roar") then spell("B CE", "Incapacitating Roar") else spell("B CE", "Mighty Bash") end
+
+				------ Right ------
+				-- Top
+				if known("Mass Entanglement") then spell("AB3", "Mass Entanglement") else spell("AB3", "Ursol's Vortex") end
+				spell("AF", "Travel Form")
+				spell("CF", "Wild Charge")
+				spell("SF", "Stampeding Roar")
+				macro("F", "C13")
+
+				-- Middle
 				spell("T", "Cyclone")
 				spell("ST", "Entangling Roots")
-				if talent[4][2] then spell("CT", "Mass Entanglement") else empty("CT") end
-				if talent[3][2] then spell("AT", "Incapacitating Roar") else empty("AT") end
+				spell("CT", "Hibernate")
+				empty("AT")
 				spell("CB3", "Typhoon")
 				spell("SQ", "Regrowth")
-				if level >= 21 then macro("SV", "C14") else macro("SV", "C13") end -- Moonkin Form
-				macro("CV", "C16", 13) -- Prowl
+				macro("SV", "C14")
+				macro("CV", "C15", "Prowl")
 
-				if talent[3][3] then spell("AB3", "Ursol's Vortex") else empty("AB3") end
-				spell("AF", "Travel Form")
-				if talent[2][3] then macro("CF", "C17") else empty("CF") end -- Wild Charge
-				spell("SF", "Stampeding Roar", 43)
-				macro("F", "C10") -- Dash
+				-- Bottom
+				spell("F1", "Barkskin")
+				macro("F2", "C12")
+				spell("F3", "Renewal")
+				spell("F4", "Nature's Vigil")
+				empty("F5")
+				empty("F6")
+				if known("Flap") then macro("CQ", "C16", "Moonkin Form") else empty("CQ") end
+
 			elseif spec == 2 then
 				--! Feral Druid
-				macro("1", "C01")
-				if talent[3][1] then spell("2", "Starfire") elseif talent[3][3] then spell("2", "Swiftmend") else empty("2") end
-				if talent[3][1] then spell("3", "Starsurge") elseif talent[3][3] then spell("3", "Wild Growth") else empty("3") end
-				if talent[3][1] then spell("4", "Sunfire") else empty("4") end
-				empty("5")
-				if talent[4][1] then spell("CE", "Mighty Bash") else empty("CE") end
+				
+				------ Macros ------
 
-				empty("C")
-				empty("SC")
-				empty("Q")
-				macro("E", "C05") -- Moonfire/Rejuvenation
-				empty("G")
-				if talent[4][3] then spell("SG", "Heart of the Wild") else empty("SG") end
-				empty("V")
-				macro("SE", "C09", 26) -- Skull Bash
+				-- Wrath / Regrowth
+				m("C01", nil, "#showtooltip\n/use [help]Regrowth;Wrath")
 
-				spell("Bear 1", "Mangle")
-				spell("Bear 2", "Thrash", 11)
-				if not talent[6][2] then spell("Bear 3", "Swipe") else empty("Bear 3") end
-				spell("Bear 4", "Ironfur")
-				empty("Bear 5")
-				if talent[4][1] then spell("Bear CE", "Mighty Bash") else empty("Bear CE") end
+				-- Starfire / Swiftmend
+				m("C02", nil, "#showtooltip\n/use [help]Swiftmend;Starfire")
 
-				empty("Bear C")
-				empty("Bear SC")
-				if talent[3][2] then spell("Bear Q", "Frenzied Regeneration") else empty("Bear Q") end
-				empty("Bear E")
-				empty("Bear G")
-				if talent[4][3] then spell("Bear SG", "Heart of the Wild") else empty("Bear SG") end
-				empty("Bear V")
-				macro("Bear SE", "C09", 26) -- Skull Bash
+				-- Starsurge / Wild Growth
+				m("C03", nil, "#showtooltip\n/use [help]Wild Growth;Starsurge")
 
-				if talent[1][3] then macro("Cat 1", "C07") else spell("Cat 1", "Shred") end
-				spell("Cat 2", "Swipe")
-				spell("Cat 3", "Ferocious Bite")
-				if talent[6][3] then macro("Cat 4", "C18") else spell("Cat 4", "Rip") end
-				spell("Cat 5", "Maim")
-				if talent[4][1] then spell("Cat CE", "Mighty Bash") else empty("Cat CE") end
+				-- Rip / Primal Wrath
+				m("C04", nil, "#showtooltip\n/use [mod:shift]Primal Wrath;Rip")
 
-				if talent[5][2] then spell("Cat C", "Savage Roar") else empty("Cat C") end
-				if talent[7][3] then spell("Cat SC", "Feral Frenzy") else empty("Cat SC") end
-				spell("Cat Q", "Thrash", 11)
-				macro("Cat E", "C05") -- Rake/Rejuvenation
-				spell("Cat G", "Berserk")
-				if talent[4][3] then spell("Cat SG", "Heart of the Wild") else empty("Cat SG") end
-				spell("Cat V", "Tiger's Fury")
-				macro("Cat SE", "C09", 26) -- Skull Bash
+				-- Moonfire / Rejuvenation
+				m("C07", nil, "#showtooltip\n/use [help]Rejuvenation;Moonfire")
 
-				spell("R", "Growl")
+				-- Skull Bash
+				m("C08", nil, "#showtooltip Skull Bash\n/stopcasting\n/stopcasting\n/use [noform:1,noform:2]Bear Form\n/use Skull Bash")
+
+				-- Innervate
+				m("C10", nil, "#showtooltip Innervate\n/use [@focus,help,nodead][exists,help,nodead]Innervate")
+
+				-- Growl
+				m("C11", nil, "#showtooltip Growl\n/use [noform:1]Bear Form\n/use Growl")
+
+				-- Bear Form
+				m("C12", nil, "#showtooltip Bear Form\n/use [noform:1]Bear Form")
+
+				-- Cat Form / Dash
+				m("C13", nil, "#showtooltip Dash\n/use [form:2]Dash;Cat Form")
+
+				-- Moonkin Form / Flap
+				m("C14", nil, "#showtooltip "..( known("Flap") and "[form:4]Flap;" or "" ).."Moonkin Form\n/use "..( known("Flap") and "[form:4]Flap;" or "" ).."!Moonkin Form")
+
+				-- Prowl
+				m("C15", nil, "#showtooltip\n/cancelaura Travel Form\n/cancelaura [btn:2]Prowl\n/use [nobtn:2]!Prowl")
+
+				-- Cat Form
+				m("C16", nil, "#showtooltip Bear Form\n/use [noform:2]Cat Form")
+
+				
+				------ Left ------
+				-- Top
+				empty("N")
+				empty("SN")
+				macro("R", "C11")
 				spell("SR", "Soothe")
 				spell("CR", "Remove Corruption")
-				if talent[2][2] then spell("H", "Renewal") else empty("H") end
-				spell("SH", "Hibernate")
+				empty("H")
+				macro("SH", "C10", "Innervate")
+				racial("AE")
 
-				spell("F1", "Barkskin")
-				macro("F2", "C11") -- Bear Form
-				spell("F3", "Survival Instincts")
-				empty("F4")
-				empty("F5")
-				if talent[3][1] then macro("CQ", "C06", 21) else empty("CQ") end -- Moonkin Form/Flap
+				-- Middle
+				spell("C", "Adaptive Swarm")
+				empty("SC")
+				empty("Q")
+				if known("Rejuvenation") then macro("E", "C07") else spell("E", "Moonfire") end
+				spell("G", "Heart of the Wild")
+				spell("SG", "Convoke the Spirits")
+				macro("SE", "C08", "Skull Bash")
 
+				-- Bottom
+				macro("1", "C01")
+				if known("Swiftmend") and known("Starfire") then macro("2", "C02") elseif known("Swiftmend") then spell("2", "Swiftmend") else spell("2", "Starfire") end
+				if known("Wild Growth") and known("Starsurge") then macro("3", "C03") elseif known("Wild Growth") then spell("3", "Wild Growh") else spell("3", "Starsurge") end
+				spell("4", "Sunfire")
+				empty("5")
+				empty("6")
+				empty("V")
+				if known("Incapacitating Roar") then spell("CE", "Incapacitating Roar") else spell("CE", "Mighty Bash") end
+
+				------ Cat Form ------
+				-- Middle
+				spell("C C", "Adaptive Swarm")
+				spell("C SC", "Feral Frenzy")
+				spell("C Q", "Swipe")
+				if known("Rejuvenation") then macro("C E", "C07") else spell("C E", "Moonfire") end
+				spell("C G", "Berserk")
+				spell("C SG", "Convoke the Spirits")
+				macro("C SE", "C08", "Skull Bash")
+
+				-- Bottom
+				spell("C 1", "Rake")
+				spell("C 2", "Thrash")
+				spell("C 3", "Shred")
+				if known("Rip") and known("Primal Wrath") then macro("C 4", "C04") elseif known("Primal Wrath") then spell("C 4", "Primal Wrath") else spell("C 4", "Rip") end
+				spell("C 5", "Ferocious Bite")
+				spell("C 6", "Maim")
+				spell("C V", "Tiger's Fury")
+				if known("Incapacitating Roar") then spell("C CE", "Incapacitating Roar") else spell("C CE", "Mighty Bash") end
+
+				------ Bear Form ------
+				-- Middle
+				spell("B C", "Adaptive Swarm")
+				empty("B SC")
+				spell("B Q", "Frenzied Regeneration")
+				if known("Rejuvenation") then macro("B E", "C07") else spell("B E", "Moonfire") end
+				spell("B G", "Heart of the Wild")
+				spell("B SG", "Convoke the Spirits")
+				macro("B SE", "C08", "Skull Bash")
+
+				-- Bottom
+				spell("B 1", "Mangle")
+				spell("B 2", "Thrash")
+				spell("B 3", "Swipe")
+				spell("B 4", "Ironfur")
+				empty("B 5")
+				empty("B 6")
+				empty("B V")
+				if known("Incapacitating Roar") then spell("B CE", "Incapacitating Roar") else spell("B CE", "Mighty Bash") end
+
+				------ Right ------
+				-- Top
+				if known("Mass Entanglement") then spell("AB3", "Mass Entanglement") else spell("AB3", "Ursol's Vortex") end
+				spell("AF", "Travel Form")
+				spell("CF", "Wild Charge")
+				spell("SF", "Stampeding Roar")
+				macro("F", "C13")
+
+				-- Middle
 				spell("T", "Cyclone")
 				spell("ST", "Entangling Roots")
-				if talent[4][2] then spell("CT", "Mass Entanglement") else empty("CT") end
-				if talent[3][2] then spell("AT", "Incapacitating Roar") else empty("AT") end
-				if talent[3][1] then spell("CB3", "Typhoon") else empty("CB3") end
+				spell("CT", "Hibernate")
+				empty("AT")
+				spell("CB3", "Typhoon")
 				spell("SQ", "Regrowth")
-				macro("SV", "C12") -- Cat Form
-				macro("CV", "C16", 13) -- Prowl
+				macro("SV", "C16")
+				macro("CV", "C15", "Prowl")
 
-				if talent[3][3] then spell("AB3", "Ursol's Vortex") else empty("AB3") end
-				spell("AF", "Travel Form")
-				if talent[2][3] then macro("CF", "C17") else empty("CF") end -- Wild Charge
-				spell("SF", "Stampeding Roar", 43)
-				macro("F", "C10") -- Dash
+				-- Bottom
+				spell("F1", "Barkskin")
+				macro("F2", "C12")
+				spell("F3", "Survival Instincts")
+				spell("F4", "Renewal")
+				spell("F5", "Nature's Vigil")
+				empty("F6")
+				macro("CQ", "C14")
+
 			elseif spec == 3 then
 				--! Guardian Druid
-				macro("1", "C01")
-				if talent[3][1] then spell("2", "Starfire") elseif talent[3][3] then spell("2", "Swiftmend") else empty("2") end
-				if talent[3][1] then spell("3", "Starsurge") elseif talent[3][3] then spell("3", "Wild Growth") else empty("3") end
-				if talent[3][1] then spell("4", "Sunfire") else empty("4") end
-				if talent[4][3] and talent[3][1] then spell("5", "Heart of the Wild") else empty("5") end
-				if talent[4][1] then spell("CE", "Mighty Bash") else empty("CE") end
+				
+				------ Macros ------
 
-				empty("C")
-				empty("SC")
-				empty("Q")
-				macro("E", "C05") -- Moonfire/Rejuvenation
-				empty("G")
-				if talent[4][3] then spell("SG", "Heart of the Wild") else empty("SG") end
-				empty("V")
-				macro("SE", "C09", 26) -- Skull Bash
+				-- Wrath / Regrowth
+				m("C01", nil, "#showtooltip\n/use [help]Regrowth;Wrath")
 
-				spell("Bear 1", "Mangle")
-				spell("Bear 2", "Thrash", 11)
-				spell("Bear 3", "Swipe")
-				spell("Bear 4", "Ironfur")
-				spell("Bear 5", "Maul")
-				if talent[4][1] then spell("Bear CE", "Mighty Bash") else empty("Bear CE") end
+				-- Starfire / Swiftmend
+				m("C02", nil, "#showtooltip\n/use [help]Swiftmend;Starfire")
 
-				if talent[1][3] then spell("Bear C", "Bristling Fur") else empty("Bear C") end
-				empty("Bear SC")
-				spell("Bear Q", "Frenzied Regeneration")
-				macro("Bear E", "C05") -- Moonfire/Rejuvenation
-				spell("Bear G", "Berserk")
-				if talent[4][3] then spell("Bear SG", "Heart of the Wild") else empty("Bear SG") end
-				empty("Bear V")
-				macro("Bear SE", "C09", 26) -- Skull Bash
+				-- Starsurge / Wild Growth
+				m("C03", nil, "#showtooltip\n/use [help]Wild Growth;Starsurge")
 
-				spell("Cat 1", "Shred")
-				spell("Cat 2", "Swipe")
-				spell("Cat 3", "Ferocious Bite")
-				if talent[3][2] then spell("Cat 4", "Rip") else empty("Cat 4") end
-				if talent[3][2] then spell("Cat 5", "Maim") else empty("Cat 5") end
-				if talent[4][1] then spell("Cat CE", "Mighty Bash") else empty("Cat CE") end
+				-- Moonfire / Rejuvenation
+				m("C07", nil, "#showtooltip\n/use [help]Rejuvenation;Moonfire")
 
-				empty("Cat C")
-				empty("Cat SC")
-				spell("Cat Q", "Thrash", 11)
-				if talent[3][2] then macro("Cat E", "C05") else empty("Cat E") end
-				empty("Cat G")
-				if talent[4][3] then spell("Cat SG", "Heart of the Wild") else empty("Cat SG") end
-				empty("Cat V")
-				macro("Cat SE", "C09", 26) -- Skull Bash
+				-- Skull Bash
+				m("C08", nil, "#showtooltip Skull Bash\n/stopcasting\n/stopcasting\n/use [noform:1,noform:2]Bear Form\n/use Skull Bash")
 
-				spell("R", "Growl")
+				-- Innervate
+				m("C10", nil, "#showtooltip Innervate\n/use [@focus,help,nodead][exists,help,nodead]Innervate")
+
+				-- Growl
+				m("C11", nil, "#showtooltip Growl\n/use [noform:1]Bear Form\n/use Growl")
+
+				-- Bear Form
+				m("C12", nil, "#showtooltip Bear Form\n/use [noform:1]Bear Form")
+
+				-- Cat Form / Dash
+				m("C13", nil, "#showtooltip Dash\n/use [form:2]Dash;Cat Form")
+
+				if known("Moonkin Form") then
+					-- Moonkin Form / Flap
+					m("C14", nil, "#showtooltip "..( known("Flap") and "[form:4]Flap;" or "" ).."Moonkin Form\n/use "..( known("Flap") and "[form:4]Flap;" or "" ).."!Moonkin Form")
+				else
+					-- Caster Form
+					m("C14", 461117, "/stopcasting\n/stopcasting\n/cancelform")
+				end
+
+				-- Prowl
+				m("C15", nil, "#showtooltip\n/cancelaura Travel Form\n/cancelaura [btn:2]Prowl\n/use [nobtn:2]!Prowl")
+
+				
+				------ Left ------
+				-- Top
+				empty("N")
+				empty("SN")
+				macro("R", "C11")
 				spell("SR", "Soothe")
 				spell("CR", "Remove Corruption")
-				if talent[2][2] then spell("H", "Renewal") else empty("H") end
-				spell("SH", "Hibernate")
+				empty("H")
+				macro("SH", "C10", "Innervate")
+				racial("AE")
 
-				spell("F1", "Barkskin")
-				spell("F2", "Survival Instincts")
-				if talent[7][3] then spell("F3", "Pulverize") else empty("F3") end
-				empty("F4")
-				empty("F5")
-				if talent[3][1] then macro("CQ", "C06") else empty("CQ") end -- Moonkin Form/Flap
-
-				spell("T", "Cyclone")
-				spell("ST", "Entangling Roots")
-				if talent[4][2] then spell("CT", "Mass Entanglement") else empty("CT") end
-				spell("AT", "Incapacitating Roar")
-				if talent[3][1] then spell("CB3", "Typhoon") else empty("CB3") end
-				spell("SQ", "Regrowth")
-				macro("SV", "C11") -- Bear Form
-				macro("CV", "C16", 13) -- Prowl
-
-				if talent[3][3] then spell("AB3", "Ursol's Vortex") else empty("AB3") end
-				spell("AF", "Travel Form")
-				if talent[2][3] then macro("CF", "C17") else empty("CF") end -- Wild Charge
-				spell("SF", "Stampeding Roar", 43)
-				macro("F", "C10") -- Dash
-			elseif spec == 4 then
-				--! Restoration Druid
-				macro("1", "C01") -- Regrowth/Wrath
-				macro("2", "C02", 11) -- Swiftmend/Starfire
-				macro("3", "C03", 34) -- Wild Growth/Starsurge
-				if level >= 23 then macro("4", "C04") else spell("4", "Lifebloom") end -- Lifebloom/Sunfire
-				if talent[1][2] then spell("5", "Nourish") elseif talent[1][3] then spell("5", "Cenarion Ward") else empty("5") end
-				if talent[4][1] then spell("CE", "Mighty Bash") else empty("CE") end
-
-				if talent[6][3] then spell("C", "Overgrowth") else empty("C") end
-				macro("SC", "C08", 42) -- Innervate
-				spell("Q", "Efflorescence")
-				macro("E", "C05") -- Rejuvenation/Moonfire
-				if talent[5][3] then spell("G", "Incarnation: Tree of Life") else empty("G") end
-				if talent[4][3] then spell("SG", "Heart of the Wild") else empty("SG") end
-				spell("V", "Nature's Swiftness")
-				spell("SE", "Ironbark")
-
-				spell("Bear 1", "Mangle")
-				if talent[3][3] then spell("Bear 2", "Thrash") else empty("Bear 2") end
-				if talent[3][2] then spell("Bear 3", "Swipe") else empty("Bear 3") end
-				spell("Bear 4", "Ironfur")
-				empty("Bear 5")
-				if talent[4][1] then spell("Bear CE", "Mighty Bash") else empty("Bear CE") end
-
-				empty("Bear C")
-				macro("Bear SC", "C08", 42) -- Innervate
-				if talent[3][3] then spell("Bear Q", "Frenzied Regeneration") else empty("Bear Q") end
-				empty("Bear E")
-				if talent[5][3] then spell("Bear G", "Incarnation: Tree of Life") else empty("Bear G") end
-				if talent[4][3] then spell("Bear SG", "Heart of the Wild") else empty("Bear SG") end
-				spell("Bear V", "Nature's Swiftness")
-				spell("Bear SE", "Ironbark")
-
-				spell("Cat 1", "Shred")
-				if talent[3][2] then spell("Cat 2", "Swipe") else empty("Cat 2") end
-				spell("Cat 3", "Ferocious Bite")
-				if talent[3][2] then spell("Cat 4", "Rip") else empty("Cat 4") end
-				if talent[3][2] then spell("Cat 5", "Maim") else empty("Cat 5") end
-				if talent[4][1] then spell("Cat CE", "Mighty Bash") else empty("Cat CE") end
-
-				empty("Cat C")
-				macro("Cat SC", "C08", 42) -- Innervate
-				if talent[3][3] then spell("Cat Q", "Thrash") else empty("Cat Q") end
-				if talent[3][2] then macro("Cat E", "C05") else empty("Cat E") end -- Rake
-				if talent[5][3] then spell("Cat G", "Incarnation: Tree of Life") else empty("Cat G") end
-				if talent[4][3] then spell("Cat SG", "Heart of the Wild") else empty("Cat SG") end
-				spell("Cat V", "Nature's Swiftness")
-				spell("Cat SE", "Ironbark")
-
-				spell("R", "Growl")
-				spell("SR", "Soothe")
-				spell("CR", "Nature's Cure")
-				if talent[2][2] then spell("H", "Renewal") else empty("H") end
-				spell("SH", "Hibernate")
-
-				spell("F1", "Barkskin")
-				macro("F2", "C11") -- Bear Form
-				spell("F3", "Tranquility")
-				if talent[7][3] then spell("F4", "Flourish") else empty("F4") end
-				empty("F5")
-				if talent[3][1] then macro("CQ", "C06") else empty("CQ") end -- Moonkin Form/Flap
-
-				spell("T", "Cyclone")
-				spell("ST", "Entangling Roots")
-				if talent[4][2] then spell("CT", "Mass Entanglement") else empty("CT") end
-				if talent[3][3] then spell("AT", "Incapacitating Roar") else empty("AT") end
-				if talent[3][1] then spell("CB3", "Typhoon") else empty("CB3") end
-				spell("SQ", "Regrowth")
-				if treant[name] then macro("SV", "C15") else macro("SV", "C13") end -- Treant/Caster Form
-				macro("CV", "C16", 13) -- Prowl
-
-				spell("AB3", "Ursol's Vortex")
-				spell("AF", "Travel Form")
-				if talent[2][3] then macro("CF", "C17") else empty("CF") end -- Wild Charge
-				spell("SF", "Stampeding Roar", 43)
-				macro("F", "C10") -- Dash
-			else
-				--! Untalented Druid
-				spell("1", "Wrath")
-				empty("2")
-				empty("3")
-				empty("4")
-				empty("5")
-				empty("CE")
-
+				-- Middle
 				empty("C")
 				empty("SC")
 				empty("Q")
-				spell("E", "Moonfire", 2)
-				empty("G")
-				empty("SG")
+				if known("Rejuvenation") then macro("E", "C07") else spell("E", "Moonfire") end
+				spell("G", "Heart of the Wild")
+				spell("SG", "Convoke the Spirits")
+				macro("SE", "C08", "Skull Bash")
+
+				-- Bottom
+				macro("1", "C01")
+				if known("Swiftmend") and known("Starfire") then macro("2", "C02") elseif known("Swiftmend") then spell("2", "Swiftmend") else spell("2", "Starfire") end
+				if known("Wild Growth") and known("Starsurge") then macro("3", "C03") elseif known("Wild Growth") then spell("3", "Wild Growh") else spell("3", "Starsurge") end
+				spell("4", "Sunfire")
+				empty("5")
+				empty("6")
 				empty("V")
-				empty("SE")
+				if known("Incapacitating Roar") then spell("CE", "Incapacitating Roar") else spell("CE", "Mighty Bash") end
 
-				spell("Cat 1", "Shred")
-				empty("Cat 2")
-				spell("Cat 3", "Ferocious Bite")
-				empty("Cat 4")
-				empty("Cat 5")
-				empty("Cat CE")
+				------ Cat Form ------
+				-- Middle
+				empty("C C")
+				empty("C SC")
+				spell("C Q", "Swipe")
+				if known("Rejuvenation") then macro("C E", "C07") else spell("C E", "Moonfire") end
+				spell("C G", "Heart of the Wild")
+				spell("C SG", "Convoke the Spirits")
+				macro("C SE", "C08", "Skull Bash")
 
-				empty("Cat C")
-				empty("Cat SC")
-				empty("Cat Q")
-				empty("Cat E")
-				empty("Cat G")
-				empty("Cat SG")
-				empty("Cat V")
-				empty("Cat SE")
+				-- Bottom
+				if known("Rake") then spell("C 1", "Rake") elseif known("Thrash") then spell("C 1", "Thrash") else spell("C 1", "Shred") end
+				if known("Rake") then spell("C 2", "Thrash") else empty("C 2") end
+				if known("Rake") or known("Thrash") then spell("C 3", "Shred") else empty("C 3") end
+				spell("C 4", "Rip")
+				spell("C 5", "Ferocious Bite")
+				spell("C 6", "Maim")
+				empty("C V")
+				if known("Incapacitating Roar") then spell("C CE", "Incapacitating Roar") else spell("C CE", "Mighty Bash") end
 
-				spell("Bear 1", "Mangle")
-				empty("Bear 2")
-				empty("Bear 3")
-				empty("Bear 4")
-				empty("Bear 5")
-				empty("Bear CE")
+				------ Bear Form ------
+				-- Middle
+				spell("B C", "Bristling Fur")
+				empty("B SC")
+				spell("B Q", "Frenzied Regeneration")
+				if known("Rejuvenation") then macro("B E", "C07") else spell("B E", "Moonfire") end
+				spell("B G", "Berserk")
+				spell("B SG", "Convoke the Spirits")
+				macro("B SE", "C08", "Skull Bash")
 
-				empty("Bear C")
-				empty("Bear SC")
-				empty("Bear Q")
-				empty("Bear E")
-				empty("Bear G")
-				empty("Bear SG")
-				empty("Bear V")
-				empty("Bear SE")
+				-- Bottom
+				spell("B 1", "Mangle")
+				spell("B 2", "Thrash")
+				spell("B 3", "Swipe")
+				spell("B 4", "Ironfur")
+				spell("B 5", "Maul")
+				spell("B 6", "Pulverize")
+				spell("B V", "Rage of the Sleeper")
+				if known("Incapacitating Roar") then spell("B CE", "Incapacitating Roar") else spell("B CE", "Mighty Bash") end
 
-				empty("R")
+				------ Right ------
+				-- Top
+				if known("Mass Entanglement") then spell("AB3", "Mass Entanglement") else spell("AB3", "Ursol's Vortex") end
+				spell("AF", "Travel Form")
+				spell("CF", "Wild Charge")
+				spell("SF", "Stampeding Roar")
+				macro("F", "C13")
+
+				-- Middle
+				spell("T", "Cyclone")
+				spell("ST", "Entangling Roots")
+				spell("CT", "Hibernate")
+				empty("AT")
+				spell("CB3", "Typhoon")
+				spell("SQ", "Regrowth")
+				macro("SV", "C12")
+				macro("CV", "C15", "Prowl")
+
+				-- Bottom
+				spell("F1", "Barkskin")
+				spell("F2", "Survival Instincts")
+				spell("F3", "Renewal")
+				spell("F4", "Nature's Vigil")
+				empty("F5")
+				empty("F6")
+				macro("CQ", "C14")
+
+			elseif spec == 4 then
+				--! Restoration Druid
+
+				------ Macros ------
+
+				-- Regrowth / Wrath
+				m("C01", nil, "#showtooltip\n/use [help]Regrowth;[harm]"..( known("Moonkin Form") and "[form:4]" or "" ).."Wrath;Regrowth")
+
+				-- Nourish or Swiftmend / Starfire
+				m("C02", nil, "#showtooltip\n/use [help]"..( known("Nourish") and "Nourish" or "Swiftmend" )..";[harm]"..( known("Moonkin Form") and "[form:4]" or "" ).."Starfire;"..( known("Nourish") and "Nourish" or "Swiftmend" ).."")
+
+				-- Wild Growth / Starsurge
+				m("C03", nil, "#showtooltip\n/use [help]Wild Growth;[harm]"..( known("Moonkin Form") and "[form:4]" or "" ).."Starsurge;Wild Growth")
+
+				-- Lifebloom / Sunfire
+				m("C04", nil, "#showtooltip\n/use [help]Lifebloom;[harm]"..( known("Moonkin Form") and "[form:4]" or "" ).."Sunfire;Lifebloom")
+
+				-- Flourish / Heart of the Wild
+				m("C06", nil, "#showtooltip\n/use [help]Flourish;"..( known("Moonkin Form") and "[form:4]" or "[harm]" ).."Heart of the Wild;Flourish")
+
+				-- Rejuvenation / Moonfire
+				m("C07", nil, "#showtooltip\n/use [help]Rejuvenation;[harm][form:1][form:2]"..( known("Moonkin Form") and "[form:4]" or "" ).."Moonfire;Rejuvenation")
+
+				-- Skull Bash
+				m("C08", nil, "#showtooltip Skull Bash\n/stopcasting\n/stopcasting\n/use [noform:1,noform:2]Bear Form\n/use Skull Bash")
+
+				-- Innervate
+				m("C10", nil, "#showtooltip Innervate\n/use [@focus,help,nodead][exists,help,nodead][@player]Innervate")
+
+				-- Growl
+				m("C11", nil, "#showtooltip Growl\n/use [noform:1]Bear Form\n/use Growl")
+
+				-- Bear Form
+				m("C12", nil, "#showtooltip Bear Form\n/use [noform:1]Bear Form")
+
+				-- Cat Form / Dash
+				m("C13", nil, "#showtooltip Dash\n/use [form:2]Dash;Cat Form")
+
+				-- Moonkin Form / Flap
+				m("C14", nil, "#showtooltip "..( known("Flap") and "[form:4]Flap;" or "" ).."Moonkin Form\n/use "..( known("Flap") and "[form:4]Flap;" or "" ).."!Moonkin Form")
+
+				-- Prowl
+				m("C15", nil, "#showtooltip\n/cancelaura Travel Form\n/cancelaura [btn:2]Prowl\n/use [nobtn:2]!Prowl")
+
+				if custom["treant"] and known("Treant Form") then
+					-- Treant Form
+					m("C16", nil, "#showtooltip Treant Form\n/stopcasting\n/stopcasting\n/use [noform:"..( known("Moonkin Form") and "5" or "4" ).."]!Treant Form")
+				else
+					-- Caster Form
+					m("C16", 461117, "/stopcasting\n/stopcasting\n/cancelform")
+				end
+
+				
+				------ Left ------
+				-- Top
+				spell("N", "Cenarion Ward")
+				spell("SN", "Nature's Swiftness")
+				macro("R", "C11")
+				spell("SR", "Soothe")
+				spell("CR", "Nature's Cure")
+				spell("H", "Ironbark")
+				macro("SH", "C10", "Innervate")
+				racial("AE")
+
+				-- Middle
+				spell("C", "Adaptive Swarm")
+				spell("SC", "Overgrowth")
+				spell("Q", "Efflorescence")
+				macro("E", "C07")
+				if known("Flourish") and known("Heart of the Wild") then macro("G", "C06") elseif known("Heart of the Wild") then spell("G", "Heart of the Wild") else spell("G", "Flourish") end
+				if known("Convoke the Spirits") then spell("SG", "Convoke the Spirits") else spell("SG", "Incarnation: Tree of Life") end
+				macro("SE", "C08", "Skull Bash")
+
+				-- Bottom
+				macro("1", "C01")
+				if (known("Nourish") or known("Swiftmend")) and known("Starfire") then macro("2", "C02") elseif known("Nourish") then spell("2", "Nourish") else spell("2", "Swiftmend") end
+				if known("Wild Growth") and known("Starsurge") then macro("3", "C03") elseif known("Starsurge") then spell("3", "Starsurge") else spell("3", "Wild Growth") end
+				if known("Lifebloom") and known("Sunfire") then macro("4", "C04") elseif known("Sunfire") then spell("4", "Sunfire") else spell("4", "Lifebloom") end
+				if known("Nourish") then spell("5", "Swiftmend") else empty("5") end
+				spell("6", "Invigorate")
+				spell("V", "Nature's Vigil")
+				if known("Incapacitating Roar") then spell("CE", "Incapacitating Roar") else spell("CE", "Mighty Bash") end
+
+				------ Cat Form ------
+				-- Middle
+				spell("C C", "Adaptive Swarm")
+				empty("C SC")
+				spell("C Q", "Swipe")
+				macro("C E", "C07")
+				spell("C G", "Heart of the Wild")
+				spell("C SG", "Convoke the Spirits")
+				macro("C SE", "C08", "Skull Bash")
+
+				-- Bottom
+				if known("Rake") then spell("C 1", "Rake") elseif known("Thrash") then spell("C 1", "Thrash") else spell("C 1", "Shred") end
+				if known("Rake") then spell("C 2", "Thrash") else empty("C 2") end
+				if known("Rake") or known("Thrash") then spell("C 3", "Shred") else empty("C 3") end
+				spell("C 4", "Rip")
+				spell("C 5", "Ferocious Bite")
+				spell("C 6", "Maim")
+				spell("C V", "Nature's Vigil")
+				if known("Incapacitating Roar") then spell("C CE", "Incapacitating Roar") else spell("C CE", "Mighty Bash") end
+
+				------ Bear Form ------
+				-- Middle
+				spell("B C", "Adaptive Swarm")
+				empty("B SC")
+				spell("B Q", "Frenzied Regeneration")
+				macro("B E", "C07")
+				spell("B G", "Heart of the Wild")
+				spell("B SG", "Convoke the Spirits")
+				macro("B SE", "C08", "Skull Bash")
+
+				-- Bottom
+				spell("B 1", "Mangle")
+				spell("B 2", "Thrash")
+				spell("B 3", "Swipe")
+				spell("B 4", "Ironfur")
+				empty("B 5")
+				empty("B 6")
+				spell("B V", "Nature's Vigil")
+				if known("Incapacitating Roar") then spell("B CE", "Incapacitating Roar") else spell("B CE", "Mighty Bash") end
+
+				------ Right ------
+				-- Top
+				if known("Mass Entanglement") then spell("AB3", "Mass Entanglement") else spell("AB3", "Ursol's Vortex") end
+				spell("AF", "Travel Form")
+				spell("CF", "Wild Charge")
+				spell("SF", "Stampeding Roar")
+				macro("F", "C13")
+
+				-- Middle
+				spell("T", "Cyclone")
+				spell("ST", "Entangling Roots")
+				spell("CT", "Hibernate")
+				empty("AT")
+				spell("CB3", "Typhoon")
+				spell("SQ", "Regrowth")
+				macro("SV", "C16")
+				macro("CV", "C15", "Prowl")
+
+				-- Bottom
+				spell("F1", "Barkskin")
+				macro("F2", "C12")
+				spell("F3", "Renewal")
+				spell("F4", "Nature's Vigil")
+				empty("F5")
+				empty("F6")
+				macro("CQ", "C14", "Moonkin Form")
+
+			else
+				--! Unspecialized Druid
+
+				------ Macros ------
+
+				-- Wrath / Regrowth
+				m("C01", nil, "#showtooltip\n/use [help]Regrowth;Wrath")
+
+				-- Growl
+				m("C11", nil, "#showtooltip Growl\n/use [noform:1]Bear Form\n/use Growl")
+
+				-- Bear Form
+				m("C12", nil, "#showtooltip Bear Form\n/use [noform:1]Bear Form")
+
+				if known("Dash") then
+					-- Cat Form / Dash
+					m("C13", nil, "#showtooltip Dash\n/use [form:" .. (level >= 8 and "2" or "1") .. "]Dash;Cat Form")
+				else
+					-- Cat Form
+					m("C13", nil, "#showtooltip Cat Form\n/use [noform:" .. (level >= 8 and "2" or "1") .. "]Cat Form")
+				end
+
+				-- Caster Form
+				m("C16", 461117, "/stopcasting\n/stopcasting\n/cancelform")
+				
+
+				------ Left ------
+				-- Top
+				empty("N")
+				empty("SN")
+				macro("R", "C11", "Growl")
 				empty("SR")
 				empty("CR")
 				empty("H")
 				empty("SH")
+				racial("AE")
 
-				empty("F1")
-				macro("F2", "C11", 8)
-				empty("F3")
-				empty("F4")
-				empty("F5")
-				empty("CQ")
+				-- Middle
+				empty("C")
+				empty("SC")
+				empty("Q")
+				spell("E", "Moonfire")
+				empty("G")
+				empty("SG")
+				empty("SE")
 
+				-- Bottom
+				if known("Regrowth") then macro("1", "C01") else spell("1", "Wrath") end
+				empty("2")
+				empty("3")
+				empty("4")
+				empty("5")
+				empty("6")
+				empty("V")
+				empty("CE")
+
+				------ Cat Form ------
+				-- Middle
+				empty("C C")
+				empty("C SC")
+				empty("C Q")
+				spell("C E", "Moonfire")
+				empty("C G")
+				empty("C SG")
+				empty("C SE")
+
+				-- Bottom
+				spell("C 1", "Shred")
+				empty("C 2")
+				empty("C 3")
+				empty("C 4")
+				spell("C 5", "Ferocious Bite")
+				empty("C 6")
+				empty("C V")
+				empty("C CE")
+
+				------ Bear Form ------
+				-- Middle
+				empty("B C")
+				empty("B SC")
+				empty("B Q")
+				spell("B E", "Moonfire")
+				empty("B G")
+				empty("B SG")
+				empty("B SE")
+
+				-- Bottom
+				spell("B 1", "Mangle")
+				empty("B 2")
+				empty("B 3")
+				empty("B 4")
+				empty("B 5")
+				empty("B 6")
+				empty("B V")
+				empty("B CE")
+
+				------ Right ------
+				-- Top
+				empty("AB3")
+				spell("AF", "Travel Form")
+				empty("CF")
+				empty("SF")
+				macro("F", "C13", "Cat Form")
+
+				-- Middle
 				empty("T")
 				spell("ST", "Entangling Roots")
 				empty("CT")
 				empty("AT")
 				empty("CB3")
 				spell("SQ", "Regrowth")
-				macro("SV", "C13", 5)
+				macro("SV", "C16", "Cat Form")
 				empty("CV")
 
+				-- Bottom
+				spell("F1", "Barkskin")
+				macro("F2", "C12", "Bear Form")
+				empty("F3")
+				empty("F4")
+				empty("F5")
+				empty("F6")
+				empty("CQ")
 
+			end
+		elseif class == "EVOKER" then
+			--! Evoker
+
+			if spec == 1 then
+				--! Devastation Evoker
+				
+				------ Macros ------
+
+				-- Quell
+				m("C08", nil, "#showtooltip Quell\n/stopcasting\n/stopcasting\n/use Quell")
+
+				-- Living Flame Healing
+				m("C13", nil, "#showtooltip\n/use [help][@player]Living Flame")
+				
+				
+				------ Left ------
+				-- Top
+				empty("N")
+				spell("SN", "Tip the Scales")
+				spell("R", "Emerald Blossom")
+				spell("SR", "Unravel")
+				spell("CR", "Expunge")
+				empty("H")
+				spell("SH", "Cauterizing Flame")
+				empty("AE")
+
+				-- Middle
+				spell("C", "Shattering Star")
+				empty("SC")
+				spell("Q", "Eternity Surge")
+				spell("E", "Fire Breath")
+				spell("G", "Dragonrage")
+				empty("SG")
+				macro("SE", "C08", "Quell")
+
+				-- Bottom
+				spell("1", "Living Flame")
+				spell("2", "Azure Strike")
+				spell("3", "Disintegrate")
+				spell("4", "Pyre")
+				spell("5", "Firestorm")
+				empty("6")
+				spell("V", "Deep Breath")
+				racial("CE")
+
+				------ Right ------
+				-- Top
+				empty("AB3")
+				spell("AF", "Rescue")
+				spell("CF", "Verdant Embrace")
+				spell("SF", "Time Spiral")
+				spell("F", "Hover")
+
+				-- Middle
+				spell("T", "Sleep Walk")
+				spell("ST", "Landslide")
+				spell("CT", "Oppressing Roar")
+				empty("AT")
+				spell("CB3", "Wing Buffet")
+				macro("SQ", "C13", "Living Flame")
+				spell("SV", "Visage")
+				spell("CV", "Soar")
+
+				-- Bottom
+				spell("F1", "Obsidian Scales")
+				spell("F2", "Renewing Blaze")
+				spell("F3", "Zephyr")
+				empty("F4")
+				empty("F5")
+				empty("F6")
+				empty("CQ")
+
+			elseif spec == 2 then
+				--! Preservation Evoker
+				
+				------ Macros ------
+
+				-- Reversion / Azure Strike
+				m("C02", nil, "#showtooltip\n/use [harm]Azure Strike;Reversion")
+
+				-- Echo / Disintegrate
+				m("C03", nil, "#showtooltip\n/use [harm]Disintegrate;Echo")
+
+				-- Quell
+				m("C08", nil, "#showtooltip Quell\n/stopcasting\n/stopcasting\n/use Quell")
+
+				-- Living Flame Healing
+				m("C13", nil, "#showtooltip\n/use [help][@player]Living Flame")
+				
+				
+				------ Left ------
+				-- Top
+				empty("N")
+				spell("SN", "Tip the Scales")
+				empty("R")
+				spell("SR", "Unravel")
+				spell("CR", "Expunge")
+				spell("H", "Time Dilation")
+				spell("SH", "Cauterizing Flame")
+				empty("AE")
+
+				-- Middle
+				spell("C", "Temporal Anomaly")
+				empty("SC")
+				spell("Q", "Dream Breath")
+				spell("E", "Fire Breath")
+				spell("G", "Emerald Communion")
+				spell("SG", "Dream Flight")
+				macro("SE", "C08", "Quell")
+
+				-- Bottom
+				spell("1", "Living Flame")
+				if known("Reversion") then macro("2", "C02") else spell("2", "Azure Strike") end
+				if known("Echo") then macro("3", "C03") else spell("3", "Disintegrate") end
+				spell("4", "Emerald Blossom")
+				spell("5", "Spiritbloom")
+				spell("6", "Stasis")
+				spell("V", "Deep Breath")
+				racial("CE")
+
+				------ Right ------
+				-- Top
+				empty("AB3")
+				spell("AF", "Rescue")
+				spell("CF", "Verdant Embrace")
+				spell("SF", "Time Spiral")
+				spell("F", "Hover")
+
+				-- Middle
+				spell("T", "Sleep Walk")
+				spell("ST", "Landslide")
+				spell("CT", "Oppressing Roar")
+				empty("AT")
+				spell("CB3", "Wing Buffet")
+				macro("SQ", "C13", "Living Flame")
+				spell("SV", "Visage")
+				spell("CV", "Soar")
+
+				-- Bottom
+				spell("F1", "Obsidian Scales")
+				spell("F2", "Renewing Blaze")
+				spell("F3", "Zephyr")
+				spell("F4", "Rewind")
+				empty("F5")
+				empty("F6")
+				empty("CQ")
+
+			else
+				--! Unspecialized Evoker
+				
+				------ Macros ------
+
+				-- Living Flame Healing
+				m("C13", nil, "#showtooltip\n/use [help][@player]Living Flame")
+
+				
+				------ Left ------
+				-- Top
+				empty("N")
+				empty("SN")
+				spell("R", "Emerald Blossom")
+				empty("SR")
+				empty("CR")
+				empty("H")
+				empty("SH")
+				empty("AE")
+
+				-- Middle
+				empty("C")
+				empty("SC")
+				empty("Q")
+				spell("E", "Fire Breath")
+				empty("G")
+				empty("SG")
+				empty("SE")
+
+				-- Bottom
+				spell("1", "Living Flame")
+				spell("2", "Azure Strike")
+				spell("3", "Disintegrate")
+				empty("4")
+				empty("5")
+				empty("6")
+				spell("V", "Deep Breath")
+				racial("CE")
+
+				------ Right ------
+				-- Top
 				empty("AB3")
 				empty("AF")
 				empty("CF")
 				empty("SF")
-				if level >= 6 then macro("F", "C10") else spell("F", "Cat Form") end
+				spell("F", "Hover")
+
+				-- Middle
+				empty("T")
+				empty("ST")
+				empty("CT")
+				empty("AT")
+				spell("CB3", "Wing Buffet")
+				macro("SQ", "C13", "Living Flame")
+				spell("SV", "Visage")
+				spell("CV", "Soar")
+
+				-- Bottom
+				empty("F1")
+				empty("F2")
+				empty("F3")
+				empty("F4")
+				empty("F5")
+				empty("F6")
+				empty("CQ")
+
 			end
 
-			-- All Druid Specs
-			macro("Bear 6", "G026")
-			macro("Bear 7", "G027")
-			macro("Cat 6", "G026")
-			macro("Cat 7", "G027")
 		elseif class == "HUNTER" then
 			--! Hunter
 
-			-- Counter Shot/Muzzle
-			m("C01", nil, "#showtooltip [spec:3]Muzzle;Counter Shot\n/stopcasting\n/stopcasting\n/use [spec:3]Muzzle;Counter Shot")
-			-- Growl
-			m("C02", 132270, "#showtooltip Growl\n/use [nobtn:2]Growl\n/petautocasttoggle [btn:2]Growl")
-			-- Kill Command
-			m("C03", nil, "#showtooltip Kill Command\n/petattack\n/petassist\n/petattack\n/use Kill Command")
-			-- Misdirection
-			m("C04", nil, "#showtooltip Misdirection\n/use [@focus,help][help][@pet,exists][]Misdirection")
-			-- Mend Pet/Revive Pet
-			m("C05", nil, "#showtooltip\n/use [@pet,dead][nopet]Revive Pet;Mend Pet")
-			-- Tranquilizing Shot
-			m("C06", 132323, "#showtooltip\n/use Tranquilizing Shot")
-			-- Aspect of the Turtle
-			m("C07", nil, "#showtooltip\n/use !Aspect of the Turtle")
-
-			-- Essence
-			essence("N", "Resonating Arrow", "Death Chakram", "Wild Spirits", "Flayed Shot")
-
 			if spec == 1 then
 				--! Beast Mastery Hunter
-				if level < 14 then spell("1", "Arcane Shot") else spell("1", "Cobra Shot") end
-				if level < 12 then spell("2", "Steady Shot") else spell("2", "Barbed Shot") end
-				macro("3", "C03") -- Kill Command
-				spell("4", "Kill Shot")
-				if talent[2][3] then spell("5", "Chimaera Shot") else empty("5") end
-				spell("CE", "Intimidation")
+				
+				------ Macros ------
 
-				if talent[6][2] then spell("C", "Barrage") elseif talent[6][3] then spell("C", "Stampede") else empty("C") end
-				if talent[1][3] then spell("SC", "Dire Beast") else empty("SC") end
+				-- Kill Command
+				m("C01", nil, "#showtooltip Kill Command\n/petattack\n/petassist\n/petattack\n/use Kill Command")
+
+				-- Counter Shot
+				m("C08", nil, "#showtooltip Counter Shot\n/stopcasting\n/stopcasting\n/use Counter Shot")
+
+				-- Growl
+				m("C09", 132270, "#showtooltip Growl\n/use [nopet]Command Pet;[nobtn:2]Growl\n/petattack [nobtn:2]\n/petassist [nobtn:2]\n/petattack [nobtn:2]\n/petautocasttoggle [btn:2]Growl")
+
+				-- Aspect of the Turtle
+				m("C13", nil, "#showtooltip\n/use !Aspect of the Turtle")
+
+				-- Misdirection
+				m("C14", nil, "#showtooltip Misdirection\n/use [@focus,help][help][@pet,exists][]Misdirection")
+
+				-- Mend Pet/Revive Pet
+				m("C15", nil, "#showtooltip\n/use [@pet,dead][nopet]Revive Pet;Mend Pet")
+
+				-- Master's Call
+				m("C16", 236189, "#showtooltip\n/use [nopet]Command Pet;[help][@player]Master's Call")
+
+				-- Fortitude of the Bear
+				m("C17", 571585, "#showtooltip\n/use [nopet]Command Pet;Fortitude of the Bear")
+					
+				
+				------ Left ------
+				-- Top
+				if known("Stampede") then spell("N", "Stampede") else spell("N", "Death Chakram") end
+				spell("SN", "Wailing Arrow")
+				macro("R", "C09")
+				spell("SR", "Tranquilizing Shot")
+				empty("CR")
+				spell("H", "Hunter's Mark")
+				spell("SH", "Sentinel Owl")
+				racial("AE")
+
+				-- Middle
+				if known("Explosive Shot") then spell("C", "Explosive Shot") else spell("C", "Barrage") end
+				if known("A Murder of Crows") then spell("SC", "A Murder of Crows") else spell("SC", "Bloodshed") end
 				spell("Q", "Multi-Shot")
-				if talent[4][3] then spell("E", "A Murder of Crows") else empty("E") end
-				spell("G", "Aspect of the Wild")
-				empty("SG")
+				spell("E", "Serpent Sting")
+				spell("G", "Call of the Wild")
+				spell("SG", "Aspect of the Wild")
+				macro("SE", "C08", "Counter Shot")
+
+				-- Bottom
+				macro("1", "C01", "Kill Command")
+				if known("Cobra Shot") then spell("2", "Steady Shot") else spell("2", "Arcane Shot") end
+				if known("Cobra Shot") then spell("3", "Barbed Shot") else spell("3", "Steady Shot") end
+				spell("4", "Kill Shot")
+				spell("5", "Dire Beast")
+				spell("6", "Steel Trap")
 				spell("V", "Bestial Wrath")
-				macro("SE", "C01", 18) -- Counter Shot
+				if known("Scatter Shot") then spell("CE", "Scatter Shot") else spell("CE", "Binding Shot") end
 
-				macro("R", "C02") -- Growl
-				macro("SR", "C06", 37) -- Tranquilizing Shot
-				macro("CR", "G019", 22) -- Pet Ability
-				if talent[7][3] then spell("H", "Bloodshed") else empty("H") end
-				empty("SH")
+				------ Right ------
+				-- Top
+				spell("AB3", "Flare")
+				if level < 28 then empty("AF") else macro("AF", "C16") end
+				empty("CF")
+				spell("SF", "Disengage")
+				spell("F", "Aspect of the Cheetah")
 
-				spell("F1", "Exhilaration")
-				macro("F2", "C07", 8)-- Aspect of the Turtle
-				macro("F3", "G020", 22) -- Exotic Ability
-				if talent[3][3] then spell("F4", "Camouflage") else empty("F4") end
-				spell("F5", "Aspect of the Chameleon")
-				macro("CQ", "C04", 27) -- Misdirection
-
+				-- Middle
 				spell("T", "Freezing Trap")
 				spell("ST", "Wing Clip")
 				spell("CT", "Tar Trap")
 				spell("AT", "Scare Beast")
-				if talent[5][3] then spell("CB3", "Binding Shot") else empty("CB3") end
-				macro("SQ", "C05") -- Mend Pet/Revive Pet
-				spell("SV", "Command Pet", 22)
+				if known("Intimidation") then spell("CB3", "Intimidation") else spell("CB3", "High Explosive Trap") end
+				macro("SQ", "C15")
+				spell("SV", "Camouflage")
 				spell("CV", "Feign Death")
 
-				spell("AB3", "Flare")
-				spell("AF", "Hunter's Mark")
-				empty("CF")
-				spell("SF", "Disengage")
-				spell("F", "Aspect of the Cheetah")
+				-- Bottom
+				spell("F1", "Exhilaration")
+				macro("F2", "C13", "Aspect of the Turtle")
+				spell("F3", "Survival of the Fittest")
+				if level < 1 then empty("F4") else macro("F4", "C17") end
+				empty("F5")
+				empty("F6")
+				macro("CQ", "C14", "Misdirection")
+
 			elseif spec == 2 then
 				--! Marksmanship Hunter
-				spell("1", "Arcane Shot")
-				spell("2", "Steady Shot")
+				
+				------ Macros ------
+
+				-- Counter Shot
+				m("C08", nil, "#showtooltip Counter Shot\n/stopcasting\n/stopcasting\n/use Counter Shot")
+
+				-- Growl
+				m("C09", 132270, "#showtooltip Growl\n/use [nopet]Command Pet;[nobtn:2]Growl\n/petattack [nobtn:2]\n/petassist [nobtn:2]\n/petattack [nobtn:2]\n/petautocasttoggle [btn:2]Growl")
+
+				-- Aspect of the Turtle
+				m("C13", nil, "#showtooltip\n/use !Aspect of the Turtle")
+
+				-- Misdirection
+				m("C14", nil, "#showtooltip Misdirection\n/use [@focus,help][help][@pet,exists][]Misdirection")
+
+				-- Mend Pet/Revive Pet
+				m("C15", nil, "#showtooltip\n/use [@pet,dead][nopet]Revive Pet;Mend Pet")
+
+				-- Master's Call
+				m("C16", 236189, "#showtooltip\n/use [nopet]Command Pet;[help][@player]Master's Call")
+
+				-- Fortitude of the Bear
+				m("C17", 571585, "#showtooltip\n/use [nopet]Command Pet;Fortitude of the Bear")
+				
+				
+				------ Left ------
+				-- Top
+				if known("Stampede") then spell("N", "Stampede") else spell("N", "Death Chakram") end
+				spell("SN", "Wailing Arrow")
+				macro("R", "C09")
+				spell("SR", "Tranquilizing Shot")
+				empty("CR")
+				spell("H", "Hunter's Mark")
+				spell("SH", "Sentinel Owl")
+				racial("AE")
+
+				-- Middle
+				if known("Explosive Shot") then spell("C", "Explosive Shot") else spell("C", "Barrage") end
+				spell("SC", "Volley")
+				spell("Q", "Multi-Shot")
+				spell("E", "Serpent Sting")
+				spell("G", "Trueshot")
+				spell("SG", "Double Tap")
+				macro("SE", "C08", "Counter Shot")
+
+				-- Bottom
+				spell("1", "Steady Shot")
+				spell("2", "Arcane Shot")
 				spell("3", "Aimed Shot")
 				spell("4", "Kill Shot")
 				spell("5", "Rapid Fire")
-				spell("CE", "Bursting Shot")
+				spell("6", "Steel Trap")
+				spell("V", "Bursting Shot")
+				if known("Scatter Shot") then spell("CE", "Scatter Shot") else spell("CE", "Binding Shot") end
 
-				if talent[2][2] then spell("C", "Barrage") elseif talent[2][3] then spell("C", "Explosive Shot") else empty("C") end
-				if talent[7][3] then spell("SC", "Volley") else empty("SC") end
-				spell("Q", "Multi-Shot")
-				if talent[1][2] then spell("E", "Serpent Sting") elseif talent[1][3] then spell("E", "A Murder of Crows") else empty("E") end
-				spell("G", "Trueshot")
-				empty("SG")
-				if talent[6][3] then spell("V", "Double Tap") else empty("V") end
-				macro("SE", "C01", 18) -- Counter Shot
-
-				macro("R", "C02") -- Growl
-				macro("SR", "C06", 37) -- Tranquilizing Shot
-				macro("CR", "G019", 22) -- Pet Ability
-				empty("H")
-				empty("SH")
-
-				spell("F1", "Exhilaration")
-				macro("F2", "C07", 8)-- Aspect of the Turtle
-				empty("F3")
-				if talent[3][3] then spell("F4", "Camouflage") else empty("F4") end
-				spell("F5", "Aspect of the Chameleon")
-				macro("CQ", "C04", 27) -- Misdirection
-
-				spell("T", "Freezing Trap")
-				spell("ST", "Wing Clip")
-				spell("CT", "Tar Trap")
-				spell("AT", "Scare Beast")
-				spell("CB3", "Binding Shot")
-				spell("SQ", "Mend Pet")
-				spell("SV", "Command Pet", 22)
-				spell("CV", "Feign Death")
-
+				------ Right ------
+				-- Top
 				spell("AB3", "Flare")
-				spell("AF", "Hunter's Mark")
+				if level < 28 then empty("AF") else macro("AF", "C16") end
 				empty("CF")
 				spell("SF", "Disengage")
 				spell("F", "Aspect of the Cheetah")
-			elseif spec == 3 then
-				--! Survival Hunter
-				spell("1", "Raptor Strike")
-				spell("2", "Wildfire Bomb")
-				macro("3", "C03", 11) -- Kill Command
-				spell("4", "Kill Shot")
-				if talent[6][3] then spell("5", "Flanking Strike") else empty("5") end
-				spell("CE", "Intimidation")
 
-				if talent[4][2] then spell("C", "Steel Trap") elseif talent[4][3] then spell("C", "A Murder of Crows") else empty("C") end
-				if talent[7][3] then spell("SC", "Chakrams") else empty("SC") end
-				spell("Q", "Carve")
-				spell("E", "Serpent Sting")
-				spell("G", "Coordinated Assault")
-				empty("SG")
-				spell("V", "Aspect of the Eagle")
-				macro("SE", "C01", 18) -- Muzzle
-
-				macro("R", "C02") -- Growl
-				macro("SR", "C06", 37) -- Tranquilizing Shot
-				macro("CR", "G019", 22) -- Pet Ability
-				empty("H")
-				empty("SH")
-
-				spell("F1", "Exhilaration")
-				macro("F2", "C07", 8)-- Aspect of the Turtle
-				empty("F3")
-				if talent[3][3] then spell("F4", "Camouflage") else empty("F4") end
-				spell("F5", "Aspect of the Chameleon")
-				macro("CQ", "C04", 27) -- Misdirection
-
+				-- Middle
 				spell("T", "Freezing Trap")
 				spell("ST", "Wing Clip")
 				spell("CT", "Tar Trap")
 				spell("AT", "Scare Beast")
-				if talent[5][3] then spell("CB3", "Binding Shot") else empty("CB3") end
-				macro("SQ", "C05") -- Mend Pet/Revive Pet
-				spell("SV", "Command Pet", 22)
+				if known("Intimidation") then spell("CB3", "Intimidation") else spell("CB3", "High Explosive Trap") end
+				macro("SQ", "C15")
+				spell("SV", "Camouflage")
 				spell("CV", "Feign Death")
 
+				-- Bottom
+				spell("F1", "Exhilaration")
+				macro("F2", "C13", "Aspect of the Turtle")
+				spell("F3", "Survival of the Fittest")
+				if level < 22 then empty("F4") else macro("F4", "C17") end
+				empty("F5")
+				empty("F6")
+				macro("CQ", "C14", "Misdirection")
+
+			elseif spec == 3 then
+				--! Survival Hunter
+				
+				------ Macros ------
+
+				-- Kill Command
+				m("C01", nil, "#showtooltip Kill Command\n/petattack\n/petassist\n/petattack\n/use Kill Command")
+
+				-- Muzzle
+				m("C08", nil, "#showtooltip Muzzle\n/stopcasting\n/stopcasting\n/use Muzzle")
+
+				-- Growl
+				m("C09", 132270, "#showtooltip Growl\n/use [nopet]Command Pet;[nobtn:2]Growl\n/petattack [nobtn:2]\n/petassist [nobtn:2]\n/petattack [nobtn:2]\n/petautocasttoggle [btn:2]Growl")
+
+				-- Aspect of the Turtle
+				m("C13", nil, "#showtooltip\n/use !Aspect of the Turtle")
+
+				-- Misdirection
+				m("C14", nil, "#showtooltip Misdirection\n/use [@focus,help][help][@pet,exists][]Misdirection")
+
+				-- Mend Pet/Revive Pet
+				m("C15", nil, "#showtooltip\n/use [@pet,dead][nopet]Revive Pet;Mend Pet")
+
+				-- Master's Call
+				m("C16", 236189, "#showtooltip\n/use [nopet]Command Pet;[help][@player]Master's Call")
+
+				-- Fortitude of the Bear
+				m("C17", 571585, "#showtooltip\n/use [nopet]Command Pet;Fortitude of the Bear")
+				
+				
+				------ Left ------
+				-- Top
+				if known("Stampede") then spell("N", "Stampede") else spell("N", "Death Chakram") end
+				empty("SN")
+				macro("R", "C09")
+				spell("SR", "Tranquilizing Shot")
+				empty("CR")
+				spell("H", "Hunter's Mark")
+				spell("SH", "Sentinel Owl")
+				racial("AE")
+
+				-- Middle
+				if known("Explosive Shot") then spell("C", "Explosive Shot") else spell("C", "Barrage") end
+				spell("SC", "Fury of the Eagle")
+				spell("Q", "Flanking Strike")
+				spell("E", "Serpent Sting")
+				spell("G", "Coordinated Assault")
+				spell("SG", "Spearhead")
+				macro("SE", "C08", "Muzzle")
+
+				-- Bottom
+				macro("1", "C01", "Kill Command")
+				spell("2", "Raptor Strike")
+				spell("3", "Wildfire Bomb")
+				spell("4", "Kill Shot")
+				if known("Carve") then spell("5", "Carve") else spell("5", "Butchery") end
+				spell("6", "Steel Trap")
+				spell("V", "Aspect of the Eagle")
+				if known("Scatter Shot") then spell("CE", "Scatter Shot") else spell("CE", "Binding Shot") end
+
+				------ Right ------
+				-- Top
 				spell("AB3", "Flare")
-				spell("AF", "Hunter's Mark")
+				if level < 28 then empty("AF") else macro("AF", "C16") end
 				spell("CF", "Harpoon")
 				spell("SF", "Disengage")
 				spell("F", "Aspect of the Cheetah")
-			else
-				--! Untalented Hunter
-				if level >= 2 then spell("1", "Arcane Shot") else spell("1", "Steady Shot") end
-				if level >= 2 then spell("2", "Steady Shot") else empty("2") end
-				empty("3")
-				empty("4")
-				empty("5")
-				empty("CE")
 
+				-- Middle
+				spell("T", "Freezing Trap")
+				spell("ST", "Wing Clip")
+				spell("CT", "Tar Trap")
+				spell("AT", "Scare Beast")
+				if known("Intimidation") then spell("CB3", "Intimidation") else spell("CB3", "High Explosive Trap") end
+				macro("SQ", "C15")
+				spell("SV", "Camouflage")
+				spell("CV", "Feign Death")
+
+				-- Bottom
+				spell("F1", "Exhilaration")
+				macro("F2", "C13", "Aspect of the Turtle")
+				spell("F3", "Survival of the Fittest")
+				macro("F4", "C17")
+				empty("F5")
+				empty("F6")
+				macro("CQ", "C14", "Misdirection")
+
+			else
+				--! Unspecialized Hunter
+				
+				------ Macros ------
+
+				-- Aspect of the Turtle
+				m("C13", nil, "#showtooltip\n/use !Aspect of the Turtle")
+
+				-- Mend Pet/Revive Pet
+				m("C15", nil, "#showtooltip\n/use [@pet,dead][nopet]Revive Pet;Mend Pet")
+
+				
+				------ Left ------
+				-- Top
+				empty("N")
+				empty("SN")
+				empty("R")
+				empty("SR")
+				empty("CR")
+				spell("H", "Hunter's Mark")
+				empty("SH")
+				racial("AE")
+
+				-- Middle
 				empty("C")
 				empty("SC")
 				empty("Q")
 				empty("E")
 				empty("G")
 				empty("SG")
-				empty("V")
 				empty("SE")
 
-				macro("R", "C02", 10) -- Growl
-				empty("SR")
-				empty("CR")
-				empty("H")
-				empty("SH")
+				-- Bottom
+				spell("1", "Steady Shot")
+				spell("2", "Arcane Shot")
+				empty("3")
+				empty("4")
+				empty("5")
+				empty("6")
+				empty("V")
+				empty("CE")
 
-				spell("F1", "Exhilaration")
-				macro("F2", "C07", 8)-- Aspect of the Turtle
-				empty("F3")
-				empty("F4")
-				empty("F5")
-				empty("CQ")
+				------ Right ------
+				-- Top
+				empty("AB3")
+				empty("AF")
+				empty("CF")
+				spell("SF", "Disengage")
+				spell("F", "Aspect of the Cheetah")
 
+				-- Middle
 				spell("T", "Freezing Trap")
 				spell("ST", "Wing Clip")
 				empty("CT")
 				empty("AT")
 				empty("CB3")
-				macro("SQ", "C05", 5) -- Mend Pet/Revive Pet
-				spell("SV", "Tame Beast")
+				if known("Mend pet") then macro("SQ", "C15") else spell("SQ", "Tame Beast") end
+				empty("SV")
 				spell("CV", "Feign Death")
 
-				empty("AB3")
-				spell("AF", "Hunter's Mark")
-				empty("CF")
-				spell("SF", "Disengage")
-				spell("F", "Aspect of the Cheetah")
+				-- Bottom
+				spell("F1", "Exhilaration")
+				macro("F2", "C13", "Aspect of the Turtle")
+				empty("F3")
+				empty("F4")
+				empty("F5")
+				empty("F6")
+				empty("CQ")
+
 			end
 		elseif class == "MAGE" then
 			--! Mage
 
-			-- Counterspell
-			m("C01", nil, "#showtooltip Counterspell\n/stopcasting\n/stopcasting\n/use Counterspell")
-			-- Ice Block
-			m("C02", nil, "#showtooltip Ice Block\n/use !Ice Block")
-			-- Freeze
-			m("C03", 1698698, "#showtooltip\n/use Freeze")
-			-- Ice barrier
-			m("C04", 135843, "#showtooltip\n/use Ice Barrier")
-			-- Mana Gem
-			m("C05", 134132, "#showtooltip\n/use Mana Gem\n/use Conjure Mana Gem")
-
-			-- Essence
-			essence("N", "Radiant Spark", "Deathborne", "Shifting Power", "Mirrors of Torment")
-
 			if spec == 1 then
 				--! Arcane Mage
+				
+				------ Macros ------
+
+				-- Touch of the Magi
+				m("C10", 236222, "#showtooltip\n/use Touch of the Magi")
+
+				-- Counterspell
+				m("C08", nil, "#showtooltip Counterspell\n/stopcasting\n/stopcasting\n/use Counterspell")
+
+				-- Ice Block
+				m("C13", nil, "#showtooltip\n/use !Ice Block")
+
+				-- Mana Gem
+				m("C14", 134132, "#showtooltip\n/use Mana Gem\n/use Conjure Mana Gem")
+				
+				
+				------ Left ------
+				-- Top
+				spell("N", "Meteor")
+				spell("SN", "Presence of Mind")
+				spell("R", "Nether Tempest")
+				spell("SR", "Spellsteal")
+				spell("CR", "Remove Curse")
+				if not known("Arcane Orb") then empty("H") else spell("H", "Fire Blast") end
+				spell("SH", "Supernova")
+				racial("AE")
+
+				-- Middle
+				spell("C", "Evocation")
+				macro("SC", "C14", "Conjure Mana Gem")
+				spell("Q", "Arcane Explosion")
+				macro("E", "C10", "Touch of the Magi")
+				spell("G", "Arcane Surge")
+				spell("SG", "Shifting Power")
+				macro("SE", "C08", "Counterspell")
+
+				-- Bottom
 				spell("1", "Arcane Blast")
 				spell("2", "Arcane Missiles")
-				spell("3", "Arcane Barrage")
-				spell("4", "Touch of the Magi")
-				if talent[6][2] then spell("5", "Arcane Orb") elseif talent[6][3] then spell("5", "Supernova") else empty("5") end
+				if known("Arcane Orb") then spell("3", "Arcane Orb") else spell("3", "Fire Blast") end
+				spell("4", "Arcane Barrage")
+				spell("5", "Radiant Spark")
+				spell("6", "Ice Nova")
+				spell("V", "Rune of Power")
 				spell("CE", "Frost Nova")
 
-				spell("C", "Evocation")
-				macro("SC", "C05", 17) -- Mana Gem
-				spell("Q", "Arcane Explosion")
-				if talent[4][3] then spell("E", "Nether Tempest") else empty("E") end
-				spell("G", "Arcane Power")
-				empty("SG")
-				spell("V", "Presence of Mind")
-				macro("SE", "C01") -- Counterspell
+				------ Right ------
+				-- Top
+				spell("AB3", "Ring of Frost")
+				spell("AF", "Ice Floes")
+				spell("CF", "Alter Time")
+				spell("SF", "Displacement")
+				spell("F", "Blink")
 
-				if talent[3][3] then spell("R", "Rune of Power") else empty("R") end
+				-- Middle
+				spell("T", "Polymorph")
+				if known("Slow") then spell("ST", "Slow") else spell("ST", "Frostbolt") end
+				spell("CT", "Dragon's Breath")
+				spell("AT", "Mass Polymorph")
+				spell("CB3", "Blast Wave")
+				spell("SQ", "Cone of Cold")
+				spell("SV", "Invisibility")
+				spell("CV", "Greater Invisibility")
+
+				-- Bottom
+				spell("F1", "Prismatic Barrier")
+				macro("F2", "C13", "Ice Block")
+				spell("F3", "Mirror Image")
+				empty("F4")
+				empty("F5")
+				empty("F6")
+				spell("CQ", "Slow Fall")
+
+			elseif spec == 2 then
+				--! Fire Mage
+				
+				------ Macros ------
+
+				-- Counterspell
+				m("C08", nil, "#showtooltip Counterspell\n/stopcasting\n/stopcasting\n/use Counterspell")
+
+				-- Ice Block
+				m("C13", nil, "#showtooltip\n/use !Ice Block")
+				
+				
+				------ Left ------
+				-- Top
+				spell("N", "Meteor")
+				empty("SN")
+				empty("R")
+				spell("SR", "Spellsteal")
+				spell("CR", "Remove Curse")
+				empty("H")
+				empty("SH")
+				racial("AE")
+
+				-- Middle
+				spell("C", "Scorch")
+				empty("SC")
+				spell("Q", "Arcane Explosion")
+				spell("E", "Living Bomb")
+				spell("G", "Combustion")
+				spell("SG", "Shifting Power")
+				macro("SE", "C08", "Counterspell")
+
+				-- Bottom
+				spell("1", "Fireball")
+				spell("2", "Fire Blast")
+				spell("3", "Pyroblast")
+				spell("4", "Flamestrike")
+				spell("5", "Phoenix Flames")
+				spell("6", "Ice Nova")
+				spell("V", "Rune of Power")
+				spell("CE", "Frost Nova")
+
+				------ Right ------
+				-- Top
+				spell("AB3", "Ring of Frost")
+				spell("AF", "Ice Floes")
+				spell("CF", "Alter Time")
+				spell("SF", "Displacement")
+				spell("F", "Blink")
+
+				-- Middle
+				spell("T", "Polymorph")
+				if known("Slow") then spell("ST", "Slow") else spell("ST", "Frostbolt") end
+				spell("CT", "Dragon's Breath")
+				spell("AT", "Mass Polymorph")
+				spell("CB3", "Blast Wave")
+				spell("SQ", "Cone of Cold")
+				spell("SV", "Invisibility")
+				spell("CV", "Greater Invisibility")
+
+				-- Bottom
+				spell("F1", "Blazing Barrier")
+				macro("F2", "C13", "Ice Block")
+				spell("F3", "Mirror Image")
+				empty("F4")
+				empty("F5")
+				empty("F6")
+				spell("CQ", "Slow Fall")
+
+			elseif spec == 3 then
+				--! Frost Mage
+				
+				------ Macros ------
+
+				-- Frostbolt and Pet Attack
+				m("C01", nil, "#showtooltip Frostbolt\n/petattack\n/petassist\n/petattack\n/use Frostbolt")
+
+				-- Counterspell
+				m("C08", nil, "#showtooltip Counterspell\n/stopcasting\n/stopcasting\n/use Counterspell")
+
+				-- Ice barrier
+				m("C12", 135843, "#showtooltip\n/use Ice Barrier")
+
+				-- Ice Block
+				m("C13", nil, "#showtooltip\n/use !Ice Block")
+
+				-- Freeze
+				m("C10", 1698698, "#showtooltip\n/use Freeze")
+				
+				
+				------ Left ------
+				-- Top
+				spell("N", "Meteor")
+				spell("SN", "Ray of Frost")
+				if level < 23 then empty("R") else macro("R", "C10", "Summon Water Elemental") end
 				spell("SR", "Spellsteal")
 				spell("CR", "Remove Curse")
 				spell("H", "Fire Blast")
 				empty("SH")
+				racial("AE")
 
-				spell("F1", "Prismatic Barrier")
-				macro("F2", "C02", 22) -- Ice Block
-				spell("F3", "Mirror Image")
-				empty("F4")
-				empty("F5")
-				spell("CQ", "Slow Fall")
-
-				custom("T", "Polymorph")
-				spell("ST", "Slow")
-				spell("CT", "Frostbolt")
-				empty("AT")
-				if talent[5][3] then spell("CB3", "Ring of Frost") else empty("CB3") end
-				empty("SQ")
-				spell("SV", "Time Warp")
-				spell("CV", "Invisibility")
-
-				empty("AB3")
-				empty("AF")
-				spell("CF", "Alter Time")
-				empty("SF")
-				spell("F", "Blink")
-			elseif spec == 2 then
-				--! Fire Mage
-				spell("1", "Fireball")
-				spell("2", "Pyroblast")
-				spell("3", "Fire Blast")
-				spell("4", "Phoenix Flames")
-				if talent[7][3] then spell("5", "Meteor") else empty("5") end
-				spell("CE", "Frost Nova")
-
-				spell("C", "Scorch")
-				empty("SC")
-				if level >= 17 then spell("Q", "Flamestrike") else spell("Q", "Arcane Explosion") end
-				if talent[6][3] then spell("E", "Living Bomb") else empty("E") end
-				spell("G", "Combustion")
-				empty("SG")
-				spell("V", "Dragon's Breath")
-				macro("SE", "C01") -- Counterspell
-
-				if talent[3][3] then spell("R", "Rune of Power") else empty("R") end
-				spell("SR", "Spellsteal")
-				spell("CR", "Remove Curse")
-				empty("H")
-				spell("SH", "Arcane Explosion", 17)
-
-				spell("F1", "Blazing Barrier")
-				macro("F2", "C02", 22) -- Ice Block
-				spell("F3", "Mirror Image")
-				empty("F4")
-				empty("F5")
-				spell("CQ", "Slow Fall")
-
-				custom("T", "Polymorph")
-				spell("ST", "Frostbolt")
-				if talent[2][3] then spell("CT", "Blast Wave") else empty("CT") end
-				empty("AT")
-				if talent[5][3] then spell("CB3", "Ring of Frost") else empty("CB3") end
-				empty("SQ")
-				spell("SV", "Time Warp")
-				spell("CV", "Invisibility")
-
-				empty("AB3")
-				empty("AF")
-				spell("CF", "Alter Time")
-				empty("SF")
-				spell("F", "Blink")
-			elseif spec == 3 then
-				--! Frost Mage
-				spell("1", "Frostbolt")
-				spell("2", "Ice Lance")
-				spell("3", "Flurry")
-				spell("4", "Frozen Orb")
-				if talent[6][3] then spell("5", "Comet Storm") else empty("5") end
-				spell("CE", "Frost Nova")
-
-				if talent[4][3] then spell("C", "Ebonbolt") else empty("C") end
-				empty("SC")
-				if level >= 14 then spell("Q", "Flamestrike") else spell("Q", "Blizzard") end
-				if talent[1][3] then spell("E", "Ice Nova") else empty("E") end
+				-- Middle
+				spell("C", "Glacial Spike")
+				spell("SC", "Comet Storm")
+				spell("Q", "Arcane Explosion")
+				spell("E", "Frozen Orb")
 				spell("G", "Icy Veins")
-				empty("SG")
-				if talent[7][2] then spell("V", "Ray of Frost") elseif talent[7][3] then spell("V", "Glacial Spike") else empty("V") end
-				macro("SE", "C01") -- Counterspell
+				spell("SG", "Shifting Power")
+				macro("SE", "C08", "Counterspell")
 
-				if talent[3][3] then spell("R", "Rune of Power") else empty("R") end
-				spell("SR", "Spellsteal")
-				spell("CR", "Remove Curse")
-				spell("H", "Fire Blast")
-				spell("SH", "Arcane Explosion", 14)
+				-- Bottom
+				if known("Summon Water Elemental") then macro("1", "C01") else spell("1", "Frostbolt") end
+				spell("2", "Flurry")
+				if known("Ice Lance") then spell("3", "Ice Lance") else spell("3", "Fire Blast") end
+				if known("Blizzard") then spell("4", "Blizzard") else spell("4", "Arcane Explosion") end
+				spell("5", "Ebonbolt")
+				spell("6", "Ice Nova")
+				spell("V", "Rune of Power")
+				spell("CE", "Frost Nova")
 
-				macro("F1", "C04", 11) -- Ice Barrier
-				macro("F2", "C02", 22) -- Ice Block
+				------ Right ------
+				-- Top
+				spell("AB3", "Ring of Frost")
+				spell("AF", "Ice Floes")
+				spell("CF", "Alter Time")
+				spell("SF", "Displacement")
+				spell("F", "Blink")
+
+				-- Middle
+				spell("T", "Polymorph")
+				spell("ST", "Slow")
+				spell("CT", "Dragon's Breath")
+				spell("AT", "Mass Polymorph")
+				spell("CB3", "Blast Wave")
+				spell("SQ", "Cone of Cold")
+				spell("SV", "Invisibility")
+				spell("CV", "Greater Invisibility")
+
+				-- Bottom
+				macro("F1", "C12", "Ice Barrier")
+				macro("F2", "C13", "Ice Block")
 				spell("F3", "Mirror Image")
-				empty("F4")
+				spell("F4", "Cold Snap")
 				empty("F5")
+				empty("F6")
 				spell("CQ", "Slow Fall")
 
-				custom("T", "Polymorph")
-				spell("ST", "Cone of Cold")
-				if not talent[1][2] then macro("CT", "C03", 23) else empty("CT") end -- Freeze
-				empty("AT")
-				if talent[5][3] then spell("CB3", "Ring of Frost") else empty("CB3") end
-				empty("SQ")
-				spell("SV", "Time Warp")
-				spell("CV", "Invisibility")
-
-				empty("AB3")
-				empty("AF")
-				spell("CF", "Alter Time")
-				if talent[2][3] then spell("SF", "Ice Floes") else empty("SF") end
-				spell("F", "Blink")
 			else
-				--! Untalented Mage
+				--! Unspecialized Mage
+
+				-- Counterspell
+				m("C08", nil, "#showtooltip Counterspell\n/stopcasting\n/stopcasting\n/use Counterspell")
+
+				-- Ice Block
+				m("C13", nil, "#showtooltip\n/use !Ice Block")
+				
+				------ Left ------
+				-- Top
+				empty("N")
+				empty("SN")
+				empty("R")
+				empty("SR")
+				empty("CR")
+				empty("H")
+				empty("SH")
+				racial("AE")
+
+				-- Middle
+				empty("C")
+				empty("SC")
+				spell("Q", "Arcane Explosion")
+				empty("E")
+				empty("G")
+				empty("SG")
+				macro("SE", "C08", "Counterspell")
+
+				-- Bottom
 				spell("1", "Frostbolt")
 				spell("2", "Fire Blast")
 				empty("3")
 				empty("4")
 				empty("5")
+				empty("6")
+				empty("V")
 				spell("CE", "Frost Nova")
 
-				empty("C")
-				empty("SC")
-				spell("Q", "Arcane Explosion")
-				empty("E")
-				empty("G")
-				empty("SG")
-				empty("V")
-				if level >= 7 then macro("SE", "C01") else empty("SE") end -- Counterspell
+				------ Right ------
+				-- Top
+				empty("AB3")
+				empty("AF")
+				empty("CF")
+				empty("SF")
+				spell("F", "Blink")
 
-				empty("R")
-				empty("SR")
-				empty("CR")
-				empty("H")
-				empty("SH")
-
-				empty("F1")
-				empty("F2")
-				empty("F3")
-				empty("F4")
-				empty("F5")
-				spell("CQ", "Slow Fall")
-
-				custom("T", "Polymorph")
+				-- Middle
+				spell("T", "Polymorph")
 				empty("ST")
 				empty("CT")
 				empty("AT")
@@ -1771,615 +2586,954 @@ local function updateBars()
 				empty("SV")
 				empty("CV")
 
-				empty("AB3")
-				empty("AF")
-				empty("CF")
-				empty("SF")
-				spell("F", "Blink")
+				-- Bottom
+				empty("F1")
+				macro("F2", "C13", "Ice Block")
+				empty("F3")
+				empty("F4")
+				empty("F5")
+				empty("F6")
+				spell("CQ", "Slow Fall")
+
 			end
 		elseif class == "MONK" then
 			--! Monk
 
-			-- Soothing Mist/Tiger Palm
-			m("C01", nil, "#showtooltip\n/use [harm]Tiger Palm;Soothing Mist")
-			-- Enveloping Mist/Rising Sun Kick
-			m("C02", nil, "#showtooltip\n/use [harm]Rising Sun Kick;Enveloping Mist")
-			-- Vivify/Blackout Kick
-			m("C03", nil, "#showtooltip\n/use [harm]Blackout Kick;Vivify")
-			-- Spear Hand Strike
-			m("C04", nil, "#showtooltip Spear Hand Strike\n/stopcasting\n/stopcasting\n/use Spear Hand Strike")
-			-- Provoke Statue
-			m("C05", 615340, "#showtooltip Provoke\n/targetexact Black Ox Statue\n/use Provoke\n/targetlasttarget")
-			-- Celestial Pet
-			m("C06", nil, "#showtooltip\n/petattack\n/petattack\n/use [spec:1]Invoke Niuzao, the Black Ox;[spec:2]Invoke Yu'lon, the Jade Serpent;Invoke Xuen, the White Tiger")
-			-- Tiger's Lust @player
-			m("C07", 571558, "#showtooltip Tiger's Lust\n/use [@player]Tiger's Lust")
-			-- Black Ox Statue
-			m("C08", nil, "#showtooltip\n/click [btn:2][nopet]TotemFrameTotem1 RightButton\n/click [btn:2][nopet]TotemFrameTotem2 RightButton\n/click [btn:2][nopet]TotemFrameTotem3 RightButton\n/use [nobtn:2]Summon Black Ox Statue")
-			-- Jade Serpent Statue
-			m("C09", nil, "#showtooltip\n/click [btn:2]TotemFrameTotem1 RightButton\n/click [btn:2]TotemFrameTotem2 RightButton\n/click [btn:2]TotemFrameTotem3 RightButton\n/use [nobtn:2]Summon Jade Serpent Statue")
-
-			-- Essence
-			essence("N", "Weapons of Order", "Bonedust Brew", "Faeline Stomp", "Fallen Order")
-
 			if spec == 1 then
 				--! Brewmaster Monk
-				spell("1", "Tiger Palm")
-				spell("2", "Keg Smash")
-				spell("3", "Blackout Kick")
-				spell("4", "Purifying Brew")
-				if talent[6][2] then spell("5", "Rushing Jade Wind") elseif talent[6][3] then spell("5", "Exploding Keg") else empty("5") end
+				
+				------ Macros ------
+
+				-- Tiger Palm / Sothing Mist
+				m("C01", nil, "#showtooltip\n/use [help]Soothing Mist;Tiger Palm")
+
+				-- Blackout Kick / Vivify
+				m("C03", nil, "#showtooltip\n/use [help]Vivify;Blackout Kick")
+
+				-- Spear Hand Strike
+				m("C08", nil, "#showtooltip Spear Hand Strike\n/stopcasting\n/stopcasting\n/use Spear Hand Strike")
+
+				-- Tiger's Lust @player
+				m("C13", 571558, "#showtooltip Tiger's Lust\n/use [@player]Tiger's Lust")
+
+				-- Provoke Black Ox Statue
+				m("C14", 611419, "#showtooltip Provoke\n/targetexact Black Ox Statue\n/use Provoke\n/targetlasttarget")
+
+				
+				------ Left ------
+				-- Top
+				spell("N", "Bonedust Brew")
+				spell("SN", "Summon White Tiger Statue")
+				spell("R", "Provoke")
+				macro("SR", "C14", "Summon Black Ox Statue")
+				spell("CR", "Detox")
+				spell("H", "Black Ox Brew")
+				empty("SH")
+				racial("AE")
+
+				-- Middle
+				if known("Chi Wave") then spell("C", "Chi Wave") else spell("C", "Chi Burst") end
+				spell("SC", "Exploding Keg")
+				spell("Q", "Spinning Crane Kick")
+				spell("E", "Rushing Jade Wind")
+				spell("G", "Invoke Niuzao, the Black Ox")
+				spell("SG", "Touch of Death")
+				macro("SE", "C08", "Spear Hand Strike")
+
+				-- Bottom
+				if known("Soothing Mist") then macro("1", "C01") else spell("1", "Tiger Palm") end
+				spell("2", "Rising Sun Kick")
+				macro("3", "C03")
+				spell("4", "Keg Smash")
+				spell("5", "Breath of Fire")
+				spell("6", "Purifying Brew")
+				spell("V", "Weapons of Order")
 				spell("CE", "Leg Sweep")
 
-				if talent[1][2] then spell("C", "Chi Wave") elseif talent[1][3] then spell("C", "Chi Burst") else empty("C") end
-				empty("SC")
-				spell("Q", "Spinning Crane Kick")
-				spell("E", "Breath of Fire")
-				macro("G", "C06", 42) -- Invoke Niuzao, the Black Ox
-				empty("SG")
-				if talent[3][3] then spell("V", "Black Ox Brew") else empty("V") end
-				macro("SE", "C04", 18) -- Spear Hand Strike
+				------ Right ------
+				-- Top
+				spell("AB3", "Summon Jade Serpent Statue")
+				spell("AF", "Tiger's Lust")
+				spell("CF", "Roll")
+				spell("SF", "Transcendence: Transfer")
+				macro("F", "C13", "Tiger's Lust")
 
-				spell("R", "Provoke")
-				if talent[4][2] then macro("SR", "C05") else empty("SR") end -- Provoke Statue
-				spell("CR", "Detox")
-				spell("H", "Crackling Jade Lightning")
-				empty("SH")
+				-- Middle
+				spell("T", "Paralysis")
+				spell("ST", "Disable")
+				spell("CT", "Clash")
+				spell("AT", "Crackling Jade Lightning")
+				spell("CB3", "Ring of Peace")
+				spell("SQ", "Vivify")
+				spell("SV", "Transcendence")
+				spell("CV", "Zen Meditation")
 
+				-- Bottom
 				spell("F1", "Celestial Brew")
 				spell("F2", "Fortifying Brew")
-				if talent[5][2] then spell("F3", "Healing Elixir") elseif talent[5][3] then spell("F3", "Dampen Harm") else empty("F3") end
-				empty("F4")
-				spell("F5", "Zen Meditation")
+				spell("F3", "Diffuse Magic")
+				spell("F4", "Dampen Harm")
+				spell("F5", "Healing Elixir")
+				spell("F6", "Summon Black Ox Statue")
 				spell("CQ", "Expel Harm")
 
-				spell("T", "Paralysis")
-				empty("ST")
-				empty("CT")
-				empty("AT")
-				spell("CB3", "Transcendence")
-				spell("SQ", "Vivify")
-				if talent[4][2] then macro("SV", "C08") else empty("SV") end -- Summon Black Ox Statue
-				spell("CV", "Touch of Death")
-
-				if talent[4][3] then spell("AB3", "Ring of Peace") else empty("AB3") end
-				if talent[2][3] then spell("AF", "Tiger's Lust") else empty("AF") end
-				spell("CF", "Clash")
-				spell("SF", "Transcendence: Transfer")
-				spell("F", "Roll")
 			elseif spec == 2 then
 				--! Mistweaver Monk
-				if level >= 17 then macro("1", "C01") else spell("1", "Tiger Palm") end -- Soothing Mist/Tiger Palm
-				if level >= 12 then macro("2", "C02") else spell("2", "Rising Sun Kick") end -- Eneveloping Mist/Rising Sun Kick
-				macro("3", "C03") -- Vivify/Blackout Kick
-				spell("4", "Essence Font")
-				if talent[6][2] then spell("5", "Refreshing Jade Wind") else empty("5") end
-				spell("CE", "Leg Sweep")
+				
+				------ Macros ------
 
-				if talent[1][2] then spell("C", "Chi Wave") elseif talent[1][3] then spell("C", "Chi Burst") else empty("C") end
-				if talent[3][3] then spell("SC", "Mana Tea") else empty("SC") end
+				-- Sothing Mist / Tiger Palm
+				m("C01", nil, "#showtooltip\n/use [harm]Tiger Palm;Soothing Mist")
+
+				-- Envelping Mist / Rising Sun Kick
+				m("C02", nil, "#showtooltip\n/use [harm]Rising Sun Kick;Enveloping Mist")
+
+				-- Vivify / Blackout Kick
+				m("C03", nil, "#showtooltip\n/use [harm]Blackout Kick;Vivify")
+
+				-- Spear Hand Strike
+				m("C08", nil, "#showtooltip Spear Hand Strike\n/stopcasting\n/stopcasting\n/use Spear Hand Strike")
+
+				-- Tiger's Lust @player
+				m("C13", 571558, "#showtooltip Tiger's Lust\n/use [@player]Tiger's Lust")
+
+				-- Provoke Black Ox Statue
+				m("C14", 611419, "#showtooltip Provoke\n/targetexact Black Ox Statue\n/use Provoke\n/targetlasttarget")
+				
+				
+				------ Left ------
+				-- Top
+				spell("N", "Bonedust Brew")
+				spell("SN", "Summon White Tiger Statue")
+				spell("R", "Provoke")
+				macro("SR", "C14", "Summon Black Ox Statue")
+				spell("CR", "Detox")
+				spell("H", "Life Cocoon")
+				empty("SH")
+				racial("AE")
+
+				-- Middle
+				if known("Chi Wave") then spell("C", "Chi Wave") else spell("C", "Chi Burst") end
+				spell("SC", "Faeline Stomp")
 				spell("Q", "Spinning Crane Kick")
 				spell("E", "Renewing Mist")
-				spell("G", "Invoke Yu'lon, the Jade Serpent")
-				empty("SG")
+				if known("Invoke Yu'lon, the Jade Serpent") then spell("G", "Invoke Yu'lon, the Jade Serpent") else spell("G", "Invoke Chi-Ji, the Red Crane") end
+				spell("SG", "Touch of Death")
+				macro("SE", "C08", "Spear Hand Strike")
+
+				-- Bottom
+				if known("Soothing Mist") then macro("1", "C01") else spell("1", "Tiger Palm") end
+				if known("Rising Sun Kick") and known("Enveloping Mist") then macro("2", "C02") elseif known("Rising Sun Kick") then spell("2", "Rising Sun Kick") else spell("2", "Enveloping Mist") end
+				macro("3", "C03")
+				spell("4", "Essence Font")
+				spell("5", "Zen Pulse")
+				spell("6", "Refreshing Jade Wind")
 				spell("V", "Thunder Focus Tea")
-				spell("SE", "Life Cocoon")
-
-				spell("R", "Provoke")
-				empty("SR")
-				spell("CR", "Detox")
-				spell("H", "Crackling Jade Lightning")
-				empty("SH")
-
-				spell("F1", "Fortifying Brew")
-				spell("F2", "Revival")
-				if talent[5][1] then spell("F3", "Healing Elixir") elseif talent[5][2] then spell("F3", "Diffuse Magic") elseif talent[5][3] then spell("F3", "Dampen Harm") else empty("F3") end
-				empty("F4")
-				spell("F5", "Zen Meditation")
-				spell("CQ", "Expel Harm")
-
-				spell("T", "Paralysis")
-				empty("ST")
-				if talent[4][2] then spell("CT", "Song of Chi-Ji") else empty("CT") end
-				empty("AT")
-				spell("CB3", "Transcendence")
-				spell("SQ", "Vivify")
-				if talent[6][1] then macro("SV", "C09") else empty("SV") end -- Summon Jade Serpent Statue
-				spell("CV", "Touch of Death")
-
-				if talent[4][3] then spell("AB3", "Ring of Peace") else empty("AB3") end
-				if talent[2][3] then spell("AF", "Tiger's Lust") else empty("AF") end
-				if talent[2][3] then macro("CF", "C07") else empty("F") end
-				spell("SF", "Transcendence: Transfer")
-				spell("F", "Roll")
-			elseif spec == 3 then
-				--! Windwalker Monk
-				spell("1", "Tiger Palm")
-				spell("2", "Rising Sun Kick")
-				spell("3", "Blackout Kick")
-				spell("4", "Fists of Fury")
-				if talent[3][2] then spell("5", "Fist of the White Tiger") elseif talent[3][3] then spell("5", "Energizing Elixir") else empty("5") end
 				spell("CE", "Leg Sweep")
 
-				if talent[1][2] then spell("C", "Chi Wave") elseif talent[1][3] then spell("C", "Chi Burst") else empty("C") end
-				if talent[6][2] then spell("SC", "Rushing Jade Wind") else empty("SC") end
-				spell("Q", "Spinning Crane Kick")
-				if talent[7][2] then spell("E", "Whirling Dragon Punch") else empty("E") end
-				macro("G", "C06", 42) -- Invoke Xuen, the White Tiger
-				empty("SG")
-				spell("V", "Storm, Earth, and Fire")
-				macro("SE", "C04", 18) -- Spear Hand Strike
+				------ Right ------
+				-- Top
+				spell("AB3", "Summon Jade Serpent Statue")
+				spell("AF", "Tiger's Lust")
+				spell("CF", "Roll")
+				spell("SF", "Transcendence: Transfer")
+				macro("F", "C13", "Tiger's Lust")
 
-				spell("R", "Provoke")
-				empty("SR")
-				spell("CR", "Detox")
-				spell("H", "Crackling Jade Lightning")
-				empty("SH")
+				-- Middle
+				spell("T", "Paralysis")
+				spell("ST", "Disable")
+				spell("CT", "Song of Chi-Ji")
+				spell("AT", "Crackling Jade Lightning")
+				spell("CB3", "Ring of Peace")
+				spell("SQ", "Vivify")
+				spell("SV", "Transcendence")
+				spell("CV", "Mana Tea")
 
-				spell("F1", "Touch of Karma")
+				-- Bottom
+				if known("Revival") then spell("F1", "Revival") else spell("F1", "Restoral") end
 				spell("F2", "Fortifying Brew")
-				if talent[5][2] then spell("F3", "Diffuse Magic") elseif talent[5][3] then spell("F3", "Dampen Harm") else empty("F3") end
-				empty("F4")
-				empty("F5")
+				spell("F3", "Diffuse Magic")
+				spell("F4", "Dampen Harm")
+				spell("F5", "Healing Elixir")
+				spell("F6", "Summon Black Ox Statue")
 				spell("CQ", "Expel Harm")
 
+			elseif spec == 3 then
+				--! Windwalker Monk
+				
+				------ Macros ------
+
+				-- Tiger Palm / Sothing Mist
+				m("C01", nil, "#showtooltip\n/use [help]Soothing Mist;Tiger Palm")
+
+				-- Blackout Kick / Vivify
+				m("C03", nil, "#showtooltip\n/use [help]Vivify;Blackout Kick")
+
+				-- Spear Hand Strike
+				m("C08", nil, "#showtooltip Spear Hand Strike\n/stopcasting\n/stopcasting\n/use Spear Hand Strike")
+
+				-- Tiger's Lust @player
+				m("C13", 571558, "#showtooltip Tiger's Lust\n/use [@player]Tiger's Lust")
+
+				-- Provoke Black Ox Statue
+				m("C14", 611419, "#showtooltip Provoke\n/targetexact Black Ox Statue\n/use Provoke\n/targetlasttarget")
+				
+				
+				------ Left ------
+				-- Top
+				spell("N", "Bonedust Brew")
+				spell("SN", "Summon White Tiger Statue")
+				spell("R", "Provoke")
+				macro("SR", "C14", "Summon Black Ox Statue")
+				spell("CR", "Detox")
+				empty("H")
+				empty("SH")
+				racial("AE")
+
+				-- Middle
+				if known("Chi Wave") then spell("C", "Chi Wave") else spell("C", "Chi Burst") end
+				spell("SC", "Faeline Stomp")
+				spell("Q", "Spinning Crane Kick")
+				spell("E", "Rushing Jade Wind")
+				spell("G", "Invoke Xuen, the White Tiger")
+				spell("SG", "Touch of Death")
+				macro("SE", "C08", "Spear Hand Strike")
+
+				-- Bottom
+				if known("Soothing Mist") then macro("1", "C01") else spell("1", "Tiger Palm") end
+				spell("2", "Rising Sun Kick")
+				macro("3", "C03")
+				spell("4", "Fists of Fury")
+				spell("5", "Whirling Dragon Punch")
+				spell("6", "Strike of the Windlord")
+				if known("Storm, Earth, and Fire") then spell("V", "Storm, Earth, and Fire") else spell("V", "Serenity") end
+				spell("CE", "Leg Sweep")
+
+				------ Right ------
+				-- Top
+				spell("AB3", "Summon Jade Serpent Statue")
+				spell("AF", "Tiger's Lust")
+				spell("CF", "Roll")
+				spell("SF", "Transcendence: Transfer")
+				macro("F", "C13", "Tiger's Lust")
+
+				-- Middle
 				spell("T", "Paralysis")
 				spell("ST", "Disable")
 				empty("CT")
-				empty("AT")
-				spell("CB3", "Transcendence")
+				spell("AT", "Crackling Jade Lightning")
+				spell("CB3", "Ring of Peace")
 				spell("SQ", "Vivify")
-				empty("SV")
-				spell("CV", "Touch of Death")
+				spell("SV", "Transcendence")
+				spell("CV", "Flying Serpent Kick")
 
-				if talent[4][3] then spell("AB3", "Ring of Peace") else empty("AB3") end
-				if talent[2][3] then spell("AF", "Tiger's Lust") else empty("AF") end
-				spell("CF", "Flying Serpent Kick")
-				spell("SF", "Transcendence: Transfer")
-				spell("F", "Roll")
+				-- Bottom
+				spell("F1", "Touch of Karma")
+				spell("F2", "Fortifying Brew")
+				spell("F3", "Diffuse Magic")
+				spell("F4", "Dampen Harm")
+				empty("F5")
+				spell("F6", "Summon Black Ox Statue")
+				spell("CQ", "Expel Harm")
+
 			else
-				--! Untalented Monk
-				spell("1", "Tiger Palm")
-				empty("2")
-				spell("3", "Blackout Kick")
-				empty("4")
-				empty("5")
-				spell("CE", "Leg Sweep")
+				--! Unspecialized Monk
+				
+				------ Macros ------
 
+				-- Blackout Kick / Vivify
+				m("C03", nil, "#showtooltip\n/use [help]Vivify;Blackout Kick")
+
+				
+				------ Left ------
+				-- Top
+				empty("N")
+				empty("SN")
+				spell("R", "Provoke")
+				empty("SR")
+				empty("CR")
+				empty("H")
+				empty("SH")
+				racial("AE")
+
+				-- Middle
 				empty("C")
 				empty("SC")
 				spell("Q", "Spinning Crane Kick")
 				empty("E")
 				empty("G")
-				empty("SG")
-				empty("V")
+				spell("SG", "Touch of Death")
 				empty("SE")
 
-				spell("R", "Provoke")
-				empty("SR")
-				empty("CR")
-				spell("H", "Crackling Jade Lightning")
-				empty("SH")
+				-- Bottom
+				spell("1", "Tiger Palm")
+				empty("2")
+				if known("Vivify") then macro("3", "C03") else spell("3", "Blackout Kick") end
+				empty("4")
+				empty("5")
+				empty("6")
+				empty("V")
+				spell("CE", "Leg Sweep")
 
+				------ Right ------
+				-- Top
+				empty("AB3")
+				empty("AF")
+				spell("CF", "Roll")
+				empty("SF")
+				empty("F")
+
+				-- Middle
+				empty("T")
+				empty("ST")
+				empty("CT")
+				spell("AT", "Crackling Jade Lightning")
+				empty("CB3")
+				spell("SQ", "Vivify")
+				empty("SV")
+				empty("CV")
+
+				-- Bottom
 				empty("F1")
 				empty("F2")
 				empty("F3")
 				empty("F4")
 				empty("F5")
+				empty("F6")
 				spell("CQ", "Expel Harm")
 
-				empty("T")
-				empty("ST")
-				empty("CT")
-				empty("AT")
-				empty("CB3")
-				spell("SQ", "Vivify")
-				empty("SV")
-				spell("CV", "Touch of Death")
-
-				empty("AB3")
-				empty("AF")
-				empty("CF")
-				empty("SF")
-				spell("F", "Roll")
 			end
 		elseif class == "PALADIN" then
 			--! Paladin
 
-			-- Flash of Light/Crusader Strike
-			m("C01", nil, "#showtooltip\n/use [harm]Crusader Strike;Flash of Light")
-			-- Holy Light/Judgment
-			m("C02", nil, "#showtooltip\n/use [harm]Judgment;Holy Light")
-			-- Light of the Martyr/Shield of the Righteous
-			m("C03", nil, "#showtooltip\n/use [equipped:shield,harm]Shield of the Righteous;Light of the Martyr")
-			-- Rebuke
-			m("C04", nil, "#showtooltip Rebuke\n/stopcasting\n/stopcasting\n/use Rebuke")
-			-- Beacon of Faith/Hammer of Wrath
-			m("C05", nil, "#showtooltip\n/use [harm]Hammer of Wrath;[talent:7/2]Beacon of Faith;Hammer of Wrath")
-
-			-- Essence
-			essence("N", "Divine Toll", "Vanquisher's Hammer", "Blessing of the Seasons", "Ashen Hallow")
-
 			if spec == 1 then
 				--! Holy Paladin
-				macro("1", "C01") -- Flash of Light/Crusader Strike
-				if level >= 11 then macro("2", "C02") else spell("2", "Judgment") end -- Holy Light/Judgment
-				spell("3", "Holy Shock")
-				if level >= 46 then macro("4", "C03") else spell("4", "Light of the Martyr") end -- Light of the Martyr/Shield of the Righteous
-				spell("5", "Light of Dawn")
-				spell("CE", "Hammer of Justice")
 
-				if talent[7][2] then macro("C", "C05") else spell("C", "Hammer of Wrath") end
-				spell("SC", "Beacon of Light")
-				spell("Q", "Word of Glory")
-				spell("E", "Consecration")
-				spell("G", "Avenging Wrath")
-				empty("SG")
-				if talent[5][2] then spell("V", "Holy Avenger") elseif talent[5][3] then spell("V", "Seraphim") else empty("V") end
-				if talent[1][2] then spell("SE", "Bestow Faith") elseif talent[1][3] then spell("SE", "Light's Hammer") else empty("SE") end
+				------ Macros ------
 
+				-- Flash of Light / Crusader Strike
+				m("C01", nil, "#showtooltip\n/use [harm]Crusader Strike;Flash of Light")
+
+				-- Holy Light / Judgment
+				m("C03", nil, "#showtooltip\n/use [harm]Judgment;Holy Light")
+
+				-- Light of the Martyr / Hammer of Wrath
+				m("C04", nil, "#showtooltip\n/use [harm]Hammer of Wrath;Light of the Martyr")
+
+				-- Light of Dawn / Shield of the Righteous
+				m("C05", nil, "#showtooltip\n/use [harm,worn:shield]Shield of the Righteous;Light of Dawn")
+
+				-- Bestow Faith / Consecration
+				m("C07", nil, "#showtooltip\n/use [help]Bestow Faith;Consecration")
+
+				-- Rebuke
+				m("C08", nil, "#showtooltip Rebuke\n/stopcasting\n/stopcasting\n/use Rebuke")
+
+				
+				------ Left ------
+				-- Top
+				spell("N", "Divine Toll")
+				spell("SN", "Divine Favor")
 				spell("R", "Hand of Reckoning")
 				empty("SR")
 				spell("CR", "Cleanse")
-				if talent[2][3] then spell("H", "Holy Prism") else empty("H") end
+				spell("H", "Blessing of Sacrifice")
 				empty("SH")
+				racial("AE")
 
-				spell("F1", "Divine Protection")
-				spell("F2", "Divine Shield")
-				spell("F3", "Aura Mastery")
-				if talent[4][3] then spell("F4", "Rule of Law") else empty("F4") end
-				empty("F5")
-				spell("CQ", "Blessing of Protection")
+				-- Middle
+				if known("Light's Hammer") then spell("C", "Light's Hammer") else spell("C", "Holy Prism") end
+				spell("SC", "Barrier of Faith")
+				spell("Q", "Word of Glory")
+				if known("Bestow Faith") then macro("E", "C07") else spell("E", "Consecration") end
+				spell("G", "Avenging Wrath")
+				spell("SG", "Blessing of the Seasons")
+				macro("SE", "C08", "Rebuke")
 
-				if talent[3][2] then spell("T", "Repentance") elseif talent[3][3] then spell("T", "Blinding Light") else empty("T") end
+				-- Bottom
+				macro("1", "C01")
+				spell("2", "Holy Shock")
+				if known("Holy Light") then macro("3", "C03") else spell("3", "Judgment") end
+				if known("Light of the Martyr") and known("Hammer of Wrath") then macro("4", "C04") elseif known("Hammer of Wrath") then spell("4", "Hammer of Wrath") else spell("4", "Light of the Martyr") end
+				if known("Light of Dawn") then macro("5", "C05") else spell("5", "Shield of the Righteous") end
+				spell("6", "Seraphim")
+				spell("V", "Holy Avenger")
+				spell("CE", "Hammer of Justice")
+
+				------ Right ------
+				-- Top
+				empty("AB3")
+				empty("AF")
+				spell("CF", "Rule of Law")
+				spell("SF", "Blessing of Freedom")
+				spell("F", "Divine Steed")
+
+				-- Middle
+				if known("Repentance") then spell("T", "Repentance") else spell("T", "Blinding Light") end
 				empty("ST")
 				spell("CT", "Turn Evil")
 				empty("AT")
 				empty("CB3")
 				spell("SQ", "Flash of Light")
-				spell("SV", "Lay on Hands")
-				spell("CV", "Blessing of Sacrifice")
+				spell("SV", "Blessing of Protection")
+				empty("CV")
 
-				empty("AB3")
-				empty("AF")
-				empty("CF")
-				spell("SF", "Blessing of Freedom")
-				spell("F", "Divine Steed")
+				-- Bottom
+				spell("F1", "Divine Protection")
+				spell("F2", "Divine Shield")
+				spell("F3", "Aura Mastery")
+				spell("F4", "Tyr's Deliverance")
+				spell("F5", "Beacon of Light")
+				spell("F6", "Beacon of Faith")
+				spell("CQ", "Lay on Hands")
+
 			elseif spec == 2 then
 				--! Protection Paladin
-				spell("1", "Crusader Strike")
-				spell("2", "Avenger's Shield")
-				spell("3", "Judgment")
-				spell("4", "Shield of the Righteous")
-				if talent[2][3] then spell("5", "Moment of Glory") else empty("5") end
-				spell("CE", "Hammer of Justice")
 
-				spell("C", "Hammer of Wrath")
+				------ Macros ------
+
+				-- Crusader Strike / Flash of Light
+				m("C01", nil, "#showtooltip\n/use [help]Flash of Light;Crusader Strike")
+
+				-- Rebuke
+				m("C08", nil, "#showtooltip Rebuke\n/stopcasting\n/stopcasting\n/use Rebuke")
+
+				
+				------ Left ------
+				-- Top
+				spell("N", "Divine Toll")
+				empty("SN")
+				spell("R", "Hand of Reckoning")
+				empty("SR")
+				spell("CR", "Cleanse Toxins")
+				spell("H", "Blessing of Sacrifice")
+				empty("SH")
+				racial("AE")
+
+				-- Middle
+				spell("C", "Bastion of Light")
 				empty("SC")
 				spell("Q", "Word of Glory")
 				spell("E", "Consecration")
 				spell("G", "Avenging Wrath")
-				empty("SG")
-				if talent[5][2] then spell("V", "Holy Avenger") elseif talent[5][3] then spell("V", "Seraphim") else empty("V") end
-				macro("SE", "C04", 27) -- Rebuke
+				spell("SG", "Moment of Glory")
+				macro("SE", "C08", "Rebuke")
 
-				spell("R", "Hand of Reckoning")
-				empty("SR")
-				spell("CR", "Cleanse Toxins")
-				empty("H")
-				empty("SH")
+				-- Bottom
+				macro("1", "C01")
+				spell("2", "Avenger's Shield")
+				spell("3", "Judgment")
+				spell("4", "Hammer of Wrath")
+				spell("5", "Shield of the Righteous")
+				spell("6", "Seraphim")
+				spell("V", "Holy Avenger")
+				spell("CE", "Hammer of Justice")
 
-				spell("F1", "Divine Protection")
-				spell("F2", "Divine Shield")
-				spell("F3", "Guardian of Ancient Kings")
-				empty("F4")
-				empty("F5")
-				spell("CQ", "Blessing of Protection")
+				------ Right ------
+				-- Top
+				empty("AB3")
+				empty("AF")
+				empty("CF")
+				spell("SF", "Blessing of Freedom")
+				spell("F", "Divine Steed")
 
-				if talent[3][2] then spell("T", "Repentance") elseif talent[3][3] then spell("T", "Blinding Light") else empty("T") end
+				-- Middle
+				if known("Repentance") then spell("T", "Repentance") else spell("T", "Blinding Light") end
 				empty("ST")
 				spell("CT", "Turn Evil")
 				empty("AT")
 				empty("CB3")
 				spell("SQ", "Flash of Light")
-				spell("SV", "Lay on Hands")
-				spell("CV", "Blessing of Sacrifice")
+				spell("SV", "Blessing of Protection")
+				spell("CV", "Blessing of Spellwarding")
 
-				empty("AB3")
-				empty("AF")
-				empty("CF")
-				spell("SF", "Blessing of Freedom")
-				spell("F", "Divine Steed")
+				-- Bottom
+				spell("F1", "Ardent Defender")
+				spell("F2", "Divine Shield")
+				spell("F3", "Guardian of Ancient Kings")
+				spell("F4", "Eye of Tyr")
+				empty("F5")
+				empty("F6")
+				spell("CQ", "Lay on Hands")
+
 			elseif spec == 3 then
 				--! Retribution Paladin
-				spell("1", "Crusader Strike")
-				spell("2", "Blade of Justice")
-				spell("3", "Judgment")
-				spell("4", "Templar's Verdict")
-				spell("5", "Wake of Ashes")
-				spell("CE", "Hammer of Justice")
 
-				spell("C", "Hammer of Wrath")
-				if talent[1][3] then spell("SC", "Execution Sentence") else empty("SC") end
-				spell("Q", "Divine Storm")
-				spell("E", "Consecration")
-				spell("G", "Avenging Wrath")
-				empty("SG")
-				if talent[5][2] then spell("V", "Holy Avenger") elseif talent[5][3] then spell("V", "Seraphim") else empty("V") end
-				macro("SE", "C04", 27) -- Rebuke
+				------ Macros ------
 
+				-- Crusader Strike / Flash of Light
+				m("C01", nil, "#showtooltip\n/use [help]Flash of Light;Crusader Strike")
+
+				-- Templar's Verdict / Shield of the Righteous
+				m("C05", nil, "#showtooltip\n/use [worn:shield]Shield of the Righteous;Templar's Verdict")
+
+				-- Divine Storm / Word of Glory
+				m("C06", nil, "#showtooltip\n/use [help]Word of Glory;Divine Storm")
+
+				-- Rebuke
+				m("C08", nil, "#showtooltip Rebuke\n/stopcasting\n/stopcasting\n/use Rebuke")
+
+				
+				------ Left ------
+				-- Top
+				spell("N", "Divine Toll")
+				spell("SN", "Execution Sentence")
 				spell("R", "Hand of Reckoning")
 				empty("SR")
 				spell("CR", "Cleanse Toxins")
-				spell("H", "Word of Glory")
-				if talent[6][2] then spell("SH", "Justicar's Vengeance") else empty("SH") end
+				spell("H", "Blessing of Sacrifice")
+				empty("SH")
+				racial("AE")
 
-				spell("F1", "Shield of Vengeance")
-				spell("F2", "Divine Shield")
-				if talent[4][3] then spell("F3", "Eye for an Eye") else empty("F3") end
-				empty("F4")
-				empty("F5")
-				spell("CQ", "Blessing of Protection")
+				-- Middle
+				spell("C", "Wake of Ashes")
+				spell("SC", "Exorcism")
+				if known("Divine Storm") then macro("Q", "C06") else spell("Q", "Word of Glory") end
+				spell("E", "Consecration")
+				spell("G", "Avenging Wrath")
+				spell("SG", "Final Reckoning")
+				macro("SE", "C08", "Rebuke")
 
-				if talent[3][2] then spell("T", "Repentance") elseif talent[3][3] then spell("T", "Blinding Light") else empty("T") end
-				spell("ST", "Hand of Hindrance")
-				spell("CT", "Turn Evil")
-				empty("AT")
-				if talent[7][3] then spell("CB3", "Final Reckoning") else empty("CB3") end
-				spell("SQ", "Flash of Light")
-				spell("SV", "Lay on Hands")
-				spell("CV", "Blessing of Sacrifice")
+				-- Bottom
+				macro("1", "C01")
+				spell("2", "Blade of Justice")
+				spell("3", "Judgment")
+				spell("4", "Hammer of Wrath")
+				macro("5", "C05")
+				spell("6", "Seraphim")
+				spell("V", "Holy Avenger")
+				spell("CE", "Hammer of Justice")
 
+				------ Right ------
+				-- Top
 				empty("AB3")
 				empty("AF")
 				empty("CF")
 				spell("SF", "Blessing of Freedom")
 				spell("F", "Divine Steed")
-			else
-				--! Untalented Paladin
-				spell("1", "Crusader Strike")
-				spell("2")
-				spell("3", "Judgment")
-				spell("4", "Shield of the Righteous")
-				empty("5")
-				spell("CE", "Hammer of Justice")
 
+				-- Middle
+				if known("Repentance") then spell("T", "Repentance") else spell("T", "Blinding Light") end
+				spell("ST", "Hand of Hindrance")
+				spell("CT", "Turn Evil")
+				empty("AT")
+				empty("CB3")
+				spell("SQ", "Flash of Light")
+				spell("SV", "Blessing of Protection")
+				empty("CV")
+
+				-- Bottom
+				if known("Shield of Vengeance") then spell("F1", "Shield of Vengeance") else spell("F1", "Divine Protection") end
+				spell("F2", "Divine Shield")
+				if known("Justicar's Vengeance") then spell("F3", "Justicar's Vengeance") else spell("F3", "Eye for an Eye") end
+				empty("F4")
+				empty("F5")
+				empty("F6")
+				spell("CQ", "Lay on Hands")
+
+			else
+				--! Unspecialized Paladin
+
+				------ Macros ------
+
+				-- Crusader Strike / Flash of Light
+				m("C01", nil, "#showtooltip\n/use [help]Flash of Light;Crusader Strike")
+
+				
+				------ Left ------
+				-- Top
+				empty("N")
+				empty("SN")
+				spell("R", "Hand of Reckoning")
+				empty("SR")
+				empty("CR")
+				empty("H")
+				empty("SH")
+				racial("AE")
+
+				-- Middle
 				empty("C")
 				empty("SC")
 				spell("Q", "Word of Glory")
 				spell("E", "Consecration")
 				empty("G")
 				empty("SG")
-				empty("V")
 				empty("SE")
 
-				empty("R")
-				empty("SR")
-				empty("CR")
-				empty("H")
-				empty("SH")
+				-- Bottom
+				if known("Flash Heal") then macro("1", "C01") else spell("1", "Crusader Strike") end
+				empty("2")
+				spell("3", "Judgment")
+				empty("4")
+				spell("5", "Shield of the Righteous")
+				empty("6")
+				empty("V")
+				spell("CE", "Hammer of Justice")
 
-				empty("F1")
-				spell("F2", "Divine Shield")
-				empty("F3")
-				empty("F4")
-				empty("F5")
-				empty("CQ")
+				------ Right ------
+				-- Top
+				empty("AB3")
+				empty("AF")
+				empty("CF")
+				empty("SF")
+				empty("F")
 
+				-- Middle
 				empty("T")
 				empty("ST")
 				empty("CT")
 				empty("AT")
 				empty("CB3")
 				spell("SQ", "Flash of Light")
-				spell("SV", "Lay on Hands")
+				empty("SV")
 				empty("CV")
 
-				empty("AB3")
-				empty("AF")
-				empty("CF")
-				empty("SF")
-				empty("F")
+				-- Bottom
+				empty("F1")
+				spell("F2", "Divine Shield")
+				empty("F3")
+				empty("F4")
+				empty("F5")
+				empty("F6")
+				empty("CQ")
+
 			end
 		elseif class == "PRIEST" then
 			--! Priest
 
-			-- Flash Heal/Smite/Shadow Mend
-			m("C01", nil, "#showtooltip\n/use [spec:2,harm]Smite;[spec:2]Flash Heal;[help]Flash Heal;Smite")
-			-- Heal/Holy Fire
-			m("C02", nil, "#showtooltip\n/use [harm]Mind Blast;Heal")
-			-- Renew/Shadow Word: Pain/Power Word: Shield
-			m("C03", nil, "#showtooltip\n/use [nospec:2,help]Power Word: Shield;[spec:2,harm]Shadow Word: Pain;[spec:2]Renew;Shadow Word: Pain")
-			-- Silence
-			m("C04", nil, "#showtooltip Silence\n/stopcasting\n/stopcasting\n/use Silence")
-			-- Angelic Feather/Body and Soul
-			m("C05", 537020, "#showtooltip [spec:1,talent:2/3][spec:2]Angelic Feather;Power Word: Shield\n/use [spec:1,talent:2/3,@player][spec:2,@player]Angelic Feather;[@player]Power Word: Shield")
-			-- Shadowform
-			m("C06", nil, "#showtooltip Shadowform\n/cancelaura [btn:2]Shadowform\n/use [nostance,nobtn:2]Shadowform")
-			-- Power Word: Shield @player
-			m("C07", nil, "#showtooltip Power Word: Shield\n/use [@player]Power Word: Shield")
-			-- Body and Soul - Power Word: Shield @player
-			m("C08", 537099, "#showtooltip\n/use [@player]Power Word: Shield")
-			-- Dispersion
-			m("C09", nil, "#showtooltip\n/use !Dispersion")
-			-- Mind Control
-			m("C11", 1718004, "#showtooltip\n/use Mind Control")
-			-- Devouring Plague/Searing Nightmare
-			m("C12", nil, "#showtooltip\n/use [mod:shift,talent:3/3]Searing Nightmare;Devouring Plague")
-			-- Mindbender
-			m("C13", 1386549, "#showtooltip\n/use Shadowfiend")
-			-- Power Infusion
-			m("C14", nil, "#showtooltip\n/use [@focus,help,nodead][help,nodead][@player]Power Infusion")
-
-			-- Essence
-			essence("N", "Boon of the Ascended", "Unholy Nova", "Fae Guardians", "Mindgames")
-
 			if spec == 1 then
 				--! Discipline Priest
-				macro("1", "C01")
-				spell("2", "Mind Blast")
-				spell("3", "Penance")
-				spell("4", "Power Word: Radiance")
-				if talent[5][3] then spell("5", "Shadow Covenant") else empty("5") end
-				if talent[1][3] then spell("CE", "Schism") else empty("CE") end
+				
+				------ Macros ------
 
-				if talent[3][3] then spell("C", "Power Word: Solace") else empty("C") end
-				if talent[6][2] then spell("SC", "Divine Star") elseif talent[6][3] then spell("SC", "Halo") else empty("SC") end
-				spell("Q", "Mind Sear")
-				macro("E", "C03") -- Shadow Word: Pain/Power Word: Shield
-				macro("G", "C14", 58) -- Power Infusion
-				spell("SG", "Rapture")
-				if talent[3][2] then macro("V", "C13") else spell("V", "Shadowfiend") end
-				spell("SE", "Pain Suppression")
+				-- Flash Heal / Smite
+				m("C01", nil, "#showtooltip\n/use [harm]Smite;Flash Heal")
 
-				spell("R", "Shadow Word: Death", 14)
+				-- Power Word: Radiance / Mind Blast
+				m("C03", nil, "#showtooltip\n/use [harm]Mind Blast;Power Word: Radiance")
+
+				-- Power Word: Shield / Schism
+				m("C04", nil, "#showtooltip\n/use [harm]Schism;Power Word: Shield")
+
+				-- Prayer of Mending / Shadow Word: Death
+				m("C05", nil, "#showtooltip\n/use [harm]Shadow Word: Death;Prayer of Mending")
+
+				-- Renew/Shadow Word: Pain
+				m("C07", nil, "#showtooltip\n/use [harm]Shadow Word: Pain;Renew")
+
+				-- Power Infusion
+				m("C08", nil, "#showtooltip\n/use [@focus,help,nodead][help,nodead][@player]Power Infusion")
+
+				-- Mind Control
+				m("C09", 1718004, "#showtooltip\n/use Mind Control")
+
+				-- Body and Soul - Power Word: Shield @player
+				m("C13", 537099, "#showtooltip\n/use [@player]Power Word: Shield")
+				
+				-- Angelic Feather @player
+				m("C14", 537020, "#showtooltip\n/use [@player]Angelic Feather")
+
+				
+				------ Left ------
+				-- Top
+				if known("Divine Star") then spell("N", "Divine Star") else spell("N", "Halo") end
+				empty("SN")
+				spell("R", "Mind Soothe")
 				spell("SR", "Dispel Magic")
 				spell("CR", "Purify")
-				spell("H", "Holy Nova")
-				empty("SH")
+				spell("H", "Pain Suppression")
+				spell("SH", "Void Shift")
+				racial("AE")
 
+				-- Middle
+				spell("C", "Power Word: Solace")
+				spell("SC", "Shadow Covenant")
+				spell("Q", "Holy Nova")
+				if known("Renew") then macro("E", "C07") else spell("E", "Shadow Word: Pain") end
+				spell("G", "Rapture")
+				macro("SG", "C08", "Power Infusion")
+				spell("SE", "Power Word: Life")
+
+				-- Bottom
+				macro("1", "C01")
+				spell("2", "Penance")
+				if known("Power Word: Radiance") then macro("3", "C03") else spell("3", "Mind Blast") end
+				if known("Schism") then macro("4", "C04") else spell("4", "Power Word: Shield") end
+				if known("Prayer of Mending") and known("Shadow Word: Death") then macro("5", "C05") elseif known("Prayer of Mending") then spell("5", "Prayer of Mending") else spell("5", "Shadow Word: Death") end
+				spell("6", "Mindgames")
+				spell("V", "Shadowfiend")
+				spell("CE", "Light's Wrath")
+
+				------ Right ------
+				-- Top
+				spell("AB3", "Mass Dispel")
+				spell("AF", "Power Word: Shield")
+				macro("CF", "C14", "Angelic Feather")
+				spell("SF", "Angelic Feather")
+				macro("F", "C13", "Body and Soul")
+
+				-- Middle
+				spell("T", "Shackle Undead")
+				spell("ST", "Psychic Scream")
+				if known("Dominate Mind") then spell("CT", "Dominate Mind") else macro("CT", "C09", "Mind Control") end
+				spell("AT", "Void Tendrils")
+				spell("CB3", "Leap of Faith")
+				spell("SQ", "Flash Heal")
+				empty("SV")
+				spell("CV", "Fade")
+
+				-- Bottom
 				spell("F1", "Desperate Prayer")
 				spell("F2", "Power Word: Barrier")
-				if talent[7][3] then spell("F3", "Evangelism") else empty("F3") end
-				empty("F4")
+				spell("F3", "Vampiric Embrace")
+				spell("F4", "Evangelism")
 				empty("F5")
+				empty("F6")
 				spell("CQ", "Levitate")
 
-				spell("T", "Shackle Undead")
-				spell("ST", "Psychic Scream")
-				macro("CT", "C11", 34) -- Mind Control
-				spell("AT", "Mind Soothe")
-				if talent[4][3] then spell("CB3", "Shining Force") else empty("CB3") end
-				spell("SQ", "Flash Heal")
-				macro("SV", "C07") -- Power Word: Shield @player
-				spell("CV", "Fade")
-
-				spell("AB3", "Mass Dispel")
-				empty("AF")
-				spell("CF", "Leap of Faith")
-				if talent[2][3] then spell("SF", "Angelic Feather") else empty("SF") end -- Angelic Feather
-				if talent[2][1] then macro("F", "C08") elseif talent[2][3] then macro("F", "C05") else empty("F") end -- Body and Soul/Angelic Feather @player
 			elseif spec == 2 then
 				--! Holy Priest
-				macro("1", "C01") -- Flash Heal/Smite
-				if level >= 15 then macro("2", "C02") else spell("2", "Mind Blast") end -- Heal/Holy Fire
-				spell("3", "Prayer of Healing")
-				spell("4", "Prayer of Mending")
-				spell("5", "Circle of Healing")
-				spell("CE", "Holy Word: Chastise")
+				
+				------ Macros ------
+				
+				-- Flash Heal / Smite
+				m("C01", nil, "#showtooltip\n/use [harm]Smite;Flash Heal")
 
-				spell("C", "Holy Word: Serenity")
-				if talent[6][2] then spell("SC", "Divine Star") elseif talent[6][3] then spell("SC", "Halo") else empty("SC") end
-				spell("Q", "Holy Nova")
-				if level >= 12 then macro("E", "C03") else spell("E", "Shadow Word: Pain") end -- Renew/Shadow Word: Pain
-				spell("V", "Holy Word: Sanctify")
-				macro("G", "C14", 58) -- Power Infusion
-				empty("SG")
-				spell("SE", "Guardian Spirit")
+				-- Heal / Holy Fire
+				m("C02", nil, "#showtooltip\n/use [harm]Mind Blast;Heal")
 
-				spell("R", "Shadow Word: Death")
+				-- Prayer of Healing / Empyreal Blaze
+				m("C03", nil, "#showtooltip\n/use [harm]Empyreal Blaze;Prayer of Healing")
+
+				-- Prayer of Mending / Mindgames
+				m("C04", nil, "#showtooltip\n/use [harm]Mindgames;Prayer of Mending")
+
+				-- Circle of Healing / Shadow Word: Death
+				m("C05", nil, "#showtooltip\n/use [harm]Shadow Word: Death;Circle of Healing")
+
+				-- Renew/Shadow Word: Pain
+				m("C07", nil, "#showtooltip\n/use [harm]Shadow Word: Pain;Renew")
+
+				-- Power Infusion
+				m("C08", nil, "#showtooltip\n/use [@focus,help,nodead][help,nodead][@player]Power Infusion")
+
+				-- Mind Control
+				m("C09", 1718004, "#showtooltip\n/use Mind Control")
+
+				-- Body and Soul - Power Word: Shield @player
+				m("C13", 537099, "#showtooltip\n/use [@player]Power Word: Shield")
+				
+				-- Angelic Feather @player
+				m("C14", 537020, "#showtooltip\n/use [@player]Angelic Feather")
+
+				
+				------ Left ------
+				-- Top
+				if known("Divine Star") then spell("N", "Divine Star") else spell("N", "Halo") end
+				empty("SN")
+				spell("R", "Mind Soothe")
 				spell("SR", "Dispel Magic")
 				spell("CR", "Purify")
-				spell("H", "Power Word: Shield")
-				empty("SH")
+				spell("H", "Guardian Spirit")
+				spell("SH", "Void Shift")
+				racial("AE")
 
-				spell("F1", "Desperate Prayer")
-				spell("F2", "Divine Hymn")
-				spell("F3", "Symbol of Hope")
-				empty("F4")
-				empty("F5")
-				spell("CQ", "Levitate")
+				-- Middle
+				spell("C", "Holy Word: Serenity")
+				spell("SC", "Holy Word: Sanctify")
+				spell("Q", "Holy Nova")
+				if known("Renew") then macro("E", "C07") else spell("E", "Shadow Word: Pain") end
+				if known("Apotheosis") then spell("G", "Apotheosis") else spell("G", "Holy Word: Salvation") end
+				macro("SG", "C08", "Power Infusion")
+				spell("SN", "Power Word: Life")
 
+				-- Bottom
+				macro("1", "C01")
+				if known("Heal") then macro("2", "C02") else spell("2", "Mind Blast") end
+				if known("Prayer of Healing") and known("Empyreal Blaze") then macro("3", "C03") elseif known("Prayer of Healing") then spell("3", "Prayer of Healing") else spell("3", "Empyreal Blaze") end
+				if known("Mindgames") then macro("4", "C04") else spell("4", "Prayer of Mending") end
+				if known("Circle of Healing") and known("Shadow Word: Death") then macro("5", "C05") elseif known("Circle of Healing") then spell("5", "Circle of Healing") else spell("5", "Shadow Word: Death") end
+				spell("6", "Divine Word")
+				spell("V", "Shadowfiend")
+				spell("CE", "Holy Word: Chastise")
+
+				------ Right ------
+				-- Top
+				spell("AB3", "Mass Dispel")
+				spell("AF", "Power Word: Shield")
+				macro("CF", "C14", "Angelic Feather")
+				spell("SF", "Angelic Feather")
+				macro("F", "C13", "Body and Soul")
+
+				-- Middle
 				spell("T", "Shackle Undead")
 				spell("ST", "Psychic Scream")
-				macro("CT", "C11", 34) -- Mind Control
-				spell("AT", "Mind Soothe")
-				if talent[4][3] then spell("CB3", "Shining Force") else empty("CB3") end
+				if known("Dominate Mind") then spell("CT", "Dominate Mind") else macro("CT", "C09", "Mind Control") end
+				spell("AT", "Void Tendrils")
+				spell("CB3", "Leap of Faith")
 				spell("SQ", "Flash Heal")
-				if talent[7][2] then spell("SV", "Apotheosis") elseif talent[7][3] then spell("SV", "Holy Word: Salvation") else empty("SV") end
+				spell("SV", "Lightwell")
 				spell("CV", "Fade")
 
-				spell("AB3", "Mass Dispel")
-				empty("AF")
-				spell("CF", "Leap of Faith")
-				if talent[2][3] then spell("SF", "Angelic Feather") else empty("SF") end -- Angelic Feather
-				if talent[2][2] then macro("F", "C08") elseif talent[2][3] then macro("F", "C05") else empty("F") end -- Body and Soul/Angelic Feather @player
+				-- Bottom
+				spell("F1", "Desperate Prayer")
+				spell("F2", "Divine Hymn")
+				spell("F3", "Vampiric Embrace")
+				empty("F4", "Symbol of Hope")
+				empty("F5")
+				empty("F6")
+				spell("CQ", "Levitate")
+
 			elseif spec == 3 then
 				--! Shadow Priest
-				if level >= 15 then spell("1", "Vampiric Touch") else spell("1", "Smite") end
-				spell("2", "Smite", 15)
-				spell("3", "Mind Blast")
-				spell("4", "Void Eruption")
-				if talent[3][3] then macro("5", "C12") else spell("5", "Devouring Plague") end
-				if talent[4][2] then spell("CE", "Psychic Scream") elseif talent[4][3] then spell("CE", "Psychic Horror") else empty("CE") end
+				
+				------ Macros ------
 
-				if talent[6][1] then spell("C", "Damnation") elseif talent[6][3] then spell("C", "Void Torrent") else empty("C") end
-				if talent[5][3] then spell("SC", "Shadow Crash") else empty("SC") end
-				spell("Q", "Mind Sear")
-				macro("E", "C03") -- Shadow Word: Pain/Power Word: Shield
-				macro("G", "C14", 58) -- Power Infusion
-				empty("SG")
-				if talent[6][2] then macro("V", "C13") else spell("V", "Shadowfiend") end
-				macro("SE", "C04", 29) -- Silence
+				-- Vampiric Touch / Flash Heal
+				m("C01", nil, "#showtooltip\n/use [help]Flash Heal;Vampiric Touch")
 
-				spell("R", "Shadow Word: Death", 14)
+				-- Devouring Plague / Mind Sear
+				m("C02", nil, "#showtooltip\n/use [mod:shift]Mind Sear;Devouring Plague")
+
+				-- Mind Flay / Holy Nova
+				m("C03", nil, "#showtooltip\n/use [mod:shift]Holy Nova;Smite")
+
+				-- Devouring Plague / Power Word: Shield
+				m("C04", nil, "#showtooltip\n/use [help]Power Word: Shield;Devouring Plague")
+
+				-- Shadow Word: Death / Prayer of Mending
+				m("C05", nil, "#showtooltip\n/use [help]Prayer of Mending;Shadow Word: Death")
+
+				-- Renew/Shadow Word: Pain
+				m("C07", nil, "#showtooltip\n/use [help]Renew;Shadow Word: Pain")
+
+				-- Power Infusion
+				m("C08", nil, "#showtooltip\n/use [@focus,help,nodead][help,nodead][@player]Power Infusion")
+
+				-- Mind Control
+				m("C09", 1718004, "#showtooltip\n/use Mind Control")
+
+				-- Silence
+				m("C10", nil, "#showtooltip Silence\n/stopcasting\n/stopcasting\n/use Silence")
+
+				-- Shadowform
+				m("C11", nil, "#showtooltip Shadowform\n/cancelaura [btn:2]Shadowform\n/use [nostance,nobtn:2]Shadowform")
+
+				-- Dispersion
+				m("C12", nil, "#showtooltip\n/use !Dispersion")
+
+				-- Body and Soul - Power Word: Shield @player
+				m("C13", 537099, "#showtooltip\n/use [@player]Power Word: Shield")
+				
+				-- Angelic Feather @player
+				m("C14", 537020, "#showtooltip\n/use [@player]Angelic Feather")
+
+				
+				------ Left ------
+				-- Top
+				if known("Divine Star") then spell("N", "Divine Star") else spell("N", "Halo") end
+				if known("Damnation") then spell("SN", "Damnation") else spell("SN", "Void Torrent") end
+				spell("R", "Mind Soothe")
 				spell("SR", "Dispel Magic")
 				spell("CR", "Purify Disease")
-				empty("H")
-				empty("SH")
+				spell("H", "Power Word: Life")
+				spell("SH", "Void Shift")
+				racial("AE")
 
+				-- Middle
+				spell("C", "Shadow Crash")
+				spell("SC", "Dark Void")
+				if known("Mind Spike") and known("Holy Nova") then macro("Q", "C03") elseif known("Holy Nova") then spell("Q", "Holy Nova") elseif known("Mind Spike") then spell("Q", "Smite") else empty("Q") end
+				if known("Renew") then macro("E", "C07") else spell("E", "Shadow Word: Pain") end
+				if known("Dark Ascension") then spell("G", "Dark Ascension") else spell("G", "Void Eruption") end
+				macro("SG", "C08", "Power Infusion")
+				macro("SE", "C10", "Silence")
+
+				-- Bottom
+				macro("1", "C01")
+				if known("Mind Spike") then spell("2", "Mind Spike") else spell("2", "Smite") end
+				spell("3", "Mind Blast")
+				if known("Devouring Plague") and known("Mind Sear") then macro("4", "C02") else spell("4", "Devouring Plague") end
+				if known("Prayer of Mending") then macro("5", "C05") else spell("5", "Shadow Word: Death") end
+				spell("6", "Mindgames")
+				spell("V", "Shadowfiend")
+				spell("CE", "Psychic Horror")
+
+				------ Right ------
+				-- Top
+				spell("AB3", "Mass Dispel")
+				spell("AF", "Power Word: Shield")
+				macro("CF", "C14", "Angelic Feather")
+				spell("SF", "Angelic Feather")
+				macro("F", "C13", "Body and Soul")
+
+				-- Middle
+				spell("T", "Shackle Undead")
+				spell("ST", "Psychic Scream")
+				if known("Dominate Mind") then spell("CT", "Dominate Mind") else macro("CT", "C09", "Mind Control") end
+				spell("AT", "Void Tendrils")
+				spell("CB3", "Leap of Faith")
+				spell("SQ", "Flash Heal")
+				macro("SV", "C11", "Shadowform")
+				spell("CV", "Fade")
+
+				-- Bottom
 				spell("F1", "Desperate Prayer")
-				macro("F2", "C09", 16) -- Dispersion
+				macro("F2", "C12", "Dispersion")
 				spell("F3", "Vampiric Embrace")
 				empty("F4")
 				empty("F5")
+				empty("F6")
 				spell("CQ", "Levitate")
 
-				spell("T", "Shackle Undead")
-				if talent[4][2] then empty("ST") else spell("ST", "Psychic Scream") end
-				macro("CT", "C11", 34) -- Mind Control
-				spell("AT", "Mind Soothe")
-				empty("CB3")
-				spell("SQ", "Flash Heal")
-				macro("SV", "C06") -- Shadowform
-				spell("CV", "Fade")
-
-				spell("AB3", "Mass Dispel")
-				if talent[7][3] then spell("AF", "Surrender to Madness") else empty("AF") end
-				spell("CF", "Leap of Faith")
-				empty("SF")
-				if talent[2][1] then macro("F", "C08") else macro("F", "C07") end -- Power Word: Shield @player
 			else
-				--! Untalented Priest
-				spell("1", "Smite")
-				spell("2", "Mind Blast")
-				empty("3")
-				empty("4")
-				empty("5")
-				empty("CE")
+				--! Unspecialized Priest
+				
+				------ Macros ------
 
-				empty("C")
-				empty("SC")
-				empty("Q")
-				if level >= 4 then macro("E", "C03") else spell("E", "Shadow Word: Pain") end
-				empty("G")
-				empty("SG")
-				empty("V")
-				empty("SE")
+				-- Flash Heal / Smite
+				m("C01", nil, "#showtooltip\n/use [help]Flash Heal;Smite")
 
+				
+				------ Left ------
+				-- Top
+				empty("N")
+				empty("SN")
 				empty("R")
 				empty("SR")
 				empty("CR")
-				spell("H", "Power Word: Shield")
-				empty("SH")
+				empty("H")
+		 		empty("SH")
+				racial("AE")
 
-				spell("F1", "Fade")
-				empty("F2")
-				spell("F3", "Desperate Prayer")
-				empty("F4")
-				empty("F5")
-				empty("CQ")
+				-- Middle
+				empty("C")
+				empty("SC")
+				empty("Q")
+				spell("E", "Shadow Word: Pain")
+				empty("G")
+				empty("SG")
+				empty("SE")
 
+				-- Bottom
+				if known("Flash Heal") then macro("1", "C01") else spell("1", "Smite") end
+				empty("2")
+				spell("3", "Mind Blast")
+				empty("4")
+				empty("5")
+				empty("6")
+				empty("V")
+				empty("CE")
+
+				------ Right ------
+				-- Top
+				empty("AB3")
+				spell("AF", "Power Word: Shield")
+				empty("CF")
+				empty("SF")
+				empty("F")
+
+				-- Middle
 				empty("T")
 				spell("ST", "Psychic Scream")
 				empty("CT")
@@ -2387,408 +3541,644 @@ local function updateBars()
 				empty("CB3")
 				spell("SQ", "Flash Heal")
 				empty("SV")
-				empty("CV")
+				spell("CV", "Fade")
 
-				empty("AB3")
-				empty("AF")
-				empty("CF")
-				empty("SF")
-				empty("F")
+				-- Bottom
+				spell("F1", "Desperate Prayer")
+				empty("F2")
+				empty("F3")
+				empty("F4")
+				empty("F5")
+				empty("F6")
+				empty("CQ")
+
 			end
 		elseif class == "ROGUE" then
 			--! Rogue
 
-			-- Sinister Strike/Ambush/Backstab/Shadowstrike
-			m("C01", nil, "#showtooltip\n/use [stance:1][stance:2]Ambush;Sinister Strike")
-			-- Kidney Shot/Cheap Shot
-			m("C02", nil, "#showtooltip\n/use [stance:1][stance:2]Cheap Shot;Kidney Shot")
-			-- Tricks of the Trade
-			m("C03", nil, "#showtooltip Tricks of the Trade\n/use [@focus,help][help][]Tricks of the Trade")
-			-- Kick
-			m("C04", nil, "#showtooltip Kick\n/stopcasting\n/stopcasting\n/use Kick")
-			-- Pistol Shot
-			m("C05", 134536, "#showtooltip\n/use Pistol Shot")
-			-- Symbols of Death + Shadow Dance
-			m("C06", nil, "#showtooltip Symbols of Death\n/use Symbols of Death\n/use [nostance:1,nostance:2]Shadow Dance\n/use 13")
-			-- Stealth
-			m("C07", nil, "#showtooltip Stealth\n/cancelaura [btn:2]Stealth;[nocombat]Shadow Dance\n/use [nobtn:2]!Stealth")
-
-			-- Essence
-			essence("N", "Echoing Reprimand", "Serrated Bone Spike", "Sepsis", "Flagellation")
-
 			if spec == 1 then
 				--! Assassination Rogue
-				macro("1", "C01") -- Mutilate/Ambush
-				spell("2", "Rupture")
-				spell("3", "Eviscerate")
-				spell("4", "Slice and Dice")
-				if talent[7][3] then spell("5", "Crimson Tempest") else empty("5") end
-				spell("CE", "Kidney Shot")
+				
+				------ Macros ------
 
-				spell("C", "Shiv")
-				if talent[6][3] then spell("SC", "Exsanguinate") else empty("SC") end
+				-- Ambush and Cold Blood / Sinister Strike
+				m("C01", nil, "#showtooltip [stance:1/2]Ambush;Sinister Strike\n"..(known("Cold Blood") and "/use [stance:1/2]Cold Blood\n" or "").."/use [stance:1/2]Ambush;Sinister Strike")
+
+				if known("Crimson Tempest") then
+					-- Envenom and Cold Blood / Crimson Tempest
+					m("C03", nil, "#showtooltip [mod:shift]Crimson Tempest;Envenom\n"..(known("Cold Blood") and "/use [nomod:shift]Cold Blood\n" or "").."/use [mod:shift]Crimson Tempest;Envenom")
+				else
+					-- Envenom and Cold Blood
+					m("C03", nil, "#showtooltip Envenom\n"..(known("Cold Blood") and "/use Cold Blood\n" or "").."/use Envenom")
+				end
+
+				-- Ambush and Cold Blood
+				m("C06", nil, "#showtooltip Ambush\n/use Cold Blood\n/use Ambush")
+
+				-- Stealth
+				m("C07", nil, "#showtooltip Stealth\n/cancelaura [btn:2]Stealth;[nocombat]Shadow Dance\n/use [nobtn:2]!Stealth")
+
+				-- Kick
+				m("C08", nil, "#showtooltip Kick\n/stopcasting\n/stopcasting\n/use Kick")
+
+				-- Tricks of the Trade
+				m("C13", nil, "#showtooltip Tricks of the Trade\n/use [@focus,help][help][]Tricks of the Trade")
+				
+				
+				------ Left ------
+				-- Top
+				spell("N", "Thistle Tea")
+				spell("SN", "Shadow Dance")
+				spell("R", "Marked for Death")
+				spell("SR", "Shiv")
+				spell("CR", "Indiscriminate Carnage")
+				empty("H")
+				empty("SH")
+				racial("AE")
+
+				-- Middle
+				spell("C", "Poisoned Knife")
+				if known("Blindside") then macro("SC", "C06") else empty("SC") end
 				spell("Q", "Fan of Knives")
 				spell("E", "Garrote")
-				spell("G", "Vendetta")
-				empty("SG")
-				if talent[3][3] then spell("V", "Marked for Death") else empty("V") end
-				macro("SE", "C04") -- Kick
+				spell("G", "Deathmark")
+				if known("Sepsis") then spell("SG", "Sepsis") else spell("SG", "Serrated Bone Knife") end
+				macro("SE", "C08", "Kick")
 
-				if talent[1][3] then spell("R", "Ambush") else empty("R") end
-				empty("SR")
-				empty("CR")
-				spell("H", "Poisoned Knife")
-				empty("SH")
+				-- Bottom
+				macro("1", "C01")
+				spell("2", "Rupture")
+				macro("3", "C03", "Envenom")
+				spell("4", "Slice and Dice")
+				spell("5", "Kingsbane")
+				spell("6", "Echoing Reprimand")
+				spell("V", "Exsanguinate")
+				spell("CE", "Kidney Shot")
 
-				spell("F1", "Feint")
-				spell("F2", "Cloak of Shadows")
-				spell("F3", "Evasion")
-				empty("F4")
-				spell("F5", "Shroud of Concealment")
-				macro("CQ", "C03", 48) -- Tricks of the Trade
-
-				spell("T", "Sap")
-				spell("ST", "Blind")
-				spell("CT", "Cheap Shot")
-				empty("AT")
-				spell("CB3", "Distract")
-				spell("SQ", "Crimson Vial")
-				macro("SV", "C07") -- Stealth
-				spell("CV", "Vanish")
-
-				empty("AB3")
-				empty("AF")
+				------ Right ------
+				-- Top
+				spell("AB3", "Distract")
+				spell("AF", "Shroud of Concealment")
 				empty("CF")
 				spell("SF", "Shadowstep")
 				spell("F", "Sprint")
-			elseif spec == 2 then
-				--! Outlaw Rogue
-				macro("1", "C01") -- Sinister Strike/Ambush
-				macro("2", "C05", 12) -- Pistol Shot
-				spell("3", "Eviscerate")
-				spell("4", "Slice and Dice")
-				if talent[7][2] then spell("5", "Blade Rush") elseif talent[7][3] then spell("5", "Killing Spree") else empty("5") end
-				spell("CE", "Kidney Shot")
 
-				spell("C", "Roll the Bones")
-				if talent[6][3] then spell("SC", "Dreadblades") else empty("SC") end
-				spell("Q", "Blade Flurry")
-				spell("E", "Between the Eyes")
-				spell("G", "Adrenaline Rush")
-				empty("SG")
-				if talent[3][3] then spell("V", "Marked for Death") else empty("V") end
-				macro("SE", "C04") -- Kick
-
-				empty("R")
-				spell("SR", "Shiv")
-				empty("CR")
-				if talent[1][3] then spell("H", "Ghostly Strike") else empty("H") end
-				empty("SH")
-
-				spell("F1", "Feint")
-				spell("F2", "Cloak of Shadows")
-				spell("F3", "Evasion")
-				empty("F4")
-				spell("F5", "Shroud of Concealment")
-				macro("CQ", "C03", 48) -- Tricks of the Trade
-
+				-- Middle
 				spell("T", "Sap")
 				spell("ST", "Blind")
 				spell("CT", "Cheap Shot")
 				spell("AT", "Gouge")
-				spell("CB3", "Distract")
+				empty("CB3")
 				spell("SQ", "Crimson Vial")
-				macro("SV", "C07") -- Stealth
+				macro("SV", "C07", "Stealth")
 				spell("CV", "Vanish")
 
-				empty("AB3")
-				empty("AF")
-				spell("CF", "Grappling Hook")
-				empty("SF")
-				spell("F", "Sprint")
-			elseif spec == 3 then
-				--! Subtlety Rogue
-				macro("1", "C01") -- Backstab/Shadowstrike
-				spell("2", "Rupture")
-				spell("3", "Eviscerate")
-				spell("4", "Slice and Dice")
-				spell("5", "Black Powder")
-				spell("CE", "Kidney Shot")
-
-				macro("C", "C06", 29) -- Symbols of Death
-				spell("SC", "Shadow Dance")
-				spell("Q", "Shuriken Storm")
-				if talent[7][2] then spell("E", "Secret Technique") elseif talent[7][3] then spell("E", "Shuriken Tornado") else empty("E") end
-				spell("G", "Shadow Blades")
-				empty("SG")
-				if talent[3][3] then spell("V", "Marked for Death") else empty("V") end
-				macro("SE", "C04") -- Kick
-
-				empty("R")
-				spell("SR", "Shiv")
-				empty("CR")
-				spell("H", "Shuriken Toss")
-				empty("SH")
-
+				-- Bottom
 				spell("F1", "Feint")
 				spell("F2", "Cloak of Shadows")
 				spell("F3", "Evasion")
 				empty("F4")
-				spell("F5", "Shroud of Concealment")
-				macro("CQ", "C03", 48) -- Tricks of the Trade
+				empty("F5")
+				empty("F6")
+				macro("CQ", "C13", "Tricks of the Trade")
 
+			elseif spec == 2 then
+				--! Outlaw Rogue
+				
+				------ Macros ------
+
+				-- Ambush and Cold Blood / Sinister Strike
+				m("C01", nil, "#showtooltip [stance:1/2]Ambush;Sinister Strike\n"..(known("Cold Blood") and "/use [stance:1/2]Cold Blood\n" or "").."/use [stance:1/2]Ambush;Sinister Strike")
+
+				-- Pistol Shot
+				m("C02", 134536, "#showtooltip\n/use Pistol Shot")
+
+				-- Stealth
+				m("C07", nil, "#showtooltip Stealth\n/cancelaura [btn:2]Stealth;[nocombat]Shadow Dance\n/use [nobtn:2]!Stealth")
+
+				-- Kick
+				m("C08", nil, "#showtooltip Kick\n/stopcasting\n/stopcasting\n/use Kick")
+
+				-- Cold Blood and Blade Rush
+				m("C09", nil, "#showtooltip Blade Rush\n/use Cold Blood\n/use Blade Rush")
+
+				-- Tricks of the Trade
+				m("C13", nil, "#showtooltip Tricks of the Trade\n/use [@focus,help][help][]Tricks of the Trade")
+				
+				
+				------ Left ------
+				-- Top
+				spell("N", "Thistle Tea")
+				spell("SN", "Shadow Dance")
+				spell("R", "Marked for Death")
+				spell("SR", "Shiv")
+				spell("CR", "Keep it Rolling")
+				empty("H")
+				empty("SH")
+				racial("AE")
+
+				-- Middle
+				if known("Audacity") then spell("C", "Ambush") else empty("C") end
+				if known("Blade Rush") and known("Cold Blood") then macro("SC", "C09") elseif known("Cold Blood") then spell("SC", "Cold Blood") else spell("SC", "Blade Rush") end
+				spell("Q", "Blade Flurry")
+				if known("Sepsis") then spell("E", "Sepsis") else spell("E", "Ghostly Strike") end
+				spell("G", "Adrenaline Rush")
+				if known("Killing Spree") then spell("SG", "Killing Spree") else spell("SG", "Dreadblades") end
+				macro("SE", "C08", "Kick")
+
+				-- Bottom
+				macro("1", "C01")
+				macro("2", "C02", "Pistol Shot")
+				spell("3", "Eviscerate")
+				spell("4", "Slice and Dice")
+				spell("5", "Between the Eyes")
+				spell("6", "Echoing Reprimand")
+				spell("V", "Roll the Bones")
+				spell("CE", "Kidney Shot")
+
+				------ Right ------
+				-- Top
+				spell("AB3", "Distract")
+				spell("AF", "Shroud of Concealment")
+				spell("CF", "Grappling Hook")
+				spell("SF", "Shadowstep")
+				spell("F", "Sprint")
+
+				-- Middle
 				spell("T", "Sap")
 				spell("ST", "Blind")
 				spell("CT", "Cheap Shot")
-				empty("AT")
-				spell("CB3", "Distract")
+				spell("AT", "Gouge")
+				empty("CB3")
 				spell("SQ", "Crimson Vial")
-				macro("SV", "C07") -- Stealth
+				macro("SV", "C07", "Stealth")
 				spell("CV", "Vanish")
 
-				empty("AB3")
-				empty("AF")
+				-- Bottom
+				spell("F1", "Feint")
+				spell("F2", "Cloak of Shadows")
+				spell("F3", "Evasion")
+				empty("F4")
+				empty("F5")
+				empty("F6")
+				macro("CQ", "C13", "Tricks of the Trade")
+
+			elseif spec == 3 then
+				--! Subtlety Rogue
+				
+				------ Macros ------
+
+				-- Ambush and Cold Blood / Sinister Strike
+				m("C01", nil, "#showtooltip [stance:1/2]Ambush;Sinister Strike\n"..(known("Cold Blood") and "/use [stance:1/2]Cold Blood\n" or "").."/use [stance:1/2]Ambush;Sinister Strike")
+
+				-- Eviscerate / Black Powder
+				m("C03", nil, "#showtooltip\n/use [mod:shift]Black Powder;Eviscerate")
+
+				-- Stealth
+				m("C07", nil, "#showtooltip Stealth\n/cancelaura [btn:2]Stealth;[nocombat]Shadow Dance\n/use [nobtn:2]!Stealth")
+
+				-- Kick
+				m("C08", nil, "#showtooltip Kick\n/stopcasting\n/stopcasting\n/use Kick")
+
+				-- Symbols of Death, Cold Blood, Shadow Dance
+				m("C09", nil, "#showtooltip\n"..(known("Symbols of Death") and "/use Symbols of Death\n" or "")..(known("Cold Blood") and "/use Cold Blood\n" or "").."/use [nostance:1,nostance:2]Shadow Dance")
+
+				-- Tricks of the Trade
+				m("C13", nil, "#showtooltip Tricks of the Trade\n/use [@focus,help][help][]Tricks of the Trade")
+				
+				
+				------ Left ------
+				-- Top
+				spell("N", "Thistle Tea")
+				if not known("Symbols of Death") then empty("SN") else spell("SN", "Shadow Dance") end
+				spell("R", "Marked for Death")
+				spell("SR", "Shiv")
+				empty("CR")
+				empty("H")
+				empty("SH")
+				racial("AE")
+
+				-- Middle
+				spell("C", "Shuriken Toss")
+				spell("SC", "Shuriken Tornado")
+				spell("Q", "Shuriken Storm")
+				spell("E", "Sepsis")
+				spell("G", "Shadow Blades")
+				spell("SG", "Flagellation")
+				macro("SE", "C08", "Kick")
+
+				-- Bottom
+				macro("1", "C01")
+				spell("2", "Rupture")
+				if known("Black Powder") then macro("3", "C03") else spell("3", "Eviscerate") end
+				spell("4", "Slice and Dice")
+				empty("5", "Secret Technique")
+				spell("6", "Echoing Reprimand")
+				macro("V", "C09", "Shadow Dance")
+				spell("CE", "Kidney Shot")
+
+				------ Right ------
+				-- Top
+				spell("AB3", "Distract")
+				spell("AF", "Shroud of Concealment")
 				empty("CF")
 				spell("SF", "Shadowstep")
 				spell("F", "Sprint")
-			else
-				--! Untalented Rogue
-				if level >= 7 then macro("1", "C01") else spell("1", "Sinister Strike") end -- Sinister Strike/Backstab
-				empty("2")
-				spell("3", "Eviscerate")
-				spell("4", "Slice and Dice")
-				empty("5")
-				spell("CE", "Cheap Shot")
 
+				-- Middle
+				spell("T", "Sap")
+				spell("ST", "Blind")
+				spell("CT", "Cheap Shot")
+				spell("AT", "Gouge")
+				empty("CB3")
+				spell("SQ", "Crimson Vial")
+				macro("SV", "C07", "Stealth")
+				spell("CV", "Vanish")
+
+				-- Bottom
+				spell("F1", "Feint")
+				spell("F2", "Cloak of Shadows")
+				spell("F3", "Evasion")
+				empty("F4")
+				empty("F5")
+				empty("F6")
+				macro("CQ", "C13", "Tricks of the Trade")
+
+			else
+				--! Unspecialized Rogue
+
+				------ Macros ------
+
+				-- Ambush / Sinister Strike
+				m("C01", nil, "#showtooltip\n/use [stance:1/2]Ambush;Sinister Strike")
+
+				-- Stealth
+				m("C07", nil, "#showtooltip Stealth\n/cancelaura [btn:2]Stealth;[nocombat]Shadow Dance\n/use [nobtn:2]!Stealth")
+
+				-- Kick
+				m("C08", nil, "#showtooltip Kick\n/stopcasting\n/stopcasting\n/use Kick")
+
+				
+				------ Left ------
+				-- Top
+				empty("N")
+				empty("SN")
+				empty("R")
+				empty("SR")
+				empty("CR")
+				empty("H")
+				empty("SH")
+				racial("AE")
+
+				-- Middle
 				empty("C")
 				empty("SC")
 				empty("Q")
 				empty("E")
 				empty("G")
 				empty("SG")
+				macro("SE", "C08", "Kick")
+
+				-- Bottom
+				if known("Ambush") then macro("1", "C01") else spell("1", "Sinister Strike") end
+				empty("2")
+				spell("3", "Eviscerate")
+				spell("4", "Slice and Dice")
+				empty("5")
+				empty("6")
 				empty("V")
-				macro("SE", "C04", 6) -- Kick
+				empty("CE")
 
-				empty("R")
-				empty("SR")
-				empty("CR")
-				empty("H")
-				empty("SH")
-
-				empty("F1")
-				empty("F2")
-				empty("F3")
-				empty("F4")
-				empty("F5")
-				empty("CQ")
-
-				spell("T", "Sap")
-				empty("ST")
-				empty("CT")
-				empty("AT")
-				empty("CB3")
-				spell("SQ", "Crimson Vial")
-				macro("SV", "C07", 3) -- Stealth
-				empty("CV")
-
+				------ Right ------
+				-- Top
 				empty("AB3")
 				empty("AF")
 				empty("CF")
 				empty("SF")
 				spell("F", "Sprint")
+
+				-- Middle
+				empty("T")
+				empty("ST")
+				spell("CT", "Cheap Shot")
+				empty("AT")
+				empty("CB3")
+				spell("SQ", "Crimson Vial")
+				macro("SV", "C07", "Stealth")
+				empty("CV")
+
+				-- Bottom
+				empty("F1")
+				empty("F2")
+				empty("F3")
+				empty("F4")
+				empty("F5")
+				empty("F6")
+				empty("CQ")
+
 			end
 		elseif class == "SHAMAN" then
 			--! Shaman
 
-			-- Healing Surge/Lightning Bolt/Stormstrike
-			m("C01", nil, "#showtooltip\n/use [nospec:2,harm]Lightning Bolt;[spec:3][nospec:3,help]Healing Surge;[spec:2]Primal Strike;Lightning Bolt")
-			-- Healing Wave/Lava Burst
-			m("C02", nil, "#showtooltip\n/use [harm]Lava Burst;Healing Wave")
-			-- Chain Heal/Chain Lightning/Crash Lightning
-			m("C03", nil, "#showtooltip\n/use [harm,spec:2]Crash Lightning;[harm]Chain Lightning;[spec:3][help]Chain Heal;[spec:2]Crash Lightning;Chain Lightning")
-			-- Wind Shear/Earth Shield
-			m("C04", nil, "#showtooltip [spec:3,help][nospec:3,talent:3/2,help]Earth Shield;Wind Shear\n/stopcasting\n/stopcasting\n/use [spec:3,help][nospec:3,talent:3/2,help]Earth Shield;Wind Shear")
-			-- Riptide/Flame Shock
-			m("C05", nil, "#showtooltip\n/use [harm] Flame Shock;Riptide")
-			-- Fire Elemental
-			m("C06", nil, "#showtooltip\n/use [pet:Earth Elemental]Harden Skin;[pet:Storm Elemental]Eye of the Storm;[pet:Fire Elemental]Meteor;Fire Elemental")
-			-- Earth Elemental
-			m("C07", nil, "#showtooltip Earth Elemental\n/use [nopet]Earth Elemental")
-			-- Reincarnation
-			m("C08", nil, "#showtooltip\n/use Reincarnation")
-			-- Frost Shock/Crash Lightning
-			m("C09", nil, "#showtooltip\n/use [mod:shift]Crash Lightning;Frost Shock")
-
-			-- Essence
-			essence("N", "Vesper Totem", "Primordial Wave", "Fae Transfusion", "Chain Harvest")
-
 			if spec == 1 then
-				-- Elemental
-				macro("1", "C01") -- Lightning Bolt/Healing Surge
-				spell("2", "Lava Burst")
-				if level >= 24 then macro("3", "C03") else spell("3", "Chain Heal") end -- Chain Lightning/Chain Heal
+				--! Elemental Shaman
+
+				------ Macros ------
+
+				-- Lightning Bolt / Healing Surge
+				m("C01", nil, "#showtooltip\n/use [help]Healing Surge;Lightning Bolt")
+
+				-- Chain Lightning / Chain Heal
+				m("C03", nil, "#showtooltip\n/use [help]Chain Heal;Chain Lightning")
+
+				-- Wind Shear
+				m("C08", nil, "#showtooltip Wind Shear\n/stopcasting\n/stopcasting\n/use Wind Shear")
+
+				if known("Storm Elemental") then
+					-- Storm Elemental
+					m("C09", known("Primal Elementalist") and 462522 or nil, "#showtooltip\n/use Storm Elemental\n/petassist\n/petattack\n/petattack")
+				else
+					-- Fire Elemental
+					m("C09", known("Primal Elementalist") and 651081 or nil, "#showtooltip\n/use Fire Elemental\n/petassist\n/petattack\n/petattack")
+				end
+
+				-- Meteor or Tempest
+				m("C10", nil, "#showtooltip\n/use [pet:Fire Elemental]Meteor;[pet:Storm Elemental]Tempest")
+
+				-- Ancestral Guidance / Mana Spring Totem
+				m("C14", nil, "#showtooltip\n/use [mod:shift]Mana Spring Totem;Ancestral Guidance")
+
+				
+				------ Left ------
+				-- Top
+				spell("N", "Primordial Wave")
+				spell("SN", "Nature's Swiftness")
+				spell("R", "Totemic Projection")
+				if known("Purge") then spell("SR", "Purge") else spell("SR", "Greater Purge") end
+				spell("CR", "Cleanse Spirit")
+				spell("H", "Earth Shield")
+				spell("SH", "Poison Cleansing Totem")
+				racial("AE")
+
+				-- Middle
+				spell("C", "Frost Shock")
+				spell("SC", "Icefury")
+				if known("Primal Elementalist") then macro("Q", "C10") else spell("Q", "Liquid Magma Totem") end
+				spell("E", "Flame Shock")
+				if known("Fire Elemental") or known("Storm Elemental") then macro("G", "C09") else empty("G") end
+				empty("SG")
+				macro("SE", "C08", "Wind Shear")
+
+				-- Bottom
+				macro("1", "C01")
+				if known("Healing Wave") and known("Lava Burst") then macro("2", "C02") elseif known("Lava Burst") then spell("2", "Lava Burst") else spell("2", "Healing Wave") end
+				if known("Chain Heal") and known("Chain Lightning") then macro("3", "C03") elseif known("Chain Lightning") then spell("3", "Chain Lightning") else spell("3", "Chain Heal") end
 				spell("4", "Earth Shock")
-				if talent[2][2] then spell("5", "Echoing Shock") elseif talent[2][3] then spell("5", "Elemental Blast") else empty("5") end
+				spell("5", "Earthquake")
+				spell("6", "Stormkeeper")
+				spell("V", "Ascendance")
 				spell("CE", "Capacitor Totem")
 
-				spell("C", "Frost Shock")
-				if talent[6][3] then spell("SC", "Icefury") else empty("SC") end
-				spell("Q", "Earthquake")
-				spell("E", "Flame Shock")
-				macro("G", "C06", 34) -- Fire Elemental
-				if talent[7][3] then spell("SG", "Ascendance") else empty("SG") end
-				if talent[7][2] then spell("V", "Stormkeeper") else empty("V") end
-				macro("SE", "C04", 12) -- Wind Shear/Earth Shield
+				------ Right ------
+				-- Top
+				if known("Wind Rush Totem") then spell("AB3", "Wind Rush Totem") else spell("AB3", "Earthgrab Totem") end
+				spell("AF", "Spiritwalker's Grace")
+				spell("CF", "Feral Lunge")
+				if known("Spirit Walk") then spell("SF", "Spirit Walk") else spell("SF", "Gust of Wind") end
+				spell("F", "Ghost Wolf")
 
-				empty("R")
-				spell("SR", "Purge")
-				spell("CR", "Cleanse Spirit")
-				if talent[1][3] then spell("H", "Static Discharge") else empty("H") end
-				empty("SH")
-
-				spell("F1", "Astral Shift")
-				macro("F2", "C07", 37) -- Earth Elemental
-				spell("F3", "Healing Stream Totem")
-				if talent[5][2] then spell("F4", "Ancestral Guidance") else empty("F4") end
-				macro("F5", "C08") -- Reincarnation
-				spell("CQ", "Water Walking")
-
-				custom("T", "Hex", 41)
+				-- Middle
+				if known("Hex") then spell("T", "Hex") else empty("T") end
 				spell("ST", "Earthbind Totem")
-				empty("CT")
+				spell("CT", "Lightning Lasso")
 				empty("AT")
 				spell("CB3", "Thunderstorm")
 				spell("SQ", "Healing Surge")
-				if faction == "Alliance" then spell("SV", "Heroism") else spell("SV", "Bloodlust") end
+				empty("SV")
 				spell("CV", "Tremor Totem")
 
-				if talent[4][3] then spell("AB3", "Liquid Magma Totem") else empty("AB3") end
-				empty("AF")
-				if talent[5][3] then spell("CF", "Wind Rush Totem") else empty("CF") end
-				spell("SF", "Spiritwalker's Grace")
-				spell("F", "Ghost Wolf")
-			elseif spec == 2 then
-				--! Enhancement Shaman
-				macro("1", "C01") -- Stormstrike/Healing Surge
-				spell("2", "Lava Lash")
-				if level >= 38 then macro("3", "C03") else spell("3", "Chain Heal") end -- Crash Lightning/Chain Heal
-				spell("4", "Lightning Bolt")
-				spell("5", "Chain Lightning")
-				spell("CE", "Capacitor Totem")
-
-				spell("C", "Frost Shock")
-				if talent[2][3] then spell("SC", "Ice Strike") else empty("SC") end
-				if talent[1][3] then spell("SC", "Elemental Blast") else empty("SC") end
-				if talent[4][3] then spell("Q", "Fire Nova") else empty("Q") end
-				spell("E", "Flame Shock")
-				spell("G", "Feral Spirit")
-				if talent[7][2] then spell("SG", "Earthen Spike") elseif talent[7][3] then spell("SG", "Ascendance") else empty("SG") end
-				if talent[6][2] then spell("V", "Stormkeeper") elseif talent[6][3] then spell("V", "Sundering") else empty("V") end
-				macro("SE", "C04", 12) -- Wind Shear/Earth Shield
-
-				spell("R", "Windfury Totem")
-				spell("SR", "Purge")
-				spell("CR", "Cleanse Spirit")
-				if (talent[7][2] or talent[7][3]) and talent[4][3] then spell("H", "Fire Nova") else empty("H") end
-				empty("SH")
-
+				-- Bottom
 				spell("F1", "Astral Shift")
 				spell("F2", "Earth Elemental")
 				spell("F3", "Healing Stream Totem")
-				empty("F4")
-				macro("F5", "C08") -- Reincarnation
+				if known("Ancestral Guidance") and known("Mana Spring Totem") then macro("F4", "C14") elseif known("Mana Spring Totem") then spell("F4", "Mana Spring Totem") else spell("F4", "Ancestral Guidance") end
+				if known("Stoneskin Totem") then spell("F5", "Stoneskin Totem") else spell("F5", "Tranquil Air Totem") end
+				spell("F6", "Totemic Recall")
 				spell("CQ", "Water Walking")
 
-				custom("T", "Hex", 41)
-				spell("ST", "Earthbind Totem")
-				empty("CT")
-				empty("AT")
-				empty("CB3")
-				spell("SQ", "Healing Surge")
-				if faction == "Alliance" then spell("SV", "Heroism") else spell("SV", "Bloodlust") end
-				spell("CV", "Tremor Totem")
+			elseif spec == 2 then
+				--! Enhancement Shaman
 
-				empty("AB3")
-				empty("AF")
-				if talent[5][2] then spell("CF", "Feral Lunge") elseif talent[5][3] then spell("CF", "Wind Rush Totem") else empty("CF") end
-				spell("SF", "Spirit Walk")
-				spell("F", "Ghost Wolf")
-			elseif spec == 3 then
-				--! Restoration Shaman
-				macro("1", "C01") -- Lightning Bolt/Healing Surge
-				if level >= 27 then macro("2", "C02") else spell("2", "Lava Burst") end -- Healing Wave/Lava Burst
-				if level >= 24 then macro("3", "C03") else spell("3", "Chain Heal") end -- Chain Lightning/Chain Heal
-				spell("4", "Healing Rain")
-				if talent[6][2] then spell("5", "Downpour") else empty("5") end
+				------ Macros ------
+
+				-- Stormstrike / Healing Surge
+				m("C01", nil, "#showtooltip\n/use [help]Healing Surge;Primal Strike")
+
+				-- Crash Lightning / Chain Heal
+				m("C03", nil, "#showtooltip\n/use [help]Chain Heal;Crash Lightning")
+
+				-- Lava Burst or Elemental Blast / Lightning Bolt
+				m("C04", nil, "#showtooltip\n/use [mod:shift]Lightning Bolt;"..( known("Elemental Blast") and "Elemental Blast" or "Lava Burst" ))
+
+				-- Wind Shear
+				m("C08", nil, "#showtooltip Wind Shear\n/stopcasting\n/stopcasting\n/use Wind Shear")
+
+				-- Ancestral Guidance / Mana Spring Totem
+				m("C14", nil, "#showtooltip\n/use [mod:shift]Mana Spring Totem;Ancestral Guidance")
+
+				
+				------ Left ------
+				-- Top
+				spell("N", "Primordial Wave")
+				spell("SN", "Nature's Swiftness")
+				spell("R", "Totemic Projection")
+				if known("Purge") then spell("SR", "Purge") else spell("SR", "Greater Purge") end
+				spell("CR", "Cleanse Spirit")
+				spell("H", "Earth Shield")
+				spell("SH", "Poison Cleansing Totem")
+				racial("AE")
+
+				-- Middle
+				spell("C", "Frost Shock")
+				spell("SC", "Ice Strike")
+				spell("Q", "Fire Nova")
+				spell("E", "Flame Shock")
+				spell("G", "Feral Spirit")
+				spell("SG", "Doom Winds")
+				macro("SE", "C08", "Wind Shear")
+
+				-- Bottom
+				spell("1", "Primal Strike")
+				spell("2", "Lava Lash")
+				spell("3", "Crash Lightning")
+				if known("Lava Burst") or known("Elemental Blast") then macro("4", "C04") else spell("4", "Lightning Bolt") end
+				spell("5", "Chain Lightning")
+				spell("6", "Sundering")
+				spell("V", "Ascendance")
 				spell("CE", "Capacitor Totem")
 
-				spell("C", "Frost Shock")
-				if talent[1][3] then spell("SC", "Unleash Life") else empty("SC") end
-				if talent[2][3] then spell("Q", "Surge of Earth") else empty("Q") end
-				macro("E", "C05") -- Riptide/Flame Shock
-				spell("G", "Healing Stream Totem")
-				if talent[7][3] then spell("SG", "Ascendance") else empty("SG") end
-				if talent[7][2] then spell("V", "Wellspring") else empty("V") end
-				macro("SE", "C04", 12) -- Wind Shear/Earth Shield
+				------ Right ------
+				-- Top
+				if known("Wind Rush Totem") then spell("AB3", "Wind Rush Totem") else spell("AB3", "Earthgrab Totem") end
+				spell("AF", "Spiritwalker's Grace")
+				spell("CF", "Feral Lunge")
+				if known("Spirit Walk") then spell("SF", "Spirit Walk") else spell("SF", "Gust of Wind") end
+				spell("F", "Ghost Wolf")
 
-				spell("R", "Mana Tide Totem")
-				spell("SR", "Purge")
+				-- Middle
+				if known("Hex") then spell("T", "Hex") else empty("T") end
+				spell("ST", "Earthbind Totem")
+				spell("CT", "Lightning Lasso")
+				empty("AT")
+				spell("CB3", "Thunderstorm")
+				spell("SQ", "Healing Surge")
+				spell("SV", "Windfury Totem")
+				spell("CV", "Tremor Totem")
+
+				-- Bottom
+				spell("F1", "Astral Shift")
+				spell("F2", "Earth Elemental")
+				spell("F3", "Healing Stream Totem")
+				if known("Ancestral Guidance") and known("Mana Spring Totem") then macro("F4", "C14") elseif known("Mana Spring Totem") then spell("F4", "Mana Spring Totem") else spell("F4", "Ancestral Guidance") end
+				if known("Stoneskin Totem") then spell("F5", "Stoneskin Totem") else spell("F5", "Tranquil Air Totem") end
+				spell("F6", "Totemic Recall")
+				spell("CQ", "Water Walking")
+
+			elseif spec == 3 then
+				--! Restoration Shaman
+
+				------ Macros ------
+
+				-- Healing Surge / Lightning Bolt
+				m("C01", nil, "#showtooltip\n/use [harm]Lightning Bolt;Healing Surge")
+
+				-- Healing Wave / Lava Burst
+				m("C02", nil, "#showtooltip\n/use [harm]Lava Burst;Healing Wave")
+
+				-- Chain Heal / Chain Lightning
+				m("C03", nil, "#showtooltip\n/use [harm]Chain Lightning;Chain Heal")
+
+				-- Ever-Rising Tide / Stormkeeper
+				m("C06", nil, "#showtooltip\n/use [harm]Stormkeeper;Ever-Rising Tide")
+
+				-- Riptide / Flame Shock
+				m("C07", nil, "#showtooltip\n/use [harm]Flame Shock;Riptide")
+
+				-- Wind Shear
+				m("C08", nil, "#showtooltip Wind Shear\n/stopcasting\n/stopcasting\n/use Wind Shear")
+
+				-- Unleash Life / Frost Shock
+				m("C09", nil, "#showtooltip\n/use [harm]Frost Shock;Unleash Life")
+
+				-- Mana Tide Totem / Mana Spring Totem
+				m("C14", nil, "#showtooltip\n/use [mod:shift]Mana Spring Totem;Mana Tide Totem")
+
+				
+				------ Left ------
+				-- Top
+				spell("N", "Primordial Wave")
+				spell("SN", "Nature's Swiftness")
+				spell("R", "Totemic Projection")
+				if known("Purge") then spell("SR", "Purge") else spell("SR", "Greater Purge") end
 				spell("CR", "Purify Spirit")
-				empty("H")
-				empty("SH")
+				spell("H", "Earth Shield")
+				spell("SH", "Poison Cleansing Totem")
+				racial("AE")
 
+				-- Middle
+				if known("Unleash Life") and known("Frost Shock") then macro("C", "C09") elseif known("Frost Shock") then spell("C", "Frost Shock") else spell("C", "Unleash Life") end
+				spell("SC", "Wellspring")
+				spell("Q", "Downpour")
+				if known("Riptide") then macro("E", "C07") else spell("E", "Flame Shock") end
+				spell("G", "Spirit Link Totem")
+				spell("SG", "Ancestral Guidance")
+				macro("SE", "C08", "Wind Shear")
+
+				-- Bottom
+				macro("1", "C01")
+				if known("Healing Wave") and known("Lava Burst") then macro("2", "C02") elseif known("Lava Burst") then spell("2", "Lava Burst") else spell("2", "Healing Wave") end
+				if known("Chain Heal") and known("Chain Lightning") then macro("3", "C03") elseif known("Chain Lightning") then spell("3", "Chain Lightning") else spell("3", "Chain Heal") end
+				spell("4", "Healing Rain")
+				spell("5", "Healing Stream Totem")
+				if known("Ever-Rising Tide") and known("Stormkeeper") then macro("6", "C06") elseif known("Stormkeeper") then spell("6", "Stormkeeper") else spell("6", "Ever-Rising Tide") end
+				spell("V", "Ascendance")
+				spell("CE", "Capacitor Totem")
+
+				------ Right ------
+				-- Top
+				if known("Wind Rush Totem") then spell("AB3", "Wind Rush Totem") else spell("AB3", "Earthgrab Totem") end
+				spell("AF", "Spiritwalker's Grace")
+				empty("CF")
+				if known("Spirit Walk") then spell("SF", "Spirit Walk") else spell("SF", "Gust of Wind") end
+				spell("F", "Ghost Wolf")
+
+				-- Middle
+				if known("Hex") then spell("T", "Hex") else empty("T") end
+				spell("ST", "Earthbind Totem")
+				spell("CT", "Lightning Lasso")
+				empty("AT")
+				spell("CB3", "Thunderstorm")
+				spell("SQ", "Healing Surge")
+				if known("Earthen Wall Totem") then spell("SV", "Earthen Wall Totem") else spell("SV", "Ancestral Protection Totem") end
+				spell("CV", "Tremor Totem")
+
+				-- Bottom
 				spell("F1", "Astral Shift")
 				spell("F2", "Earth Elemental")
 				spell("F3", "Healing Tide Totem")
-				spell("F4", "Spirit Link Totem")
-				macro("F5", "C08") -- Reincarnation
-				spell("CQ", "Water Walking")
+				if known("Mana Tide Totem") and known("Mana Spring Totem") then macro("F4", "C14") elseif known("Mana Spring Totem") then spell("F4", "Mana Spring Totem") else spell("F4", "Mana Tide Totem") end
+				if known("Stoneskin Totem") then spell("F5", "Stoneskin Totem") else spell("F5", "Tranquil Air Totem") end
+				spell("F6", "Totemic Recall")
+				empty("CQ")
 
-				custom("T", "Hex", 41)
-				spell("ST", "Earthbind Totem")
-				if talent[3][2] then spell("CT", "Earthgrab Totem") else empty("CT") end
-				empty("AT")
-				if talent[4][2] then spell("CB3", "Earthen Wall Totem") elseif talent[4][3] then spell("CB3", "Ancestral Protection Totem") else empty("CB3") end
-				spell("SQ", "Healing Surge")
-				if faction == "Alliance" then spell("SV", "Heroism") else spell("SV", "Bloodlust") end
-				spell("CV", "Tremor Totem")
-
-				empty("AB3")
-				empty("AF")
-				if talent[5][3] then spell("CF", "Wind Rush Totem") else empty("CF") end
-				spell("SF", "Spiritwalker's Grace")
-				spell("F", "Ghost Wolf")
 			else
-				--! Untalented Shaman
-				if level >= 2 then spell("1", "Primal Strike") else spell("1", "Lightning Bolt") end
-				empty("2")
-				empty("3")
-				if level >= 2 then spell("4", "Lightning Bolt") else empty("4") end
-				empty("5")
-				empty("CE")
+				--! Unspecialized Shaman
 
+				------ Macros ------
+
+				-- Lightning Bolt / Healing Surge
+				m("C01", nil, "#showtooltip\n/use [help]Healing Surge;Lightning Bolt")
+
+				
+				------ Left ------
+				-- Top
+				empty("N")
+				empty("SN")
+				empty("R")
+				empty("SR")
+				empty("CR")
+				empty("H")
+				empty("SH")
+				racial("AE")
+
+				-- Middle
 				empty("C")
 				empty("SC")
 				empty("Q")
 				spell("E", "Flame Shock")
 				empty("G")
 				empty("SG")
-				empty("V")
 				empty("SE")
 
-				empty("R")
-				empty("SR")
-				empty("CR")
-				empty("H")
-				empty("SH")
+				-- Bottom
+				if known("Healing Surge") then macro("1", "C01") else spell("1", "Lightning Bolt") end
+				spell("2", "Primal Strike")
+				empty("3")
+				empty("4")
+				empty("5")
+				empty("6")
+				empty("V")
+				empty("CE")
 
-				empty("F1")
-				empty("F2")
-				empty("F3")
-				empty("F4")
-				empty("F5")
-				empty("CQ")
+				------ Right ------
+				-- Top
+				empty("AB3")
+				empty("AF")
+				empty("CF")
+				empty("SF")
+				spell("F", "Ghost Wolf")
 
+				-- Middle
 				empty("T")
 				spell("ST", "Earthbind Totem")
 				empty("CT")
@@ -2798,411 +4188,617 @@ local function updateBars()
 				empty("SV")
 				empty("CV")
 
-				empty("AB3")
-				empty("AF")
-				empty("CF")
-				empty("SF")
-				spell("F", "Ghost Wolf")
+				-- Bottom
+				empty("F1")
+				empty("F2")
+				empty("F3")
+				empty("F4")
+				empty("F5")
+				empty("F6")
+				empty("CQ")
+
 			end
 		elseif class == "WARLOCK" then
 			--! Warlock
 
-			-- Pet Primary
-			m("C01", nil, "#showtooltip\n/use [pet:Felguard/Wrathguard]Axe Toss;[pet:Felhunter/Observer]Spell Lock;[pet:Succubus/Incubus/Shivarra]Seduction;[pet:Voidwalker/Voidlord,nobtn:2]Suffering;[nobtn:2]Command Demon\n/petautocasttoggle [btn:2]Suffering")
-			-- Pet Secondary
-			m("C02", nil, "#showtooltip\n/use [pet:Felguard/Wrathguard]Felstorm;[pet:Felhunter/Observer]Devour Magic;[pet:Imp/Fel Imp]Flee;[pet:Succubus/Incubus/Shivarra]Lesser Invisibility;[pet:Voidwalker/Voidlord]Shadow Bulwark;Command Demon")
-			-- Emergency Felhunter Interrupt
-			m("C03", 136174, "#showtooltip [pet:Felhunter/Observer]Spell Lock;Fel Domination\n/use [pet:Felhunter/Observer]Spell Lock;Fel Domination\n/use [nopet:Felhunter/Observer]Summon Felhunter")
-
-			-- Essence
-			essence("N", "Scouring Tithe", "Decimating Bolt", "Soul Rot", "Impending Catastrophe")
-
 			if spec == 1 then
 				--! Affliction Warlock
-				spell("1", "Shadow Bolt")
-				spell("2", "Malefic Rapture")
-				spell("3", "Unstable Affliction")
-				spell("4", "Agony")
-				if talent[6][2] then spell("5", "Haunt") else empty("5") end
-				spell("CE", "Shadowfury")
 
-				if talent[4][2] then spell("C", "Phantom Singularity") elseif talent[4][3] then spell("C", "Vile Taint") else empty("C") end
-				if talent[2][3] then spell("SC", "Siphon Life") else empty("SC") end
-				spell("Q", "Seed of Corruption")
-				spell("E", "Corruption")
-				spell("G", "Summon Darkglare")
-				empty("SG")
-				if talent[7][3] then spell("V", "Dark Soul: Misery") else empty("V") end
-				macro("SE", "C01", 29) -- Pet Primary
+				------ Macros ------
 
-				spell("R", "Curse of Exhaustion")
-				spell("SR", "Curse of Weakness")
+				-- Shadow Bolt
+				m("C02", nil, "#showtooltip Shadow Bolt\n/petattack\n/petassist\n/petattack\n/use Shadow Bolt")
+
+				-- Pet Primary
+				m("C07", nil, "#showtooltip\n/use [pet:Felhunter/Observer]Spell Lock;[pet:Succubus/Incubus/Shivarra]Seduction;[pet:Voidwalker/Voidlord,nobtn:2]Suffering;[nobtn:2]Command Demon\n/petautocasttoggle [btn:2]Suffering")
+				
+				-- Pet Secondary
+				m("C08", nil, "#showtooltip\n/use [pet:Felhunter/Observer]Devour Magic;[pet:Imp/Fel Imp]Flee;[pet:Succubus/Incubus/Shivarra]Lesser Invisibility;[pet:Voidwalker/Voidlord]Shadow Bulwark;Command Demon")
+
+				
+				------ Left ------
+				-- Top
+				spell("N", "Soul Rot")
+				spell("SN", "Amplify Curse")
+				spell("R", "Curse of Weakness")
+				spell("SR", "Curse of Exhaustion")
 				spell("CR", "Curse of Tongues")
 				spell("H", "Health Funnel")
-				spell("SH", "Subjugate Demon")
+				empty("SH")
+				racial("AE")
 
-				spell("F1", "Unending Resolve")
-				if talent[3][3] then spell("F2", "Dark Pact") else empty("F2") end
-				empty("F3")
-				empty("F4")
-				empty("F5")
-				spell("CQ", "Unending Breath")
+				-- Middle
+				spell("C", "Siphon Life")
+				spell("SC", "Soul Swap")
+				if known("Phantom Singularity") then spell("Q", "Phantom Singularity") else spell("Q", "Vile Taint") end
+				spell("E", "Agony")
+				spell("G", "Summon Darkglare")
+				spell("SG", "Summon Soulkeeper")
+				macro("SE", "C07", "Command Demon")
 
-				spell("T", "Fear")
-				spell("ST", "Banish")
-				if talent[5][2] then spell("CT", "Mortal Coil") elseif talent[5][3] then spell("CT", "Howl of Terror") else empty("CT") end
-				empty("AT")
-				spell("CB3", "Demonic Circle")
-				spell("SQ", "Drain Life")
-				macro("SV", "C02", 29) -- Pet Secondary
-				macro("CV", "C03", 23) -- Emergency Felhunter Interrupt
+				-- Bottom
+				spell("1", "Corruption")
+				macro("2", "C02")
+				spell("3", "Seed of Corruption")
+				spell("4", "Malefic Rapture")
+				spell("5", "Unstable Affliction")
+				spell("6", "Haunt")
+				spell("V", "Soul Tap")
+				spell("CE", "Shadowfury")
 
+				------ Right ------
+				-- Top
 				empty("AB3")
 				empty("AF")
 				spell("CF", "Demonic Gateway")
 				spell("SF", "Demonic Circle: Teleport")
-				if talent[3][2] then spell("F", "Burning Rush") else empty("F") end
+				spell("F", "Burning Rush")
+
+				-- Middle
+				spell("T", "Banish")
+				spell("ST", "Fear")
+				if known("Howl of Terror") then spell("CT", "Howl of Terror") else spell("CT", "Mortal Coil") end
+				spell("AT", "Subjugate Demon")
+				spell("CB3", "Shadowflame")
+				spell("SQ", "Drain Life")
+				spell("SV", "Demonic Circle")
+				macro("CV", "C08", "Command Demon")
+
+				-- Bottom
+				spell("F1", "Unending Resolve")
+				spell("F2", "Dark Pact")
+				spell("F3", "Soulburn")
+				empty("F4")
+				empty("F5")
+				empty("F6")
+				spell("CQ", "Unending Breath")
+
 			elseif spec == 2 then
 				--! Demonology Warlock
-				spell("1", "Shadow Bolt")
+
+				------ Macros ------
+
+				-- Shadow Bolt
+				m("C01", nil, "#showtooltip Shadow Bolt\n/petattack\n/petassist\n/petattack\n/use Shadow Bolt")
+
+				-- Pet Primary
+				m("C07", nil, "#showtooltip\n/use [pet:Felguard/Wrathguard]Axe Toss;[pet:Felhunter/Observer]Spell Lock;[pet:Succubus/Incubus/Shivarra]Seduction;[pet:Voidwalker/Voidlord,nobtn:2]Suffering;[nobtn:2]Command Demon\n/petautocasttoggle [btn:2]Suffering")
+				
+				-- Pet Secondary
+				m("C08", nil, "/use [pet:Felguard/Wrathguard,nobtn:2]Felstorm;[pet:Felhunter/Observer]Devour Magic;[pet:Imp/Fel Imp]Flee;[pet:Succubus/Incubus/Shivarra]Lesser Invisibility;[pet:Voidwalker/Voidlord]Shadow Bulwark;Command Demon\n/petautocasttoggle [btn:2]Felstorm")
+
+				
+				------ Left ------
+				-- Top
+				spell("N", "Doom")
+				spell("SN", "Amplify Curse")
+				spell("R", "Curse of Weakness")
+				spell("SR", "Curse of Exhaustion")
+				spell("CR", "Curse of Tongues")
+				spell("H", "Health Funnel")
+				empty("SH")
+				racial("AE")
+
+				-- Middle
+				if known("Summon Vilefiend") then spell("C", "Summon Vilefiend") else spell("C", "Soul Strike") end
+				spell("SC", "Guillotine")
+				if known("Bilescourge Bombers") then spell("Q", "Bilescourge Bombers") else spell("Q", "Demonic Strength") end
+				spell("E", "Power Siphon")
+				spell("G", "Summon Demonic Tyrant")
+				spell("SG", "Nether Portal")
+				macro("SE", "C07", "Command Demon")
+
+				-- Bottom
+				macro("1", "C01")
 				spell("2", "Demonbolt")
 				spell("3", "Call Dreadstalkers")
 				spell("4", "Hand of Gul'dan")
-				if talent[1][2] then spell("5", "Bilescourge Bombers") elseif talent[1][3] then spell("5", "Demonic Strength") else empty("5") end
+				spell("5", "Implosion")
+				spell("6", "Grimoire: Felguard")
+				spell("V", "Summon Soulkeeper")
 				spell("CE", "Shadowfury")
 
-				if talent[4][2] then spell("C", "Soul Strike") elseif talent[4][3] then spell("C", "Summon Vilefiend") else empty("C") end
-				if talent[6][3] then spell("SC", "Grimoire: Felguard") else empty("SC") end
-				spell("Q", "Implosion")
-				if talent[2][2] then spell("E", "Power Siphon") elseif talent[2][3] then spell("E", "Doom") else empty("E") end
-				spell("G", "Summon Demonic Tyrant")
-				empty("SG")
-				if talent[7][3] then spell("V", "Nether Portal") else empty("V") end
-				macro("SE", "C01", 17) -- Pet Primary
-
-				spell("R", "Curse of Exhaustion")
-				spell("SR", "Curse of Weakness")
-				spell("CR", "Curse of Tongues")
-				spell("H", "Health Funnel")
-				spell("SH", "Subjugate Demon")
-
-				spell("F1", "Unending Resolve")
-				if talent[3][3] then spell("F2", "Dark Pact") else empty("F2") end
-				empty("F3")
-				empty("F4")
-				empty("F5")
-				spell("CQ", "Unending Breath")
-
-				spell("T", "Fear")
-				spell("ST", "Banish")
-				if talent[5][2] then spell("CT", "Mortal Coil") elseif talent[5][3] then spell("CT", "Howl of Terror") else empty("CT") end
-				empty("AT")
-				spell("CB3", "Demonic Circle")
-				spell("SQ", "Drain Life")
-				macro("SV", "C02", 12) -- Pet Secondary
-				macro("CV", "C03", 23) -- Emergency Felhunter Interrupt
-
+				------ Right ------
+				-- Top
 				empty("AB3")
 				empty("AF")
 				spell("CF", "Demonic Gateway")
 				spell("SF", "Demonic Circle: Teleport")
-				if talent[3][2] then spell("F", "Burning Rush") else empty("F") end
+				spell("F", "Burning Rush")
+
+				-- Middle
+				spell("T", "Banish")
+				spell("ST", "Fear")
+				if known("Howl of Terror") then spell("CT", "Howl of Terror") else spell("CT", "Mortal Coil") end
+				spell("AT", "Subjugate Demon")
+				spell("CB3", "Shadowflame")
+				spell("SQ", "Drain Life")
+				spell("SV", "Demonic Circle")
+				macro("CV", "C08")
+
+				-- Bottom
+				spell("F1", "Unending Resolve")
+				spell("F2", "Dark Pact")
+				spell("F3", "Soulburn")
+				empty("F4")
+				empty("F5")
+				empty("F6")
+				spell("CQ", "Unending Breath")
+
 			elseif spec == 3 then
 				--! Destruction Warlock
-				if level >= 11 then spell("1", "Immolate") else spell("1", "Corruption") end
-				spell("2", "Incinerate")
-				spell("3", "Chaos Bolt")
-				spell("4", "Conflagrate")
-				if talent[4][3] then spell("5", "Cataclysm") else empty("5") end
-				spell("CE", "Shadowfury")
 
-				if talent[2][3] then spell("C", "Shadowburn") else empty("C") end
-				if talent[1][3] then spell("SC", "Soul Fire") else empty("SC") end
-				spell("Q", "Rain of Fire")
-				spell("E", "Havoc")
-				spell("G", "Summon Infernal")
-				empty("SG")
-				if talent[7][2] then spell("V", "Channel Demonfire") elseif talent[7][3] then spell("V", "Dark Soul: Instability") else empty("V") end
-				macro("SE", "C01", 29) -- Pet Primary
+				------ Macros ------
 
-				spell("R", "Curse of Exhaustion")
-				spell("SR", "Curse of Weakness")
+				-- Shadow Bolt
+				m("C02", nil, "#showtooltip Shadow Bolt\n/petattack\n/petassist\n/petattack\n/use Shadow Bolt")
+
+				-- Pet Primary
+				m("C07", nil, "#showtooltip\n/use [pet:Felhunter/Observer]Spell Lock;[pet:Succubus/Incubus/Shivarra]Seduction;[pet:Voidwalker/Voidlord,nobtn:2]Suffering;[nobtn:2]Command Demon\n/petautocasttoggle [btn:2]Suffering")
+				
+				-- Pet Secondary
+				m("C08", nil, "#showtooltip\n/use [pet:Felhunter/Observer]Devour Magic;[pet:Imp/Fel Imp]Flee;[pet:Succubus/Incubus/Shivarra]Lesser Invisibility;[pet:Voidwalker/Voidlord]Shadow Bulwark;Command Demon")
+				
+
+				------ Left ------
+				-- Top
+				spell("N", "Soul Fire")
+				spell("SN", "Amplify Curse")
+				spell("R", "Curse of Weakness")
+				spell("SR", "Curse of Exhaustion")
 				spell("CR", "Curse of Tongues")
 				spell("H", "Health Funnel")
-				spell("SH", "Subjugate Demon")
+				empty("SH")
+				racial("AE")
 
-				spell("F1", "Unending Resolve")
-				if talent[3][3] then spell("F2", "Dark Pact") else empty("F2") end
-				empty("F3")
-				empty("F4")
-				empty("F5")
-				spell("CQ", "Unending Breath")
+				-- Middle
+				spell("C", "Shadowburn")
+				spell("SC", "Channel Demonfire")
+				spell("Q", "Cataclysm")
+				spell("E", "Havoc")
+				spell("G", "Summon Infernal")
+				spell("SG", "Summon Soulkeeper")
+				macro("SE", "C07", "Command Demon")
 
-				spell("T", "Fear")
-				spell("ST", "Banish")
-				if talent[5][2] then spell("CT", "Mortal Coil") elseif talent[5][3] then spell("CT", "Howl of Terror") else empty("CT") end
-				empty("AT")
-				spell("CB3", "Demonic Circle")
-				spell("SQ", "Drain Life")
-				macro("SV", "C02", 29) -- Pet Secondary
-				macro("CV", "C03", 23) -- Emergency Felhunter Interrupt
+				-- Bottom
+				spell("1", "Corruption")
+				macro("2", "C02")
+				spell("3", "Conflagrate")
+				spell("4", "Chaos Bolt")
+				spell("5", "Rain of Fire")
+				spell("6", "Dimensional Rift")
+				empty("V")
+				spell("CE", "Shadowfury")
 
+				------ Right ------
+				-- Top
 				empty("AB3")
 				empty("AF")
 				spell("CF", "Demonic Gateway")
 				spell("SF", "Demonic Circle: Teleport")
-				if talent[3][2] then spell("F", "Burning Rush") else empty("F") end
-			else
-				--! Untalented Warlock
-				spell("1", "Shadow Bolt")
-				empty("2")
-				empty("3")
-				empty("4")
-				empty("5")
-				empty("CE")
+				spell("F", "Burning Rush")
 
+				-- Middle
+				spell("T", "Banish")
+				spell("ST", "Fear")
+				if known("Howl of Terror") then spell("CT", "Howl of Terror") else spell("CT", "Mortal Coil") end
+				spell("AT", "Subjugate Demon")
+				spell("CB3", "Shadowflame")
+				spell("SQ", "Drain Life")
+				spell("SV", "Demonic Circle")
+				macro("CV", "C08", "Command Demon")
+
+				-- Bottom
+				spell("F1", "Unending Resolve")
+				spell("F2", "Dark Pact")
+				spell("F3", "Soulburn")
+				empty("F4")
+				empty("F5")
+				empty("F6")
+				spell("CQ", "Unending Breath")
+
+			else
+				--! Unspecialized Warlock
+
+				------ Macros ------
+
+				-- Shadow Bolt
+				m("C01", nil, "#showtooltip Shadow Bolt\n/petattack\n/petassist\n/petattack\n/use Shadow Bolt")
+
+				
+				------ Left ------
+				-- Top
+				empty("N")
+				empty("SN")
+				spell("R", "Curse of Weakness")
+				empty("SR")
+				empty("CR")
+				spell("H", "Health Funnel")
+				empty("SH")
+				racial("AE")
+
+				-- Middle
 				empty("C")
 				empty("SC")
 				empty("Q")
 				spell("E", "Corruption")
 				empty("G")
 				empty("SG")
-				empty("V")
 				empty("SE")
 
-				spell("R", "Curse of Exhaustion")
-				spell("SR", "Curse of Weakness")
-				empty("CR")
-				spell("H", "Health Funnel")
-				empty("SH")
+				-- Bottom
+				macro("1", "C01")
+				empty("2")
+				empty("3")
+				empty("4")
+				empty("5")
+				empty("6")
+				empty("V")
+				empty("CE")
 
-				spell("F1", "Unending Resolve")
-				empty("F2")
-				empty("F3")
-				empty("F4")
-				empty("F5")
-				empty("CQ")
-
-				spell("T", "Fear")
-				empty("ST")
-				empty("CT")
-				empty("AT")
-				empty("CB3")
-				spell("SQ", "Drain Life")
-				empty("SV")
-				empty("CV")
-
+				------ Right ------
+				-- Top
 				empty("AB3")
 				empty("AF")
 				empty("CF")
 				empty("SF")
 				empty("F")
+
+				-- Middle
+				empty("T")
+				spell("ST", "Fear")
+				empty("CT")
+				empty("AT")
+				empty("CB3")
+				spell("SQ", "Drain Life")
+				empty("SV")
+				empty("CV")
+
+				-- Bottom
+				spell("F1", "Unending Resolve")
+				empty("F2")
+				empty("F3")
+				empty("F4")
+				empty("F5")
+				empty("F6")
+				empty("CQ")
+
 			end
 		elseif class == "WARRIOR" then
 			--! Warrior
 
-			-- Pummel
-			m("C01", nil, "#showtooltip Pummel\n/stopcasting\n/stopcasting\n/use Pummel")
-			-- Charge/Intervene
-			m("C02", nil, "#showtooltip\n/use [help]Intervene;Charge")
-			-- Challenging Shout
-			m("C03", 4067374, "#showtooltip\n/use Challenging Shout")
-
-			-- Essence
-			essence("N", "Spear of Bastion", "Conqueror's Banner", "Ancient Aftershock", false)
-
 			if spec == 1 then
 				--! Arms Warrior
-				spell("1", "Mortal Strike")
-				if level < 12 then spell("2", "Slam") else spell("2", "Overpower") end
-				spell("3", "Execute")
-				if level < 12 then empty("4") elseif talent[5][3] then spell("4", "Cleave") else spell("4", "Slam") end
-				spell("5", "Colossus Smash")
-				if talent[2][3] then spell("CE", "Storm Bolt") else empty("CE") end
+				
+				------ Macros ------
 
-				if talent[1][3] then spell("C", "Skullsplitter") else empty("C") end
+				-- Mortal Strike / Shield Slam
+				m("C01", nil, "#showtooltip\n/use [worn:shield]Shield Slam;"..(known("Mortal Strike") and "Mortal Strike" or "Slam"))
+
+				-- Slam / Whirlwind
+				m("C04", nil, "#showtooltip\n/use [mod:shift]Whirlwind;Slam")
+
+				-- Pummel
+				m("C08", nil, "#showtooltip Pummel\n/stopcasting\n/stopcasting\n/use Pummel")
+
+				if known("Skullsplitter") then
+					-- Skullsplitter / Thunder Clap
+					m("C05", nil, "#showtooltip\n/use [mod:shift]Thunder Clap;Skullsplitter")
+				else
+					-- Blood and Thunder
+					m("C05", 460957, "#showtooltip\n/use Thunder Clap")
+				end
+
+				-- Battle Stance
+				m("C13", nil, "#showtooltip Battle Stance\n/use [nostance:"..(known("Defensive Stance") and "2" or "1").."]!Battle Stance")
+
+				-- Defensive Stance / Shield Block
+				m("C14", nil, "#showtooltip [stance:1,worn:shield]Shield Block;Defensive Stance\n/use [stance:1,worn:shield]Shield Block;[nostance:1]!Defensive Stance")
+				
+				
+				------ Left ------
+				-- Top
+				spell("N", "Spear of Bastion")
+				empty("SN")
+				spell("R", "Taunt")
+				if known("Wrecking Throw") then spell("SR", "Wrecking Throw") else spell("SR", "Shattering Throw") end
+				empty("CR")
+				empty("H")
+				empty("SH")
+				racial("AE")
+
+				-- Middle
+				spell("C", "Heroic Throw")
 				spell("SC", "Sweeping Strikes")
-				spell("Q", "Whirlwind")
-				if talent[3][3] then spell("E", "Rend") else empty("E") end
-				if talent[6][2] then spell("G", "Avatar") elseif talent[6][3] then spell("G", "Deadly Calm") else empty("G") end
-				empty("SG")
+				spell("Q", "Cleave")
+				spell("E", "Rend")
+				spell("G", "Colossus Smash")
+				spell("SG", "Avatar")
+				macro("SE", "C08", "Pummel")
+
+				-- Bottom
+				macro("1", "C01")
+				spell("2", "Overpower")
+				spell("3", "Execute")
+				if not known("Mortal Strike") then spell("4", "Whirlwind") else macro("4", "C04") end
+				if known("Blood and Thunder") then macro("5", "C05") else spell("5", "Skullsplitter") end
+				spell("6", "Thunderous Roar")
 				spell("V", "Bladestorm")
-				macro("SE", "C01") -- Pummel
+				spell("CE", "Storm Bolt")
 
-				spell("R", "Taunt")
-				spell("SR", "Shattering Throw")
-				macro("CR", "C03", 54)
-				spell("H", "Heroic Throw")
-				empty("SH")
-
-				spell("F1", "Die by the Sword")
-				spell("F2", "Rallying Cry")
-				empty("F3")
-				empty("F4")
-				empty("F5")
-				spell("CQ", "Ignore Pain")
-
-				spell("T", "Intimidating Shout")
-				spell("ST", "Hamstring")
-				spell("CT", "Piercing Howl")
-				empty("AT")
-				empty("CB3")
-				spell("SQ", "Victory Rush")
-				if talent[4][3] then spell("SV", "Defensive Stance") else empty("SV") end
-				spell("CV", "Spell Reflection")
-
+				------ Right ------
+				-- Top
 				empty("AB3")
-				empty("AF")
-				if level >= 43 then macro("CF", "C02") else spell("CF", "Charge") end
+				spell("AF", "Intervene")
+				spell("CF", "Charge")
 				spell("SF", "Berserker Rage")
 				spell("F", "Heroic Leap")
-			elseif spec == 2 then
-				--! Fury Warrior
-				spell("1", "Bloodthirst")
-				if level >= 12 then spell("2", "Raging Blow") else spell("2", "Slam") end
-				spell("3", "Execute")
-				if level >= 19 then spell("4", "Rampage") else spell("4", "Slam", 12) end
-				if talent[7][3] then spell("5", "Siegebreaker") else empty("5") end
-				if talent[2][3] then spell("CE", "Storm Bolt") else empty("CE") end
 
-				empty("C")
-				empty("SC")
-				spell("Q", "Whirlwind")
-				if talent[3][3] then spell("E", "Onslaught") else empty("E") end
-				spell("G", "Recklessness")
-				empty("SG")
-				if talent[6][2] then spell("V", "Dragon Roar") elseif talent[6][3] then spell("V", "Bladestorm") else empty("V") end
-				macro("SE", "C01") -- Pummel
-
-				spell("R", "Taunt")
-				spell("SR", "Shattering Throw")
-				macro("CR", "C03", 54)
-				spell("H", "Heroic Throw")
-				empty("SH")
-
-				spell("F1", "Enraged Regeneration")
-				spell("F2", "Rallying Cry")
-				empty("F3")
-				empty("F4")
-				empty("F5")
-				spell("CQ", "Ignore Pain")
-
-				spell("T", "Intimidating Shout")
-				spell("ST", "Hamstring")
-				spell("CT", "Piercing Howl")
-				empty("AT")
-				empty("CB3")
-				spell("SQ", "Victory Rush")
-				empty("SV")
-				spell("CV", "Spell Reflection")
-
-				empty("AB3")
-				empty("AF")
-				if level >= 43 then macro("CF", "C02") else spell("CF", "Charge") end
-				spell("SF", "Berserker Rage")
-				spell("F", "Heroic Leap")
-			elseif spec == 3 then
-				--! Protection Warrior
-				spell("1", "Shield Slam")
-				if level >= 12 then spell("2", "Revenge") else spell("2", "Slam") end
-				spell("3", "Execute")
-				spell("4", "Shield Block")
-				if level >= 19 then spell("5", "Thunder Clap") else spell("5", "Whirlwind") end
-				if talent[2][3] then spell("CE", "Storm Bolt") else empty("CE") end
-
-				empty("C")
-				empty("SC")
-				spell("Q", "Ignore Pain")
-				if talent[1][3] then empty("E") else spell("E", "Devastate") end
-				spell("G", "Avatar")
-				empty("SG")
-				if talent[3][3] then spell("V", "Dragon Roar") else empty("V") end
-				macro("SE", "C01") -- Pummel
-
-				spell("R", "Taunt")
-				spell("SR", "Shattering Throw")
-				macro("CR", "C03", 54)
-				spell("H", "Heroic Throw")
-				empty("SH")
-
-				spell("F1", "Demoralizing Shout")
-				spell("F2", "Last Stand")
-				spell("F3", "Shield Wall")
-				spell("F4", "Rallying Cry")
-				empty("F5")
-				empty("CQ")
-
+				-- Middle
 				spell("T", "Intimidating Shout")
 				spell("ST", "Hamstring")
 				spell("CT", "Shockwave")
-				empty("AT")
-				if talent[6][3] then spell("CB3", "Ravager") else empty("CB3") end
+				spell("AT", "Piercing Howl")
+				empty("CB3")
 				spell("SQ", "Victory Rush")
-				empty("SV")
-				spell("CV", "Spell Reflection")
+				macro("SV", "C13")
+				empty("CV")
 
+				-- Bottom
+				spell("F1", "Die by the Sword")
+				macro("F2", "C14", "Defensive Stance")
+				spell("F3", "Rallying Cry")
+				spell("F4", "Bitter Immunity")
+				empty("F5")
+				empty("F6")
+				spell("CQ", "Spell Reflection")
+
+			elseif spec == 2 then
+				--! Fury Warrior
+				
+				------ Macros ------
+
+				-- Raging Blow or Bloodthirst / Shield Slam
+				m("C01", nil, "#showtooltip\n/use [worn:shield]Shield Slam;"..((known("Annihilator") or not known("Raging Blow")) and "Bloodthirst" or "Raging Blow"))
+
+				-- Pummel
+				m("C08", nil, "#showtooltip Pummel\n/stopcasting\n/stopcasting\n/use Pummel")
+
+				-- Berserker Stance
+				m("C13", nil, "#showtooltip Berserker Stance\n/use [nostance:"..(known("Defensive Stance") and "2" or "1").."]!Berserker Stance")
+
+				-- Defensive Stance / Shield Block
+				m("C14", nil, "#showtooltip [stance:1,worn:shield]Shield Block;Defensive Stance\n/use [stance:1,worn:shield]Shield Block;[nostance:1]!Defensive Stance")
+				
+				
+				------ Left ------
+				-- Top
+				spell("N", "Spear of Bastion")
+				empty("SN")
+				spell("R", "Taunt")
+				if known("Wrecking Throw") then spell("SR", "Wrecking Throw") else spell("SR", "Shattering Throw") end
+				empty("CR")
+				empty("H")
+				empty("SH")
+				racial("AE")
+
+				-- Middle
+				spell("C", "Heroic Throw")
+				empty("SC")
+				spell("Q", "Whirlwind")
+				spell("E", "Onslaught")
+				spell("G", "Recklessness")
+				spell("SG", "Avatar")
+				macro("SE", "C08", "Pummel")
+
+				-- Bottom
+				if known("Bloodthirst") then macro("1", "C01") else spell("1", "Slam") end
+				if known("Annihilator") or (not known("Raging Blow") and known("Bloodthirst")) then spell("2", "Slam") else spell("2", "Bloodthirst") end
+				spell("3", "Execute")
+				spell("4", "Rampage")
+				spell("5", "Odyn's Fury")
+				spell("6", "Thunderous Roar")
+				spell("V", "Ravager")
+				spell("CE", "Storm Bolt")
+
+				------ Right ------
+				-- Top
 				empty("AB3")
-				empty("AF")
-				if level >= 43 then macro("CF", "C02") else spell("CF", "Charge") end
+				spell("AF", "Intervene")
+				spell("CF", "Charge")
 				spell("SF", "Berserker Rage")
 				spell("F", "Heroic Leap")
-			else
-				--! Untalented Warrior
-				spell("1", "Slam")
-				empty("2")
-				spell("3", "Execute")
-				empty("4")
-				empty("5")
-				empty("CE")
 
-				empty("C")
+				-- Middle
+				spell("T", "Intimidating Shout")
+				spell("ST", "Hamstring")
+				spell("CT", "Shockwave")
+				spell("AT", "Piercing Howl")
+				empty("CB3")
+				spell("SQ", "Victory Rush")
+				macro("SV", "C13")
+				empty("CV")
+
+				-- Bottom
+				spell("F1", "Enraged Regeneration")
+				macro("F2", "C14", "Defensive Stance")
+				spell("F3", "Rallying Cry")
+				spell("F4", "Bitter Immunity")
+				empty("F5")
+				empty("F6")
+				spell("CQ", "Spell Reflection")
+
+			elseif spec == 3 then
+				--! Protection Warrior
+				
+				------ Macros ------
+
+				-- Shield Slam / Slam
+				m("C01", nil, "#showtooltip\n/use [noworn:shield]Slam;Shield Slam")
+
+				-- Pummel
+				m("C08", nil, "#showtooltip Pummel\n/stopcasting\n/stopcasting\n/use Pummel")
+
+				-- Challenging Shout
+				m("C09", 4067374, "#showtooltip\n/use Challenging Shout")
+
+				-- Defensive Stance
+				m("C13", nil, "#showtooltip Defensive Stance\n/use [nostance:1]!Defensive Stance")
+
+				if known("Battle Stance") then
+					-- Battle Stance
+					m("C14", nil, "#showtooltip Battle Stance\n/use [nostance:2]!Battle Stance")
+				else
+					-- Cancel Defensive Stance
+					m("C14", 132349, "/cancelaura Defensive Stance")
+				end
+				
+				
+				------ Left ------
+				-- Top
+				spell("N", "Spear of Bastion")
+				empty("SN")
+				spell("R", "Taunt")
+				if known("Wrecking Throw") then spell("SR", "Wrecking Throw") else spell("SR", "Shattering Throw") end
+				macro("CR", "C09", "Challenging Shout")
+				empty("H")
+				empty("SH")
+				racial("AE")
+
+				-- Middle
+				spell("C", "Heroic Throw")
+				empty("SC")
+				spell("Q", "Ignore Pain")
+				if known("Blood and Thunder") then empty("E") else spell("E", "Rend") end
+				spell("G", "Shield Charge")
+				spell("SG", "Avatar")
+				macro("SE", "C08", "Pummel")
+
+				-- Bottom
+				macro("1", "C01")
+				if not known("Revenge") then spell("2", "Devastate") else spell("2", "Revenge") end
+				spell("3", "Execute")
+				if not known("Thunder Clap") and not known("Devastator") and known("Revenge") then spell("4", "Devastate") else spell("4", "Thunder Clap") end
+				spell("5", "Shield Block")
+				spell("6", "Thunderous Roar")
+				spell("V", "Ravager")
+				spell("CE", "Storm Bolt")
+
+				------ Right ------
+				-- Top
+				empty("AB3")
+				spell("AF", "Intervene")
+				spell("CF", "Charge")
+				spell("SF", "Berserker Rage")
+				spell("F", "Heroic Leap")
+
+				-- Middle
+				spell("T", "Intimidating Shout")
+				spell("ST", "Hamstring")
+				spell("CT", "Shockwave")
+				spell("AT", "Piercing Howl")
+				empty("CB3")
+				spell("SQ", "Victory Rush")
+				macro("SV", "C13")
+				macro("CV", "C14")
+
+				-- Bottom
+				spell("F1", "Demoralizing Shout")
+				spell("F2", "Last Stand")
+				spell("F3", "Rallying Cry")
+				spell("F4", "Shield Wall")
+				spell("F5", "Spell Block")
+				spell("F6", "Bitter Immunity")
+				spell("CQ", "Spell Reflection")
+
+			else
+				--! Unspecialized Warrior
+				
+				------ Macros ------
+
+				-- Pummel
+				m("C08", nil, "#showtooltip Pummel\n/stopcasting\n/stopcasting\n/use Pummel")
+
+				
+				------ Left ------
+				-- Top
+				empty("N")
+				empty("SN")
+				spell("R", "Taunt")
+				empty("SR")
+				empty("CR")
+				empty("H")
+				empty("SH")
+				racial("AE")
+
+				-- Middle
+				spell("C", "Heroic Throw")
 				empty("SC")
 				spell("Q", "Whirlwind")
 				empty("E")
 				empty("G")
 				empty("SG")
+				macro("SE", "C08", "Pummel")
+
+				-- Bottom
+				if known("Shield Slam") then spell("1", "Shield Slam") else spell("1", "Slam") end
+				if known("Shield Slam") then spell("2", "Slam") empty("2") end
+				spell("3", "Execute")
+				empty("4")
+				spell("5", "Shield Block")
+				empty("6")
 				empty("V")
-				macro("SE", "C01", 7)
+				empty("CE")
 
-				empty("R")
-				empty("SR")
-				empty("CR")
-				empty("H")
-				empty("SH")
-
-				empty("F1")
-				empty("F2")
-				empty("F3")
-				empty("F4")
-				empty("F5")
-				empty("CQ")
-
-				empty("T")
-				spell("ST", "Hamstring")
-				empty("CT")
-				empty("AT")
-				empty("CB3")
-				spell("SQ", "Victory Rush")
-				empty("SV")
-				empty("CV")
-
+				------ Right ------
+				-- Top
 				empty("AB3")
 				empty("AF")
 				spell("CF", "Charge")
 				empty("SF")
 				empty("F")
+
+				-- Middle
+				empty("T")
+				spell("ST", "Hamstring")
+				empty("CT")
+				empty("AT")
+				empty("CB3")
+				spell("SQ", "Victory Rush")
+				empty("SV")
+				empty("CV")
+
+				-- Bottom
+				empty("F1")
+				empty("F2")
+				empty("F3")
+				empty("F4")
+				empty("F5")
+				empty("F6")
+				empty("CQ")
+
 			end
 		end
-
-
-		-- All Classes
-		macro("6", "G026") -- Trinket 1
-		macro("7", "G027") -- Trinket 2
-		signature("SN")
-		racial("AE")
-		macro("SX", "G029") -- Tonic
-		macro("X", "G028") -- Healthstone
-
 		
 		-- PvP Talents
 		local pvp1, pvp2, pvp3 = false, false, false
@@ -3227,13 +4823,39 @@ local function updateBars()
 		if not pvp1 then empty("J") end
 		if not pvp2 then empty("SJ") end
 		if not pvp3 then empty("CJ") end
-		-----
+		
+		-- Potion
+		empty("CG")
+		empty("C CG")
+		empty("B CG")
+
+		-- Dragonriding
+		if class == "EVOKER" then
+			spell("D 1", "Surge Forward")
+			spell("D 2", "Skyward Ascent")
+			empty("D 3")
+			empty("D 4")
+			empty("D 5")
+			empty("D 6")
+			empty("D V")
+			empty("D CE")
+		else
+			empty("D 1")
+			empty("D 2")
+			empty("D 3")
+			empty("D 4")
+			empty("D 5")
+			empty("D 6")
+			empty("D V")
+			empty("D CE")
+		end
 	end
 end
 
-local function updateEquipmentSets()
+local function UpdateEquipmentSets()
 	local icons = {
 		["Timewalking"] = 463446,
+		["Speed"] = 965900,
 		["Alliance_PvP"] = 463448,
 		["Horde_PvP"] = 463449,
 		["DEATHKNIGHT_Blood"] = 135770,
@@ -3245,6 +4867,8 @@ local function updateEquipmentSets()
 		["DRUID_Feral"] = 132115,
 		["DRUID_Guardian"] = 132276,
 		["DRUID_Restoration"] = 136041,
+		["EVOKER_Devastation"] = 4511811,
+		["EVOKER_Preservation"] = 4511812,
 		["HUNTER_Beast Mastery"] = 461112,
 		["HUNTER_Marksmanship"] = 236179,
 		["HUNTER_Survival"] = 461113,
@@ -3293,35 +4917,32 @@ local function updateEquipmentSets()
 	end
 end
 
-local function eventHandler(self, event)
-	if event == "PLAYER_LOGIN" then
-		-- Prevent anything from happening before PLAYER_LOGIN has triggered at least once
-		loaded = true
+Placer:SetScript("OnEvent", function(self, event)
+	if event == "PLAYER_LOGIN" and not loaded then
+		-- Delay the first load
+		C_Timer.After(0.5, function()
+			loaded = true
+			UpdateBars(event)
+		end)
 	end
 
-	if InCombatLockdown() then
-		-- If we are in combat, delay until after combat
-		frame:RegisterEvent("PLAYER_REGEN_ENABLED")
-	else
+	if loaded then
 		if event == "PLAYER_REGEN_ENABLED" then
-			frame:UnregisterEvent("PLAYER_REGEN_ENABLED")
-			updateBars()
-		elseif loaded then
-			if throttled then
-				return
-			else
-				throttled = true
-				C_Timer.After(1, function()
-					throttled = false
-				end)
-			end
+			Placer:UnregisterEvent("PLAYER_REGEN_ENABLED")
+		end
 
-			C_Timer.After(1, updateBars)
+		if not locked then
+			locked = true
+
+			C_Timer.After(0.5, function()
+				locked = false
+				UpdateBars(event)
+			end)
 		end
 	end
-end
-frame:SetScript("OnEvent", eventHandler)
+end)
 
+SLASH_PLACER1 = "/placer"
 function SlashCmdList.PLACER(msg, editbox)
 	if msg == "clear" then
 		for i = 1, 120 do
@@ -3329,7 +4950,7 @@ function SlashCmdList.PLACER(msg, editbox)
 			ClearCursor()
 		end
 	else
-		updateBars()
-		updateEquipmentSets()
+		UpdateBars("SLASH_PLACER")
+		UpdateEquipmentSets()
 	end
 end
