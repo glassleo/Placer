@@ -70,6 +70,7 @@ local slotNames = {
 	["F5"] = 53,
 	["F6"] = 54,
 	["CQ"] = 55,
+	["="] = 56,
 
 	------ Cat Form ------
 	-- Middle
@@ -436,24 +437,6 @@ local function item(slotName, itemName)
 	PickupItem(itemName)
 	PlaceAction(slotId)
 	ClearCursor()
-end
-
-local function pvptalent(slotName, talentId)
-	local slotId = slotNames[slotName]
-	local actionType, actionDataId, actionSubtype = GetActionInfo(slotId)
-	local _,_,_,_,_,spellId = GetPvpTalentInfoByID(talentId)
-	local todo = "place"
-
-	if actionType == "spell" and actionDataId == spellId then
-		-- do nothing
-	else
-		-- Place PvP talent
-		PickupAction(slotId)
-		ClearCursor()
-		PickupPvpTalent(talentId)
-		PlaceAction(slotId)
-		ClearCursor()
-	end
 end
 
 local function racial(slotName)
@@ -1091,7 +1074,7 @@ local function UpdateBars(event)
 
 				if known("Moonkin Form") then
 					-- Moonkin Form
-					m("C14", nil, "#showtooltip Moonkin Form\n/stopcasting\n/stopcasting\n/use [noform:4]Moonkin Form")
+					m("C14", nil, "#showtooltip Moonkin Form\n/stopcasting\n/stopcasting\n/use [noform:4,nobtn:2]Moonkin Form\n/cancelform [btn:2]")
 				else
 					-- Caster Form
 					m("C14", 461117, "/stopcasting\n/stopcasting\n/cancelform")
@@ -1243,7 +1226,7 @@ local function UpdateBars(event)
 				m("C15", nil, "#showtooltip\n/cancelaura Travel Form\n/cancelaura [btn:2]Prowl\n/use [nobtn:2]!Prowl")
 
 				-- Cat Form
-				m("C16", nil, "#showtooltip Bear Form\n/use [noform:2]Cat Form")
+				m("C16", nil, "#showtooltip Bear Form\n/use [noform:2,nobtn:2]Cat Form\n/cancelform [btn:2]")
 
 				
 				------ Left ------
@@ -1370,7 +1353,7 @@ local function UpdateBars(event)
 				m("C11", nil, "#showtooltip Growl\n/use [noform:1]Bear Form\n/use Growl")
 
 				-- Bear Form
-				m("C12", nil, "#showtooltip Bear Form\n/use [noform:1]Bear Form")
+				m("C12", nil, "#showtooltip Bear Form\n/use [noform:1,nobtn:2]Bear Form\n/cancelform [btn:2]")
 
 				-- Cat Form / Dash
 				m("C13", nil, "#showtooltip Dash\n/use [form:2]Dash;Cat Form")
@@ -1769,6 +1752,9 @@ local function UpdateBars(event)
 				-- Quell
 				m("C08", nil, "#showtooltip Quell\n/stopcasting\n/stopcasting\n/use Quell")
 
+				-- Verdant Embrace
+				m("C10", nil, "#showtooltip Verdant Embrace\n/use [help]Verdant Embrace")
+
 				-- Living Flame Healing
 				m("C13", nil, "#showtooltip\n/use [help][@player]Living Flame")
 				
@@ -1807,7 +1793,7 @@ local function UpdateBars(event)
 				-- Top
 				empty("AB3")
 				spell("AF", "Rescue")
-				spell("CF", "Verdant Embrace")
+				macro("CF", "C10", "Verdant Embrace")
 				spell("SF", "Time Spiral")
 				spell("F", "Hover")
 
@@ -1843,6 +1829,9 @@ local function UpdateBars(event)
 
 				-- Quell
 				m("C08", nil, "#showtooltip Quell\n/stopcasting\n/stopcasting\n/use Quell")
+
+				-- Verdant Embrace
+				m("C10", nil, "#showtooltip Verdant Embrace\n/use [help]Verdant Embrace")
 
 				-- Living Flame Healing
 				m("C13", nil, "#showtooltip\n/use [help][@player]Living Flame")
@@ -1882,7 +1871,7 @@ local function UpdateBars(event)
 				-- Top
 				empty("AB3")
 				spell("AF", "Rescue")
-				spell("CF", "Verdant Embrace")
+				macro("CF", "C10", "Verdant Embrace")
 				spell("SF", "Time Spiral")
 				spell("F", "Hover")
 
@@ -2616,8 +2605,8 @@ local function UpdateBars(event)
 				-- Tiger's Lust @player
 				m("C13", 571558, "#showtooltip Tiger's Lust\n/use [@player]Tiger's Lust")
 
-				-- Provoke Black Ox Statue
-				m("C14", 611419, "#showtooltip Provoke\n/targetexact Black Ox Statue\n/use Provoke\n/targetlasttarget")
+				-- Black Ox Statue
+				m("C14", nil, "#showtooltip Black Ox Statue\n/targetexact Black Ox Statue\n/use Black Ox Statue")
 
 				
 				------ Left ------
@@ -2625,7 +2614,7 @@ local function UpdateBars(event)
 				spell("N", "Bonedust Brew")
 				spell("SN", "Summon White Tiger Statue")
 				spell("R", "Provoke")
-				macro("SR", "C14", "Summon Black Ox Statue")
+				spell("SR", "Crackling Jade Lightning")
 				spell("CR", "Detox")
 				spell("H", "Black Ox Brew")
 				empty("SH")
@@ -2635,9 +2624,9 @@ local function UpdateBars(event)
 				if known("Chi Wave") then spell("C", "Chi Wave") else spell("C", "Chi Burst") end
 				spell("SC", "Exploding Keg")
 				spell("Q", "Spinning Crane Kick")
-				spell("E", "Rushing Jade Wind")
+				spell("E", "Breath of Fire")
 				spell("G", "Invoke Niuzao, the Black Ox")
-				spell("SG", "Touch of Death")
+				spell("SG", "Weapons of Order")
 				macro("SE", "C08", "Spear Hand Strike")
 
 				-- Bottom
@@ -2645,28 +2634,28 @@ local function UpdateBars(event)
 				spell("2", "Rising Sun Kick")
 				macro("3", "C03")
 				spell("4", "Keg Smash")
-				spell("5", "Breath of Fire")
+				spell("5", "Rushing Jade Wind")
 				spell("6", "Purifying Brew")
-				spell("V", "Weapons of Order")
+				spell("V", "Touch of Death")
 				spell("CE", "Leg Sweep")
 
 				------ Right ------
 				-- Top
 				spell("AB3", "Summon Jade Serpent Statue")
 				spell("AF", "Tiger's Lust")
-				spell("CF", "Roll")
-				spell("SF", "Transcendence: Transfer")
-				macro("F", "C13", "Tiger's Lust")
+				spell("CF", "Clash")
+				macro("SF", "C13", "Tiger's Lust")
+				spell("F", "Roll")
 
 				-- Middle
 				spell("T", "Paralysis")
 				spell("ST", "Disable")
-				spell("CT", "Clash")
-				spell("AT", "Crackling Jade Lightning")
+				empty("CT")
+				macro("AT", "C14", "Summon Black Ox Statue")
 				spell("CB3", "Ring of Peace")
 				spell("SQ", "Vivify")
 				spell("SV", "Transcendence")
-				spell("CV", "Zen Meditation")
+				spell("CV", "Transcendence: Transfer")
 
 				-- Bottom
 				spell("F1", "Celestial Brew")
@@ -2674,7 +2663,7 @@ local function UpdateBars(event)
 				spell("F3", "Diffuse Magic")
 				spell("F4", "Dampen Harm")
 				spell("F5", "Healing Elixir")
-				spell("F6", "Summon Black Ox Statue")
+				spell("F6", "Zen Meditation")
 				spell("CQ", "Expel Harm")
 
 			elseif spec == 2 then
@@ -2697,8 +2686,8 @@ local function UpdateBars(event)
 				-- Tiger's Lust @player
 				m("C13", 571558, "#showtooltip Tiger's Lust\n/use [@player]Tiger's Lust")
 
-				-- Provoke Black Ox Statue
-				m("C14", 611419, "#showtooltip Provoke\n/targetexact Black Ox Statue\n/use Provoke\n/targetlasttarget")
+				-- Black Ox Statue
+				m("C14", nil, "#showtooltip Black Ox Statue\n/targetexact Black Ox Statue\n/use Black Ox Statue")
 				
 				
 				------ Left ------
@@ -2709,7 +2698,7 @@ local function UpdateBars(event)
 				macro("SR", "C14", "Summon Black Ox Statue")
 				spell("CR", "Detox")
 				spell("H", "Life Cocoon")
-				empty("SH")
+				spell("SH", "Mana Tea")
 				racial("AE")
 
 				-- Middle
@@ -2718,7 +2707,7 @@ local function UpdateBars(event)
 				spell("Q", "Spinning Crane Kick")
 				spell("E", "Renewing Mist")
 				if known("Invoke Yu'lon, the Jade Serpent") then spell("G", "Invoke Yu'lon, the Jade Serpent") else spell("G", "Invoke Chi-Ji, the Red Crane") end
-				spell("SG", "Touch of Death")
+				spell("SG", "Thunder Focus Tea")
 				macro("SE", "C08", "Spear Hand Strike")
 
 				-- Bottom
@@ -2726,28 +2715,28 @@ local function UpdateBars(event)
 				if known("Rising Sun Kick") and known("Enveloping Mist") then macro("2", "C02") elseif known("Rising Sun Kick") then spell("2", "Rising Sun Kick") else spell("2", "Enveloping Mist") end
 				macro("3", "C03")
 				spell("4", "Essence Font")
-				spell("5", "Zen Pulse")
-				spell("6", "Refreshing Jade Wind")
-				spell("V", "Thunder Focus Tea")
+				spell("5", "Refreshing Jade Wind")
+				spell("6", "Zen Pulse")
+				spell("V", "Touch of Death")
 				spell("CE", "Leg Sweep")
 
 				------ Right ------
 				-- Top
 				spell("AB3", "Summon Jade Serpent Statue")
 				spell("AF", "Tiger's Lust")
-				spell("CF", "Roll")
-				spell("SF", "Transcendence: Transfer")
-				macro("F", "C13", "Tiger's Lust")
+				empty("CF")
+				macro("SF", "C13", "Tiger's Lust")
+				spell("F", "Roll")
 
 				-- Middle
 				spell("T", "Paralysis")
 				spell("ST", "Disable")
 				spell("CT", "Song of Chi-Ji")
-				spell("AT", "Crackling Jade Lightning")
+				macro("AT", "C14", "Summon Black Ox Statue")
 				spell("CB3", "Ring of Peace")
 				spell("SQ", "Vivify")
 				spell("SV", "Transcendence")
-				spell("CV", "Mana Tea")
+				spell("CV", "Transcendence: Transfer")
 
 				-- Bottom
 				if known("Revival") then spell("F1", "Revival") else spell("F1", "Restoral") end
@@ -2755,7 +2744,7 @@ local function UpdateBars(event)
 				spell("F3", "Diffuse Magic")
 				spell("F4", "Dampen Harm")
 				spell("F5", "Healing Elixir")
-				spell("F6", "Summon Black Ox Statue")
+				empty("F6")
 				spell("CQ", "Expel Harm")
 
 			elseif spec == 3 then
@@ -2775,8 +2764,8 @@ local function UpdateBars(event)
 				-- Tiger's Lust @player
 				m("C13", 571558, "#showtooltip Tiger's Lust\n/use [@player]Tiger's Lust")
 
-				-- Provoke Black Ox Statue
-				m("C14", 611419, "#showtooltip Provoke\n/targetexact Black Ox Statue\n/use Provoke\n/targetlasttarget")
+				-- Black Ox Statue
+				m("C14", nil, "#showtooltip Black Ox Statue\n/targetexact Black Ox Statue\n/use Black Ox Statue")
 				
 				
 				------ Left ------
@@ -2784,7 +2773,7 @@ local function UpdateBars(event)
 				spell("N", "Bonedust Brew")
 				spell("SN", "Summon White Tiger Statue")
 				spell("R", "Provoke")
-				macro("SR", "C14", "Summon Black Ox Statue")
+				spell("SR", "Crackling Jade Lightning")
 				spell("CR", "Detox")
 				empty("H")
 				empty("SH")
@@ -2794,9 +2783,9 @@ local function UpdateBars(event)
 				if known("Chi Wave") then spell("C", "Chi Wave") else spell("C", "Chi Burst") end
 				spell("SC", "Faeline Stomp")
 				spell("Q", "Spinning Crane Kick")
-				spell("E", "Rushing Jade Wind")
+				spell("E", "Whirling Dragon Punch")
 				spell("G", "Invoke Xuen, the White Tiger")
-				spell("SG", "Touch of Death")
+				if known("Storm, Earth, and Fire") then spell("SG", "Storm, Earth, and Fire") else spell("SG", "Serenity") end
 				macro("SE", "C08", "Spear Hand Strike")
 
 				-- Bottom
@@ -2804,28 +2793,28 @@ local function UpdateBars(event)
 				spell("2", "Rising Sun Kick")
 				macro("3", "C03")
 				spell("4", "Fists of Fury")
-				spell("5", "Whirling Dragon Punch")
+				spell("5", "Rushing Jade Wind")
 				spell("6", "Strike of the Windlord")
-				if known("Storm, Earth, and Fire") then spell("V", "Storm, Earth, and Fire") else spell("V", "Serenity") end
+				spell("V", "Touch of Death")
 				spell("CE", "Leg Sweep")
 
 				------ Right ------
 				-- Top
 				spell("AB3", "Summon Jade Serpent Statue")
 				spell("AF", "Tiger's Lust")
-				spell("CF", "Roll")
-				spell("SF", "Transcendence: Transfer")
-				macro("F", "C13", "Tiger's Lust")
+				spell("CF", "Flying Serpent Kick")
+				macro("SF", "C13", "Tiger's Lust")
+				spell("F", "Roll")
 
 				-- Middle
 				spell("T", "Paralysis")
 				spell("ST", "Disable")
 				empty("CT")
-				spell("AT", "Crackling Jade Lightning")
+				macro("AT", "C14", "Summon Black Ox Statue")
 				spell("CB3", "Ring of Peace")
 				spell("SQ", "Vivify")
 				spell("SV", "Transcendence")
-				spell("CV", "Flying Serpent Kick")
+				spell("CV", "Transcendence: Transfer")
 
 				-- Bottom
 				spell("F1", "Touch of Karma")
@@ -2850,7 +2839,7 @@ local function UpdateBars(event)
 				empty("N")
 				empty("SN")
 				spell("R", "Provoke")
-				empty("SR")
+				spell("SR", "Crackling Jade Lightning")
 				empty("CR")
 				empty("H")
 				empty("SH")
@@ -2862,7 +2851,7 @@ local function UpdateBars(event)
 				spell("Q", "Spinning Crane Kick")
 				empty("E")
 				empty("G")
-				spell("SG", "Touch of Death")
+				empty("SG")
 				empty("SE")
 
 				-- Bottom
@@ -2872,7 +2861,7 @@ local function UpdateBars(event)
 				empty("4")
 				empty("5")
 				empty("6")
-				empty("V")
+				spell("V", "Touch of Death")
 				spell("CE", "Leg Sweep")
 
 				------ Right ------
@@ -2887,7 +2876,7 @@ local function UpdateBars(event)
 				empty("T")
 				empty("ST")
 				empty("CT")
-				spell("AT", "Crackling Jade Lightning")
+				empty("AT")
 				empty("CB3")
 				spell("SQ", "Vivify")
 				empty("SV")
@@ -2929,6 +2918,9 @@ local function UpdateBars(event)
 				-- Rebuke
 				m("C08", nil, "#showtooltip Rebuke\n/stopcasting\n/stopcasting\n/use Rebuke")
 
+				-- Blessing of Freedom @player
+				m("C13", 135878, "#showtooltip Blessing of Freedom\n/use [@player]Blessing of Freedom")
+
 				
 				------ Left ------
 				-- Top
@@ -2963,9 +2955,9 @@ local function UpdateBars(event)
 				------ Right ------
 				-- Top
 				empty("AB3")
-				empty("AF")
+				spell("AF", "Blessing of Freedom")
 				spell("CF", "Rule of Law")
-				spell("SF", "Blessing of Freedom")
+				macro("SF", "C13", "Blessing of Freedom")
 				spell("F", "Divine Steed")
 
 				-- Middle
@@ -2997,6 +2989,9 @@ local function UpdateBars(event)
 
 				-- Rebuke
 				m("C08", nil, "#showtooltip Rebuke\n/stopcasting\n/stopcasting\n/use Rebuke")
+
+				-- Blessing of Freedom @player
+				m("C13", 135878, "#showtooltip Blessing of Freedom\n/use [@player]Blessing of Freedom")
 
 				
 				------ Left ------
@@ -3032,9 +3027,9 @@ local function UpdateBars(event)
 				------ Right ------
 				-- Top
 				empty("AB3")
-				empty("AF")
+				spell("AF", "Blessing of Freedom")
 				empty("CF")
-				spell("SF", "Blessing of Freedom")
+				macro("SF", "C13", "Blessing of Freedom")
 				spell("F", "Divine Steed")
 
 				-- Middle
@@ -3073,6 +3068,9 @@ local function UpdateBars(event)
 				-- Rebuke
 				m("C08", nil, "#showtooltip Rebuke\n/stopcasting\n/stopcasting\n/use Rebuke")
 
+				-- Blessing of Freedom @player
+				m("C13", 135878, "#showtooltip Blessing of Freedom\n/use [@player]Blessing of Freedom")
+
 				
 				------ Left ------
 				-- Top
@@ -3107,9 +3105,9 @@ local function UpdateBars(event)
 				------ Right ------
 				-- Top
 				empty("AB3")
-				empty("AF")
+				spell("AF", "Blessing of Freedom")
 				empty("CF")
-				spell("SF", "Blessing of Freedom")
+				macro("SF", "C13", "Blessing of Freedom")
 				spell("F", "Divine Steed")
 
 				-- Middle
@@ -3942,9 +3940,9 @@ local function UpdateBars(event)
 				------ Right ------
 				-- Top
 				if known("Wind Rush Totem") then spell("AB3", "Wind Rush Totem") else spell("AB3", "Earthgrab Totem") end
-				spell("AF", "Spiritwalker's Grace")
-				spell("CF", "Feral Lunge")
-				if known("Spirit Walk") then spell("SF", "Spirit Walk") else spell("SF", "Gust of Wind") end
+				empty("AF")
+				if known("Spirit Walk") then spell("CF", "Spirit Walk") else spell("CF", "Gust of Wind") end
+				spell("SF", "Spiritwalker's Grace")
 				spell("F", "Ghost Wolf")
 
 				-- Middle
@@ -4020,9 +4018,9 @@ local function UpdateBars(event)
 				------ Right ------
 				-- Top
 				if known("Wind Rush Totem") then spell("AB3", "Wind Rush Totem") else spell("AB3", "Earthgrab Totem") end
-				spell("AF", "Spiritwalker's Grace")
-				spell("CF", "Feral Lunge")
-				if known("Spirit Walk") then spell("SF", "Spirit Walk") else spell("SF", "Gust of Wind") end
+				spell("AF", "Feral Lunge")
+				if known("Spirit Walk") then spell("CF", "Spirit Walk") else spell("CF", "Gust of Wind") end
+				spell("SF", "Spiritwalker's Grace")
 				spell("F", "Ghost Wolf")
 
 				-- Middle
@@ -4107,9 +4105,9 @@ local function UpdateBars(event)
 				------ Right ------
 				-- Top
 				if known("Wind Rush Totem") then spell("AB3", "Wind Rush Totem") else spell("AB3", "Earthgrab Totem") end
-				spell("AF", "Spiritwalker's Grace")
-				empty("CF")
-				if known("Spirit Walk") then spell("SF", "Spirit Walk") else spell("SF", "Gust of Wind") end
+				empty("AF")
+				if known("Spirit Walk") then spell("CF", "Spirit Walk") else spell("CF", "Gust of Wind") end
+				spell("SF", "Spiritwalker's Grace")
 				spell("F", "Ghost Wolf")
 
 				-- Middle
@@ -4243,7 +4241,7 @@ local function UpdateBars(event)
 				spell("4", "Malefic Rapture")
 				spell("5", "Unstable Affliction")
 				spell("6", "Haunt")
-				spell("V", "Soul Tap")
+				macro("V", "C08", "Command Demon")
 				spell("CE", "Shadowfury")
 
 				------ Right ------
@@ -4251,7 +4249,7 @@ local function UpdateBars(event)
 				empty("AB3")
 				empty("AF")
 				spell("CF", "Demonic Gateway")
-				spell("SF", "Demonic Circle: Teleport")
+				spell("SF", "Soulburn")
 				spell("F", "Burning Rush")
 
 				-- Middle
@@ -4262,12 +4260,12 @@ local function UpdateBars(event)
 				spell("CB3", "Shadowflame")
 				spell("SQ", "Drain Life")
 				spell("SV", "Demonic Circle")
-				macro("CV", "C08", "Command Demon")
+				spell("CV", "Demonic Circle: Teleport")
 
 				-- Bottom
 				spell("F1", "Unending Resolve")
 				spell("F2", "Dark Pact")
-				spell("F3", "Soulburn")
+				spell("F3", "Soul Tap")
 				empty("F4")
 				empty("F5")
 				empty("F6")
@@ -4290,13 +4288,13 @@ local function UpdateBars(event)
 				
 				------ Left ------
 				-- Top
-				spell("N", "Doom")
+				spell("N", "Nether Portal")
 				spell("SN", "Amplify Curse")
 				spell("R", "Curse of Weakness")
 				spell("SR", "Curse of Exhaustion")
 				spell("CR", "Curse of Tongues")
 				spell("H", "Health Funnel")
-				empty("SH")
+				spell("SH", "Doom")
 				racial("AE")
 
 				-- Middle
@@ -4305,7 +4303,7 @@ local function UpdateBars(event)
 				if known("Bilescourge Bombers") then spell("Q", "Bilescourge Bombers") else spell("Q", "Demonic Strength") end
 				spell("E", "Power Siphon")
 				spell("G", "Summon Demonic Tyrant")
-				spell("SG", "Nether Portal")
+				spell("SG", "Summon Soulkeeper")
 				macro("SE", "C07", "Command Demon")
 
 				-- Bottom
@@ -4315,7 +4313,7 @@ local function UpdateBars(event)
 				spell("4", "Hand of Gul'dan")
 				spell("5", "Implosion")
 				spell("6", "Grimoire: Felguard")
-				spell("V", "Summon Soulkeeper")
+				macro("V", "C08")
 				spell("CE", "Shadowfury")
 
 				------ Right ------
@@ -4323,7 +4321,7 @@ local function UpdateBars(event)
 				empty("AB3")
 				empty("AF")
 				spell("CF", "Demonic Gateway")
-				spell("SF", "Demonic Circle: Teleport")
+				spell("SF", "Soulburn")
 				spell("F", "Burning Rush")
 
 				-- Middle
@@ -4334,12 +4332,12 @@ local function UpdateBars(event)
 				spell("CB3", "Shadowflame")
 				spell("SQ", "Drain Life")
 				spell("SV", "Demonic Circle")
-				macro("CV", "C08")
+				spell("CV", "Demonic Circle: Teleport")
 
 				-- Bottom
 				spell("F1", "Unending Resolve")
 				spell("F2", "Dark Pact")
-				spell("F3", "Soulburn")
+				empty("F3")
 				empty("F4")
 				empty("F5")
 				empty("F6")
@@ -4387,7 +4385,7 @@ local function UpdateBars(event)
 				spell("4", "Chaos Bolt")
 				spell("5", "Rain of Fire")
 				spell("6", "Dimensional Rift")
-				empty("V")
+				macro("V", "C08", "Command Demon")
 				spell("CE", "Shadowfury")
 
 				------ Right ------
@@ -4395,7 +4393,7 @@ local function UpdateBars(event)
 				empty("AB3")
 				empty("AF")
 				spell("CF", "Demonic Gateway")
-				spell("SF", "Demonic Circle: Teleport")
+				spell("SF", "Soulburn")
 				spell("F", "Burning Rush")
 
 				-- Middle
@@ -4406,12 +4404,12 @@ local function UpdateBars(event)
 				spell("CB3", "Shadowflame")
 				spell("SQ", "Drain Life")
 				spell("SV", "Demonic Circle")
-				macro("CV", "C08", "Command Demon")
+				spell("CV", "Demonic Circle: Teleport")
 
 				-- Bottom
 				spell("F1", "Unending Resolve")
 				spell("F2", "Dark Pact")
-				spell("F3", "Soulburn")
+				empty("F3")
 				empty("F4")
 				empty("F5")
 				empty("F6")
@@ -4800,34 +4798,14 @@ local function UpdateBars(event)
 			end
 		end
 		
-		-- PvP Talents
-		local pvp1, pvp2, pvp3 = false, false, false
-
-		if level >= 20 then
-			local i = 0
-			for k, v in pairs(C_SpecializationInfo.GetAllSelectedPvpTalentIDs()) do
-				i = i + 1
-				if i == 1 then
-					pvptalent("J", v)
-					pvp1 = true
-				elseif i == 2 then
-					pvptalent("SJ", v)
-					pvp2 = true
-				elseif i == 3 then
-					pvptalent("CJ", v)
-					pvp3 = true
-				end
-			end
-		end
-
-		if not pvp1 then empty("J") end
-		if not pvp2 then empty("SJ") end
-		if not pvp3 then empty("CJ") end
-		
-		-- Potion
-		empty("CG")
-		empty("C CG")
-		empty("B CG")
+		-- Dynamic Buttons
+		empty("CG") -- Potion
+		empty("C CG") -- Potion
+		empty("B CG") -- Potion
+		empty("J") -- PvP Talent 1
+		empty("SJ") -- PvP Talent 2
+		empty("CJ") -- PvP Talent 3
+		empty("=") -- Nitro Boosts
 
 		-- Dragonriding
 		if class == "EVOKER" then
