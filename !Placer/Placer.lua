@@ -115,15 +115,25 @@ local slotNames = {
 	["B CE"] = 104,
 
 	------ Dragonriding ------
-	-- Bottom
-	["D 1"] = 145,
-	["D 2"] = 146,
-	["D 3"] = 147,
-	["D 4"] = 148,
-	["D 5"] = 149,
-	["D 6"] = 150,
-	["D V"] = 151,
-	["D CE"] = 152,
+	-- Soar
+	["S 1"] = 145,
+	["S 2"] = 146,
+	["S 3"] = 147,
+	["S 4"] = 148,
+	["S 5"] = 149,
+	["S 6"] = 150,
+	["S V"] = 151,
+	["S CE"] = 152,
+
+	-- Dragonriding
+	["D 1"] = 121,
+	["D 2"] = 122,
+	["D 3"] = 123,
+	["D 4"] = 124,
+	["D 5"] = 125,
+	["D 6"] = 126,
+	["D V"] = 127,
+	["D CE"] = 128,
 }
 
 
@@ -161,7 +171,7 @@ end
 local spellNameToId = {
 	-- Death Knight
 	["Abomination Limb"] = 383269,
-	["Raise Dead"] = 46584,
+	["Raise Dead"] = 46585,
 	["Summon Gargoyle"] = 49206,
 	-- Demon Hunter
 	["Demon Blades"] = 203555,
@@ -171,6 +181,8 @@ local spellNameToId = {
 	["Sigil of Misery"] = 207684,
 	["Sigil of Silence"] = 202137,
 	["The Hunt"] = 370965,
+	["Blade Dance"] = 188499,
+	["Chaos Strike"] = 162794,
 	-- Druid
 	["Adaptive Swarm"] = 391888,
 	["Celestial Alignment"] = 194223,
@@ -335,6 +347,14 @@ local function spell(slotName, spellName, requiredLevel)
 		if actionType == "spell" and (actionDataId == 213764 or actionDataId == 213771 or actionDataId == 106785) then
 			todo = nil
 		end
+	elseif spellName == "Eternity Surge" then
+		if actionType == "spell" and (actionDataId == 382411 or actionDataId == 359073) then
+			todo = nil
+		end
+	elseif spellName == "Fire Breath" then
+		if actionType == "spell" and (actionDataId == 382266 or actionDataId == 357208) then
+			todo = nil
+		end
 	elseif level >= requiredLevel then
 		if actionType == "spell" and spellId and actionDataId == spellId then
 			todo = nil
@@ -360,6 +380,8 @@ local function spell(slotName, spellName, requiredLevel)
 			spellById(slotId, 328622) -- Blessing of Autumn
 			spellById(slotId, 328281) -- Blessing of Winter
 		end
+
+		if ZA and ZA.DebugMode then print("Placing " .. slotName .. " (" .. slotId .. ")  ", "Spell: " .. spellId, spellName) end
 
 		-- Place spell
 		PickupSpell(spellId)
@@ -400,7 +422,7 @@ local function macro(slotName, macroName, requiredSpell)
 	local actionType = GetActionInfo(slotId)
 	local todo = "place"
 
-	if not requiredSpell or requiredSpell and known(requiredSpell) then
+	if not requiredSpell or (requiredSpell and known(requiredSpell)) then
 		if actionType == "macro" then
 			local actionText = GetActionText(slotId)
 			if macroName == actionText then
@@ -416,6 +438,8 @@ local function macro(slotName, macroName, requiredSpell)
 	end
 
 	if todo == "place" then
+		if ZA and ZA.DebugMode then print("Placing " .. slotName .. " (" .. slotId .. ")  ", "Macro: " .. macroName) end
+
 		-- Place macro
 		PickupAction(slotId)
 		ClearCursor()
@@ -541,6 +565,9 @@ local function UpdateBars(event)
 				-- Rune Strike / Death Coil
 				m("C03", nil, "#showtooltip\n/use [mod:shift]Death Coil;Rune Strike")
 
+				-- Death and Decay
+				m("C04", nil, "#showtooltip\n/stopspelltarget [mod:shift]\n/use [mod:shift,@player][]Death and Decay")
+
 				-- Mind Freeze
 				m("C08", nil, "#showtooltip Mind Freeze\n#showtooltip Mind Freeze\n/stopcasting\n/stopcasting\n/use Mind Freeze")
 
@@ -578,7 +605,7 @@ local function UpdateBars(event)
 				spell("1", "Marrowrend")
 				spell("2", "Blood Boil")
 				macro("3", "C03")
-				spell("4", "Death and Decay")
+				macro("4", "C04", "Death and Decay")
 				spell("5", "Death Strike")
 				if known("Blooddrinker") then spell("6", "Blooddrinker") else spell("6", "Consumption") end
 				spell("V", "Rune Tap")
@@ -586,7 +613,7 @@ local function UpdateBars(event)
 
 				------ Right ------
 				-- Top
-				empty("AB3")
+				spell("AB3", "Anti-Magic Zone")
 				empty("AF")
 				spell("CF", "Lichborne")
 				spell("SF", "Death's Advance")
@@ -605,9 +632,9 @@ local function UpdateBars(event)
 				-- Bottom
 				spell("F1", "Anti-Magic Shell")
 				spell("F2", "Icebound Fortitude")
-				spell("F3", "Anti-Magic Zone")
+				spell("F3", "Death Pact")
 				spell("F4", "Vampiric Blood")
-				spell("F5", "Death Pact")
+				empty("F5")
 				empty("F6")
 				spell("CQ", "Path of Frost")
 
@@ -618,6 +645,9 @@ local function UpdateBars(event)
 
 				-- Frost Strike / Death Coil
 				m("C03", nil, "#showtooltip\n/use [help][mod:shift]Death Coil;Frost Strike")
+
+				-- Death and Decay
+				m("C04", nil, "#showtooltip\n/stopspelltarget [mod:shift]\n/use [mod:shift,@player][]Death and Decay")
 
 				-- Breath of Sindragosa
 				m("C06", nil, "#showtooltip\n/use !Breath of Sindragosa")
@@ -653,7 +683,7 @@ local function UpdateBars(event)
 				spell("1", "Rune Strike")
 				spell("2", "Remorseless Winter")
 				if known("Frost Strike") then macro("3", "C03") else spell("3", "Death Coil") end
-				spell("4", "Death and Decay")
+				macro("4", "C04", "Death and Decay")
 				spell("5", "Glacial Advance")
 				macro("6", "C06", "Breath of Sindragosa")
 				spell("V", "Pillar of Frost")
@@ -661,7 +691,7 @@ local function UpdateBars(event)
 
 				------ Right ------
 				-- Top
-				empty("AB3")
+				spell("AB3", "Anti-Magic Zone")
 				empty("AF")
 				spell("CF", "Lichborne")
 				spell("SF", "Death's Advance")
@@ -680,9 +710,9 @@ local function UpdateBars(event)
 				-- Bottom
 				spell("F1", "Anti-Magic Shell")
 				spell("F2", "Icebound Fortitude")
-				spell("F3", "Anti-Magic Zone")
+				spell("F3", "Death Pact")
 				empty("F4")
-				spell("F5", "Death Pact")
+				empty("F5")
 				empty("F6")
 				spell("CQ", "Path of Frost")
 
@@ -690,6 +720,9 @@ local function UpdateBars(event)
 				--! Unholy Death Knight
 				
 				------ Macros ------
+
+				-- Death and Decay
+				m("C04", nil, "#showtooltip\n/stopspelltarget [mod:shift]\n/use [mod:shift,@player][]Death and Decay")
 
 				-- Mind Freeze
 				m("C08", nil, "#showtooltip Mind Freeze\n#showtooltip Mind Freeze\n/stopcasting\n/stopcasting\n/use Mind Freeze")
@@ -706,7 +739,7 @@ local function UpdateBars(event)
 				
 				------ Left ------
 				-- Top
-				spell("N", "Abomination Limb")
+				spell("N", "Soul Reaper")
 				spell("SN", "Vile Contagion")
 				spell("R", "Dark Command")
 				spell("SR", "Death Grip")
@@ -728,15 +761,15 @@ local function UpdateBars(event)
 				spell("1", "Rune Strike")
 				spell("2", "Scourge Strike")
 				spell("3", "Death Coil")
-				spell("4", "Death and Decay")
-				spell("5", "Soul Reaper")
+				macro("4", "C04", "Death and Decay")
+				spell("5", "Abomination Limb")
 				spell("6", "Apocalypse")
 				spell("V", "Dark Transformation")
 				spell("CE", "Asphyxiate")
 
 				------ Right ------
 				-- Top
-				empty("AB3")
+				spell("AB3", "Anti-Magic Zone")
 				empty("AF")
 				spell("CF", "Lichborne")
 				spell("SF", "Death's Advance")
@@ -755,15 +788,20 @@ local function UpdateBars(event)
 				-- Bottom
 				spell("F1", "Anti-Magic Shell")
 				spell("F2", "Icebound Fortitude")
-				spell("F3", "Anti-Magic Zone")
+				spell("F3", "Death Pact")
 				empty("F4")
-				spell("F5", "Death Pact")
+				empty("F5")
 				if level < 22 then empty("F6") else macro("F6", "C10", 46584) end
-				empty("F6")
 				spell("CQ", "Path of Frost")
 
 			else
 				--! Unspecialized Death Knight
+				
+				------ Macros ------
+
+				-- Death and Decay
+				m("C04", nil, "#showtooltip\n/stopspelltarget [mod:shift]\n/use [mod:shift,@player][]Death and Decay")
+
 				
 				------ Left ------
 				-- Top
@@ -789,7 +827,7 @@ local function UpdateBars(event)
 				spell("1", "Rune Strike")
 				empty("2")
 				spell("3", "Death Coil")
-				spell("4", "Death and Decay")
+				macro("4", "C04", "Death and Decay")
 				empty("5")
 				empty("6")
 				empty("V")
@@ -858,17 +896,17 @@ local function UpdateBars(event)
 				if known("Demon Blades") then empty("Q") else spell("Q", "Felblade") end
 				spell("E", "Sigil of Flame")
 				macro("G", "C13", "Metamorphosis")
-				spell("SG", "The Hunt")
+				spell("SG", "Elysian Decree")
 				macro("SE", "C08", "Disrupt")
 
 				-- Bottom
 				if known("Demon Blades") and known("Felblade") then spell("1", "Felblade") else spell("1", "Demon's Bite") end
-				spell("2", "Immolation Aura")
+				spell("2", "Chaos Strike")
 				spell("3", "Blade Dance")
-				spell("4", "Chaos Strike")
+				spell("4", "Immolation Aura")
 				spell("5", "Eye Beam")
 				if known("Glaive Tempest") then spell("6", "Glaive Tempest") else spell("6", "Fel Barrage") end
-				spell("V", "Elysian Decree")
+				spell("V", "The Hunt")
 				spell("CE", "Chaos Nova")
 
 				------ Right ------
@@ -924,17 +962,17 @@ local function UpdateBars(event)
 				spell("Q", "Felblade")
 				spell("E", "Sigil of Flame")
 				spell("G", "Metamorphosis")
-				spell("SG", "The Hunt")
+				spell("SG", "Elysian Decree")
 				macro("SE", "C08", "Disrupt")
 
 				-- Bottom
 				spell("1", "Shear")
-				spell("2", "Immolation Aura")
-				spell("3", "Soul Cleave")
-				spell("4", "Demon Spikes")
+				spell("2", "Soul Cleave")
+				spell("3", "Demon Spikes")
+				spell("4", "Immolation Aura")
 				spell("5", "Spirit Bomb")
 				spell("6", "Soul Carver")
-				spell("V", "Elysian Decree")
+				spell("V", "The Hunt")
 				spell("CE", "Chaos Nova")
 
 				------ Right ------
@@ -2337,8 +2375,8 @@ local function UpdateBars(event)
 				-- Bottom
 				spell("1", "Arcane Blast")
 				spell("2", "Arcane Missiles")
-				if known("Arcane Orb") then spell("3", "Arcane Orb") else spell("3", "Fire Blast") end
-				spell("4", "Arcane Barrage")
+				spell("3", "Arcane Barrage")
+				if known("Arcane Orb") then spell("4", "Arcane Orb") else spell("4", "Fire Blast") end
 				spell("5", "Radiant Spark")
 				spell("6", "Ice Nova")
 				spell("V", "Rune of Power")
@@ -3210,11 +3248,11 @@ local function UpdateBars(event)
 				-- Power Word: Radiance / Mind Blast
 				m("C03", nil, "#showtooltip\n/use [harm]Mind Blast;Power Word: Radiance")
 
-				-- Power Word: Shield / Schism
-				m("C04", nil, "#showtooltip\n/use [harm]Schism;Power Word: Shield")
-
 				-- Prayer of Mending / Shadow Word: Death
-				m("C05", nil, "#showtooltip\n/use [harm]Shadow Word: Death;Prayer of Mending")
+				m("C04", nil, "#showtooltip\n/use [harm]Shadow Word: Death;Prayer of Mending")
+
+				-- Power Word: Shield / Schism
+				m("C05", nil, "#showtooltip\n/use [harm]Schism;Power Word: Shield")
 
 				-- Renew/Shadow Word: Pain
 				m("C07", nil, "#showtooltip\n/use [harm]Shadow Word: Pain;Renew")
@@ -3235,29 +3273,29 @@ local function UpdateBars(event)
 				------ Left ------
 				-- Top
 				if known("Divine Star") then spell("N", "Divine Star") else spell("N", "Halo") end
-				empty("SN")
+				spell("SN", "Void Shift") --spell("SN", "Power Word: Life")
 				spell("R", "Mind Soothe")
 				spell("SR", "Dispel Magic")
 				spell("CR", "Purify")
-				spell("H", "Pain Suppression")
-				spell("SH", "Void Shift")
+				--spell("H", "Pain Suppression")
+				--spell("SH", "Void Shift")
 				racial("AE")
 
 				-- Middle
 				spell("C", "Power Word: Solace")
 				spell("SC", "Shadow Covenant")
-				spell("Q", "Holy Nova")
+				spell("Q", "Power Word: Life") --spell("Q", "Holy Nova")
 				if known("Renew") then macro("E", "C07") else spell("E", "Shadow Word: Pain") end
 				spell("G", "Rapture")
 				macro("SG", "C08", "Power Infusion")
-				spell("SE", "Power Word: Life")
+				spell("SE", "Pain Suppression") --empty("SE")
 
 				-- Bottom
 				macro("1", "C01")
 				spell("2", "Penance")
 				if known("Power Word: Radiance") then macro("3", "C03") else spell("3", "Mind Blast") end
-				if known("Schism") then macro("4", "C04") else spell("4", "Power Word: Shield") end
-				if known("Prayer of Mending") and known("Shadow Word: Death") then macro("5", "C05") elseif known("Prayer of Mending") then spell("5", "Prayer of Mending") else spell("5", "Shadow Word: Death") end
+				if known("Prayer of Mending") and known("Shadow Word: Death") then macro("4", "C04") elseif known("Prayer of Mending") then spell("4", "Prayer of Mending") else spell("4", "Shadow Word: Death") end
+				if known("Schism") then macro("5", "C05") else spell("5", "Power Word: Shield") end
 				spell("6", "Mindgames")
 				spell("V", "Shadowfiend")
 				spell("CE", "Light's Wrath")
@@ -3266,15 +3304,15 @@ local function UpdateBars(event)
 				-- Top
 				spell("AB3", "Mass Dispel")
 				spell("AF", "Power Word: Shield")
-				macro("CF", "C14", "Angelic Feather")
+				macro("CF", "C13", "Body and Soul")
 				spell("SF", "Angelic Feather")
-				macro("F", "C13", "Body and Soul")
+				macro("F", "C14", "Angelic Feather")
 
 				-- Middle
-				spell("T", "Shackle Undead")
+				spell("T", "Void Tendrils")
 				spell("ST", "Psychic Scream")
 				if known("Dominate Mind") then spell("CT", "Dominate Mind") else macro("CT", "C09", "Mind Control") end
-				spell("AT", "Void Tendrils")
+				spell("AT", "Shackle Undead")
 				spell("CB3", "Leap of Faith")
 				spell("SQ", "Flash Heal")
 				empty("SV")
@@ -3303,11 +3341,11 @@ local function UpdateBars(event)
 				-- Prayer of Healing / Empyreal Blaze
 				m("C03", nil, "#showtooltip\n/use [harm]Empyreal Blaze;Prayer of Healing")
 
-				-- Prayer of Mending / Mindgames
-				m("C04", nil, "#showtooltip\n/use [harm]Mindgames;Prayer of Mending")
+				-- Prayer of Mending / Shadow Word: Death
+				m("C04", nil, "#showtooltip\n/use [harm]Shadow Word: Death;Prayer of Mending")
 
-				-- Circle of Healing / Shadow Word: Death
-				m("C05", nil, "#showtooltip\n/use [harm]Shadow Word: Death;Circle of Healing")
+				-- Circle of Healing / Mindgames
+				m("C05", nil, "#showtooltip\n/use [harm]Mindgames;Circle of Healing")
 
 				-- Renew/Shadow Word: Pain
 				m("C07", nil, "#showtooltip\n/use [harm]Shadow Word: Pain;Renew")
@@ -3327,30 +3365,30 @@ local function UpdateBars(event)
 				
 				------ Left ------
 				-- Top
-				if known("Divine Star") then spell("N", "Divine Star") else spell("N", "Halo") end
-				empty("SN")
+				spell("N", "Holy Nova")
+				spell("SN", "Void Shift")
 				spell("R", "Mind Soothe")
 				spell("SR", "Dispel Magic")
 				spell("CR", "Purify")
-				spell("H", "Guardian Spirit")
-				spell("SH", "Void Shift")
+				if known("Divine Star") then spell("H", "Divine Star") else spell("H", "Halo") end
+				empty("SH")
 				racial("AE")
 
 				-- Middle
 				spell("C", "Holy Word: Serenity")
 				spell("SC", "Holy Word: Sanctify")
-				spell("Q", "Holy Nova")
+				spell("Q", "Power Word: Life")
 				if known("Renew") then macro("E", "C07") else spell("E", "Shadow Word: Pain") end
 				if known("Apotheosis") then spell("G", "Apotheosis") else spell("G", "Holy Word: Salvation") end
 				macro("SG", "C08", "Power Infusion")
-				spell("SN", "Power Word: Life")
+				spell("SE", "Guardian Spirit")
 
 				-- Bottom
 				macro("1", "C01")
 				if known("Heal") then macro("2", "C02") else spell("2", "Mind Blast") end
 				if known("Prayer of Healing") and known("Empyreal Blaze") then macro("3", "C03") elseif known("Prayer of Healing") then spell("3", "Prayer of Healing") else spell("3", "Empyreal Blaze") end
-				if known("Mindgames") then macro("4", "C04") else spell("4", "Prayer of Mending") end
-				if known("Circle of Healing") and known("Shadow Word: Death") then macro("5", "C05") elseif known("Circle of Healing") then spell("5", "Circle of Healing") else spell("5", "Shadow Word: Death") end
+				if known("Shadow Word: Death") and known("Prayer of Mending") then macro("4", "C04") elseif known("Shadow Word: Death") then spell("4", "Shadow Word: Death") else spell("4", "Prayer of Mending") end
+				if known("Circle of Healing") and known("Mindgames") then macro("5", "C05") elseif known("Mindgames") then spell("5", "Mindgames") else spell("5", "Circle of Healing") end
 				spell("6", "Divine Word")
 				spell("V", "Shadowfiend")
 				spell("CE", "Holy Word: Chastise")
@@ -3359,9 +3397,9 @@ local function UpdateBars(event)
 				-- Top
 				spell("AB3", "Mass Dispel")
 				spell("AF", "Power Word: Shield")
-				macro("CF", "C14", "Angelic Feather")
+				macro("CF", "C13", "Body and Soul")
 				spell("SF", "Angelic Feather")
-				macro("F", "C13", "Body and Soul")
+				macro("F", "C14", "Angelic Feather")
 
 				-- Middle
 				spell("T", "Shackle Undead")
@@ -3377,7 +3415,7 @@ local function UpdateBars(event)
 				spell("F1", "Desperate Prayer")
 				spell("F2", "Divine Hymn")
 				spell("F3", "Vampiric Embrace")
-				empty("F4", "Symbol of Hope")
+				spell("F4", "Symbol of Hope")
 				empty("F5")
 				empty("F6")
 				spell("CQ", "Levitate")
@@ -3390,17 +3428,14 @@ local function UpdateBars(event)
 				-- Vampiric Touch / Flash Heal
 				m("C01", nil, "#showtooltip\n/use [help]Flash Heal;Vampiric Touch")
 
-				-- Devouring Plague / Mind Sear
-				m("C02", nil, "#showtooltip\n/use [mod:shift]Mind Sear;Devouring Plague")
-
 				-- Mind Flay / Holy Nova
 				m("C03", nil, "#showtooltip\n/use [mod:shift]Holy Nova;Smite")
 
-				-- Devouring Plague / Power Word: Shield
-				m("C04", nil, "#showtooltip\n/use [help]Power Word: Shield;Devouring Plague")
-
 				-- Shadow Word: Death / Prayer of Mending
-				m("C05", nil, "#showtooltip\n/use [help]Prayer of Mending;Shadow Word: Death")
+				m("C04", nil, "#showtooltip\n/use [help]Prayer of Mending;Shadow Word: Death")
+
+				-- Devouring Plague / Mind Sear
+				m("C05", nil, "#showtooltip\n/use [mod:shift]Mind Sear;Devouring Plague")
 
 				-- Renew/Shadow Word: Pain
 				m("C07", nil, "#showtooltip\n/use [help]Renew;Shadow Word: Pain")
@@ -3451,8 +3486,8 @@ local function UpdateBars(event)
 				macro("1", "C01")
 				if known("Mind Spike") then spell("2", "Mind Spike") else spell("2", "Smite") end
 				spell("3", "Mind Blast")
-				if known("Devouring Plague") and known("Mind Sear") then macro("4", "C02") else spell("4", "Devouring Plague") end
-				if known("Prayer of Mending") then macro("5", "C05") else spell("5", "Shadow Word: Death") end
+				if known("Prayer of Mending") then macro("4", "C04") else spell("4", "Shadow Word: Death") end
+				if known("Devouring Plague") and known("Mind Sear") then macro("5", "C05") else spell("5", "Devouring Plague") end
 				spell("6", "Mindgames")
 				spell("V", "Shadowfiend")
 				spell("CE", "Psychic Horror")
@@ -3461,9 +3496,9 @@ local function UpdateBars(event)
 				-- Top
 				spell("AB3", "Mass Dispel")
 				spell("AF", "Power Word: Shield")
-				macro("CF", "C14", "Angelic Feather")
+				macro("CF", "C13", "Body and Soul")
 				spell("SF", "Angelic Feather")
-				macro("F", "C13", "Body and Soul")
+				macro("F", "C14", "Angelic Feather")
 
 				-- Middle
 				spell("T", "Shackle Undead")
@@ -3940,7 +3975,7 @@ local function UpdateBars(event)
 				------ Right ------
 				-- Top
 				if known("Wind Rush Totem") then spell("AB3", "Wind Rush Totem") else spell("AB3", "Earthgrab Totem") end
-				empty("AF")
+				spell("AF", "Tremor Totem")
 				if known("Spirit Walk") then spell("CF", "Spirit Walk") else spell("CF", "Gust of Wind") end
 				spell("SF", "Spiritwalker's Grace")
 				spell("F", "Ghost Wolf")
@@ -3953,7 +3988,7 @@ local function UpdateBars(event)
 				spell("CB3", "Thunderstorm")
 				spell("SQ", "Healing Surge")
 				empty("SV")
-				spell("CV", "Tremor Totem")
+				empty("CV")
 
 				-- Bottom
 				spell("F1", "Astral Shift")
@@ -4018,7 +4053,7 @@ local function UpdateBars(event)
 				------ Right ------
 				-- Top
 				if known("Wind Rush Totem") then spell("AB3", "Wind Rush Totem") else spell("AB3", "Earthgrab Totem") end
-				spell("AF", "Feral Lunge")
+				spell("AF", "Tremor Totem")
 				if known("Spirit Walk") then spell("CF", "Spirit Walk") else spell("CF", "Gust of Wind") end
 				spell("SF", "Spiritwalker's Grace")
 				spell("F", "Ghost Wolf")
@@ -4031,7 +4066,7 @@ local function UpdateBars(event)
 				spell("CB3", "Thunderstorm")
 				spell("SQ", "Healing Surge")
 				spell("SV", "Windfury Totem")
-				spell("CV", "Tremor Totem")
+				spell("CV", "Feral Lunge")
 
 				-- Bottom
 				spell("F1", "Astral Shift")
@@ -4105,7 +4140,7 @@ local function UpdateBars(event)
 				------ Right ------
 				-- Top
 				if known("Wind Rush Totem") then spell("AB3", "Wind Rush Totem") else spell("AB3", "Earthgrab Totem") end
-				empty("AF")
+				spell("AF", "Tremor Totem")
 				if known("Spirit Walk") then spell("CF", "Spirit Walk") else spell("CF", "Gust of Wind") end
 				spell("SF", "Spiritwalker's Grace")
 				spell("F", "Ghost Wolf")
@@ -4118,7 +4153,7 @@ local function UpdateBars(event)
 				spell("CB3", "Thunderstorm")
 				spell("SQ", "Healing Surge")
 				if known("Earthen Wall Totem") then spell("SV", "Earthen Wall Totem") else spell("SV", "Ancestral Protection Totem") end
-				spell("CV", "Tremor Totem")
+				empty("CV")
 
 				-- Bottom
 				spell("F1", "Astral Shift")
@@ -4300,7 +4335,7 @@ local function UpdateBars(event)
 				-- Middle
 				if known("Summon Vilefiend") then spell("C", "Summon Vilefiend") else spell("C", "Soul Strike") end
 				spell("SC", "Guillotine")
-				if known("Bilescourge Bombers") then spell("Q", "Bilescourge Bombers") else spell("Q", "Demonic Strength") end
+				spell("Q", "Implosion")
 				spell("E", "Power Siphon")
 				spell("G", "Summon Demonic Tyrant")
 				spell("SG", "Summon Soulkeeper")
@@ -4311,7 +4346,7 @@ local function UpdateBars(event)
 				spell("2", "Demonbolt")
 				spell("3", "Call Dreadstalkers")
 				spell("4", "Hand of Gul'dan")
-				spell("5", "Implosion")
+				if known("Bilescourge Bombers") then spell("5", "Bilescourge Bombers") else spell("5", "Demonic Strength") end
 				spell("6", "Grimoire: Felguard")
 				macro("V", "C08")
 				spell("CE", "Shadowfury")
@@ -4531,7 +4566,7 @@ local function UpdateBars(event)
 				spell("Q", "Cleave")
 				spell("E", "Rend")
 				spell("G", "Colossus Smash")
-				spell("SG", "Avatar")
+				spell("SG", "Bladestorm")
 				macro("SE", "C08", "Pummel")
 
 				-- Bottom
@@ -4541,7 +4576,7 @@ local function UpdateBars(event)
 				if not known("Mortal Strike") then spell("4", "Whirlwind") else macro("4", "C04") end
 				if known("Blood and Thunder") then macro("5", "C05") else spell("5", "Skullsplitter") end
 				spell("6", "Thunderous Roar")
-				spell("V", "Bladestorm")
+				spell("V", "Avatar")
 				spell("CE", "Storm Bolt")
 
 				------ Right ------
@@ -4606,7 +4641,7 @@ local function UpdateBars(event)
 				spell("Q", "Whirlwind")
 				spell("E", "Onslaught")
 				spell("G", "Recklessness")
-				spell("SG", "Avatar")
+				spell("SG", "Ravager")
 				macro("SE", "C08", "Pummel")
 
 				-- Bottom
@@ -4616,7 +4651,7 @@ local function UpdateBars(event)
 				spell("4", "Rampage")
 				spell("5", "Odyn's Fury")
 				spell("6", "Thunderous Roar")
-				spell("V", "Ravager")
+				spell("V", "Avatar")
 				spell("CE", "Storm Bolt")
 
 				------ Right ------
@@ -4689,7 +4724,7 @@ local function UpdateBars(event)
 				spell("Q", "Ignore Pain")
 				if known("Blood and Thunder") then empty("E") else spell("E", "Rend") end
 				spell("G", "Shield Charge")
-				spell("SG", "Avatar")
+				spell("SG", "Ravager")
 				macro("SE", "C08", "Pummel")
 
 				-- Bottom
@@ -4699,7 +4734,7 @@ local function UpdateBars(event)
 				if not known("Thunder Clap") and not known("Devastator") and known("Revenge") then spell("4", "Devastate") else spell("4", "Thunder Clap") end
 				spell("5", "Shield Block")
 				spell("6", "Thunderous Roar")
-				spell("V", "Ravager")
+				spell("V", "Avatar")
 				spell("CE", "Storm Bolt")
 
 				------ Right ------
@@ -4798,7 +4833,7 @@ local function UpdateBars(event)
 			end
 		end
 		
-		-- Dynamic Buttons
+		--! Dynamic Buttons
 		empty("CG") -- Potion
 		empty("C CG") -- Potion
 		empty("B CG") -- Potion
@@ -4807,26 +4842,26 @@ local function UpdateBars(event)
 		empty("CJ") -- PvP Talent 3
 		empty("=") -- Nitro Boosts
 
-		-- Dragonriding
-		if class == "EVOKER" then
-			spell("D 1", "Surge Forward")
-			spell("D 2", "Skyward Ascent")
-			empty("D 3")
-			empty("D 4")
-			empty("D 5")
-			empty("D 6")
-			empty("D V")
-			empty("D CE")
-		else
-			empty("D 1")
-			empty("D 2")
-			empty("D 3")
-			empty("D 4")
-			empty("D 5")
-			empty("D 6")
-			empty("D V")
-			empty("D CE")
-		end
+		--! Dragonriding
+		spell("D 1", 372608) -- Surge Forward
+		spell("D 2", 372610) -- Skyward Ascent
+		spell("D 3", "Whirling Surge")
+		empty("D 4")
+		empty("D 5")
+		empty("D 6")
+		spell("D V", "Bronze Timelock")
+		empty("D CE")
+
+		--! Soar
+		spell("S 1", 376743) -- Surge Forward
+		spell("S 2", 376744) -- Skyward Ascent
+		empty("S 3")
+		empty("S 4")
+		empty("S 5")
+		empty("S 6")
+		empty("S V")
+		empty("S CE")
+
 	end
 end
 
