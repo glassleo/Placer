@@ -347,6 +347,18 @@ local function spell(slotName, spellName, requiredLevel)
 		if actionType == "spell" and (actionDataId == 213764 or actionDataId == 213771 or actionDataId == 106785) then
 			todo = nil
 		end
+	elseif spellName == "Wild Charge" then
+		if actionType == "spell" and (actionDataId == 102401 or actionDataId == 49376 or actionDataId == 16979 or actionDataId == 102417 or actionDataId == 102416) then
+			todo = nil
+		end
+	elseif spellName == "Stampeding Roar" then
+		if actionType == "spell" and (actionDataId == 106898 or actionDataId == 77764 or actionDataId == 77761) then
+			todo = nil
+		end
+	elseif spellName == "Wildfire Bomb" then
+		if actionType == "spell" and (actionDataId == 270335 or actionDataId == 271045 or actionDataId == 270323) then
+			todo = nil
+		end
 	elseif spellName == "Eternity Surge" then
 		if actionType == "spell" and (actionDataId == 382411 or actionDataId == 359073) then
 			todo = nil
@@ -493,10 +505,21 @@ local function racial(slotName)
 		["Dracthyr"] = "Tail Swipe",
 	}
 
-	if racials[race] then
+	if known(racials[race]) then
 		spell(slotName, racials[race])
 	else
-		empty(slotName)
+		-- Mercenary
+		local placed = false
+		for _, spellName in pairs(racials) do
+			if known(spellName) then
+				spell(slotName, spellName)
+				placed = true
+			end
+		end
+
+		if not placed then
+			empty(slotName)
+		end
 	end
 end
 
@@ -2009,7 +2032,7 @@ local function UpdateBars(event)
 				------ Macros ------
 
 				-- Kill Command
-				m("C01", nil, "#showtooltip Kill Command\n/petattack\n/petassist\n/petattack\n/use Kill Command")
+				m("C02", nil, "#showtooltip Kill Command\n/petattack\n/petassist\n/petattack\n/use Kill Command")
 
 				-- Counter Shot
 				m("C08", nil, "#showtooltip Counter Shot\n/stopcasting\n/stopcasting\n/use Counter Shot")
@@ -2049,18 +2072,18 @@ local function UpdateBars(event)
 				if known("A Murder of Crows") then spell("SC", "A Murder of Crows") else spell("SC", "Bloodshed") end
 				spell("Q", "Multi-Shot")
 				spell("E", "Serpent Sting")
-				spell("G", "Call of the Wild")
+				spell("G", "Bestial Wrath")
 				spell("SG", "Aspect of the Wild")
 				macro("SE", "C08", "Counter Shot")
 
 				-- Bottom
-				macro("1", "C01", "Kill Command")
-				if known("Cobra Shot") then spell("2", "Steady Shot") else spell("2", "Arcane Shot") end
-				if known("Cobra Shot") then spell("3", "Barbed Shot") else spell("3", "Steady Shot") end
+				if known("Cobra Shot") then spell("1", "Barbed Shot") else spell("1", "Steady Shot") end
+				macro("2", "C02", "Kill Command")
+				if known("Cobra Shot") then spell("3", "Steady Shot") else spell("3", "Arcane Shot") end
 				spell("4", "Kill Shot")
 				spell("5", "Dire Beast")
 				spell("6", "Steel Trap")
-				spell("V", "Bestial Wrath")
+				spell("V", "Call of the Wild")
 				if known("Scatter Shot") then spell("CE", "Scatter Shot") else spell("CE", "Binding Shot") end
 
 				------ Right ------
@@ -2138,9 +2161,9 @@ local function UpdateBars(event)
 				macro("SE", "C08", "Counter Shot")
 
 				-- Bottom
-				spell("1", "Steady Shot")
-				spell("2", "Arcane Shot")
-				spell("3", "Aimed Shot")
+				spell("1", "Aimed Shot")
+				spell("2", "Steady Shot")
+				spell("3", "Arcane Shot")
 				spell("4", "Kill Shot")
 				spell("5", "Rapid Fire")
 				spell("6", "Steel Trap")
@@ -2180,7 +2203,7 @@ local function UpdateBars(event)
 				------ Macros ------
 
 				-- Kill Command
-				m("C01", nil, "#showtooltip Kill Command\n/petattack\n/petassist\n/petattack\n/use Kill Command")
+				m("C02", nil, "#showtooltip Kill Command\n/petattack\n/petassist\n/petattack\n/use Kill Command")
 
 				-- Muzzle
 				m("C08", nil, "#showtooltip Muzzle\n/stopcasting\n/stopcasting\n/use Muzzle")
@@ -2225,8 +2248,8 @@ local function UpdateBars(event)
 				macro("SE", "C08", "Muzzle")
 
 				-- Bottom
-				macro("1", "C01", "Kill Command")
-				spell("2", "Raptor Strike")
+				spell("1", "Raptor Strike")
+				macro("2", "C02", "Kill Command")
 				spell("3", "Wildfire Bomb")
 				spell("4", "Kill Shot")
 				if known("Carve") then spell("5", "Carve") else spell("5", "Butchery") end
@@ -2294,8 +2317,8 @@ local function UpdateBars(event)
 				empty("SE")
 
 				-- Bottom
-				spell("1", "Steady Shot")
-				spell("2", "Arcane Shot")
+				spell("1", "Arcane Shot")
+				spell("2", "Steady Shot")
 				empty("3")
 				empty("4")
 				empty("5")
@@ -3598,11 +3621,11 @@ local function UpdateBars(event)
 				m("C01", nil, "#showtooltip [stance:1/2]Ambush;Sinister Strike\n"..(known("Cold Blood") and "/use [stance:1/2]Cold Blood\n" or "").."/use [stance:1/2]Ambush;Sinister Strike")
 
 				if known("Crimson Tempest") then
-					-- Envenom and Cold Blood / Crimson Tempest
-					m("C03", nil, "#showtooltip [mod:shift]Crimson Tempest;Envenom\n"..(known("Cold Blood") and "/use [nomod:shift]Cold Blood\n" or "").."/use [mod:shift]Crimson Tempest;Envenom")
+					-- Eviscerate and Cold Blood / Crimson Tempest
+					m("C03", nil, "#showtooltip [mod:shift]Crimson Tempest;Eviscerate\n"..(known("Cold Blood") and "/use [nomod:shift]Cold Blood\n" or "").."/use [mod:shift]Crimson Tempest;Eviscerate")
 				else
-					-- Envenom and Cold Blood
-					m("C03", nil, "#showtooltip Envenom\n"..(known("Cold Blood") and "/use Cold Blood\n" or "").."/use Envenom")
+					-- Eviscerate and Cold Blood
+					m("C03", nil, "#showtooltip Eviscerate\n"..(known("Cold Blood") and "/use Cold Blood\n" or "").."/use Eviscerate")
 				end
 
 				-- Ambush and Cold Blood
@@ -3641,7 +3664,7 @@ local function UpdateBars(event)
 				-- Bottom
 				macro("1", "C01")
 				spell("2", "Rupture")
-				macro("3", "C03", "Envenom")
+				macro("3", "C03", "Eviscerate")
 				spell("4", "Slice and Dice")
 				spell("5", "Kingsbane")
 				spell("6", "Echoing Reprimand")
@@ -4267,7 +4290,7 @@ local function UpdateBars(event)
 				spell("E", "Agony")
 				spell("G", "Summon Darkglare")
 				spell("SG", "Summon Soulkeeper")
-				macro("SE", "C07", "Command Demon")
+				macro("SE", "C07")
 
 				-- Bottom
 				spell("1", "Corruption")
@@ -4276,7 +4299,7 @@ local function UpdateBars(event)
 				spell("4", "Malefic Rapture")
 				spell("5", "Unstable Affliction")
 				spell("6", "Haunt")
-				macro("V", "C08", "Command Demon")
+				macro("V", "C08")
 				spell("CE", "Shadowfury")
 
 				------ Right ------
@@ -4961,6 +4984,15 @@ function SlashCmdList.PLACER(msg, editbox)
 		for i = 1, 120 do
 			PickupAction(i)
 			ClearCursor()
+		end
+	elseif msg == "debug" then
+		for i = 1, 1000000 do
+			if IsSpellKnown(i) then
+				local name, rank, icon, castTime, minRange, maxRange, spellID = GetSpellInfo(i)
+				print(i, name)
+				-- 376280 /use Hunting Cmpanion
+				-- 384522 /use Blessing of Ohn'ara
+			end
 		end
 	else
 		UpdateBars("SLASH_PLACER")
