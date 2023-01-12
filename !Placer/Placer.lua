@@ -356,7 +356,7 @@ local function spell(slotName, spellName, requiredLevel)
 			todo = nil
 		end
 	elseif spellName == "Wildfire Bomb" then
-		if actionType == "spell" and (actionDataId == 270335 or actionDataId == 271045 or actionDataId == 270323) then
+		if actionType == "spell" and (actionDataId == 259495 or actionDataId == 270335 or actionDataId == 271045 or actionDataId == 270323) then
 			todo = nil
 		end
 	elseif spellName == "Eternity Surge" then
@@ -2077,9 +2077,9 @@ local function UpdateBars(event)
 				macro("SE", "C08", "Counter Shot")
 
 				-- Bottom
-				if known("Cobra Shot") then spell("1", "Barbed Shot") else spell("1", "Steady Shot") end
+				if known("Barbed Shot") then spell("1", "Barbed Shot") else spell("1", "Steady Shot") end
 				macro("2", "C02", "Kill Command")
-				if known("Cobra Shot") then spell("3", "Steady Shot") else spell("3", "Arcane Shot") end
+				if known("Cobra Shot") and known("Barbed Shot") then spell("3", "Steady Shot") elseif known("Cobra Shot") then empty("3") else spell("3", "Arcane Shot") end
 				spell("4", "Kill Shot")
 				spell("5", "Dire Beast")
 				spell("6", "Steel Trap")
@@ -3300,8 +3300,8 @@ local function UpdateBars(event)
 				spell("R", "Mind Soothe")
 				spell("SR", "Dispel Magic")
 				spell("CR", "Purify")
-				--spell("H", "Pain Suppression")
-				--spell("SH", "Void Shift")
+				empty("H") --spell("H", "Pain Suppression")
+				empty("SH") --spell("SH", "Void Shift")
 				racial("AE")
 
 				-- Middle
@@ -3998,9 +3998,9 @@ local function UpdateBars(event)
 				------ Right ------
 				-- Top
 				if known("Wind Rush Totem") then spell("AB3", "Wind Rush Totem") else spell("AB3", "Earthgrab Totem") end
-				spell("AF", "Tremor Totem")
-				if known("Spirit Walk") then spell("CF", "Spirit Walk") else spell("CF", "Gust of Wind") end
-				spell("SF", "Spiritwalker's Grace")
+				empty("AF")
+				spell("CF", "Spiritwalker's Grace")
+				if known("Spirit Walk") then spell("SF", "Spirit Walk") else spell("SF", "Gust of Wind") end
 				spell("F", "Ghost Wolf")
 
 				-- Middle
@@ -4011,7 +4011,7 @@ local function UpdateBars(event)
 				spell("CB3", "Thunderstorm")
 				spell("SQ", "Healing Surge")
 				empty("SV")
-				empty("CV")
+				spell("CV", "Tremor Totem")
 
 				-- Bottom
 				spell("F1", "Astral Shift")
@@ -4033,8 +4033,8 @@ local function UpdateBars(event)
 				-- Crash Lightning / Chain Heal
 				m("C03", nil, "#showtooltip\n/use [help]Chain Heal;Crash Lightning")
 
-				-- Lava Burst or Elemental Blast / Lightning Bolt
-				m("C04", nil, "#showtooltip\n/use [mod:shift]Lightning Bolt;"..( known("Elemental Blast") and "Elemental Blast" or "Lava Burst" ))
+				-- Lightning Bolt / Chain Lightning
+				m("C05", nil, "#showtooltip\n/use [mod:shift]Chain Lightning;Lightning Bolt")
 
 				-- Wind Shear
 				m("C08", nil, "#showtooltip Wind Shear\n/stopcasting\n/stopcasting\n/use Wind Shear")
@@ -4067,8 +4067,8 @@ local function UpdateBars(event)
 				spell("1", "Primal Strike")
 				spell("2", "Lava Lash")
 				spell("3", "Crash Lightning")
-				if known("Lava Burst") or known("Elemental Blast") then macro("4", "C04") else spell("4", "Lightning Bolt") end
-				spell("5", "Chain Lightning")
+				if known("Lava Burst") then spell("4", "Lava Burst") elseif known("Elemental Blast") then spell("4", "Elemental Blast") else spell("4", "Lightning Bolt") end
+				if known("Lava Burst") or known("Elemental Blast") then macro("5", "C05") else spell("5", "Chain Lightning") end
 				spell("6", "Sundering")
 				spell("V", "Ascendance")
 				spell("CE", "Capacitor Totem")
@@ -4076,9 +4076,9 @@ local function UpdateBars(event)
 				------ Right ------
 				-- Top
 				if known("Wind Rush Totem") then spell("AB3", "Wind Rush Totem") else spell("AB3", "Earthgrab Totem") end
-				spell("AF", "Tremor Totem")
-				if known("Spirit Walk") then spell("CF", "Spirit Walk") else spell("CF", "Gust of Wind") end
-				spell("SF", "Spiritwalker's Grace")
+				spell("AF", "Spiritwalker's Grace")
+				spell("CF", "Feral Lunge")
+				if known("Spirit Walk") then spell("SF", "Spirit Walk") else spell("SF", "Gust of Wind") end
 				spell("F", "Ghost Wolf")
 
 				-- Middle
@@ -4089,7 +4089,7 @@ local function UpdateBars(event)
 				spell("CB3", "Thunderstorm")
 				spell("SQ", "Healing Surge")
 				spell("SV", "Windfury Totem")
-				spell("CV", "Feral Lunge")
+				spell("CV", "Tremor Totem")
 
 				-- Bottom
 				spell("F1", "Astral Shift")
@@ -4163,9 +4163,9 @@ local function UpdateBars(event)
 				------ Right ------
 				-- Top
 				if known("Wind Rush Totem") then spell("AB3", "Wind Rush Totem") else spell("AB3", "Earthgrab Totem") end
-				spell("AF", "Tremor Totem")
-				if known("Spirit Walk") then spell("CF", "Spirit Walk") else spell("CF", "Gust of Wind") end
-				spell("SF", "Spiritwalker's Grace")
+				empty("AF")
+				spell("CF", "Spiritwalker's Grace")
+				if known("Spirit Walk") then spell("SF", "Spirit Walk") else spell("SF", "Gust of Wind") end
 				spell("F", "Ghost Wolf")
 
 				-- Middle
@@ -4176,7 +4176,7 @@ local function UpdateBars(event)
 				spell("CB3", "Thunderstorm")
 				spell("SQ", "Healing Surge")
 				if known("Earthen Wall Totem") then spell("SV", "Earthen Wall Totem") else spell("SV", "Ancestral Protection Totem") end
-				empty("CV")
+				spell("CV", "Tremor Totem")
 
 				-- Bottom
 				spell("F1", "Astral Shift")
