@@ -193,6 +193,7 @@ local spellNameToId = {
 	["Thrash"] = 106832,
 	["Wild Charge"] = 102401,
 	-- Evoker
+	["Dream Breath"] = 355936,
 	["Eternity Surge"] = 359073,
 	["Fire Breath"] = 357208,
 	["Spiritbloom"] = 367226,
@@ -365,6 +366,18 @@ local function spell(slotName, spellName, requiredLevel)
 		end
 	elseif spellName == "Fire Breath" then
 		if actionType == "spell" and (actionDataId == 382266 or actionDataId == 357208) then
+			todo = nil
+		end
+	elseif spellName == "Execute" then
+		if actionType == "spell" and (actionDataId == 163201 or actionDataId == 280735 or actionDataId == 330325) then
+			todo = nil
+		end
+	elseif spellName == "Spiritbloom" then
+		if actionType == "spell" and (actionDataId == 367226 or actionDataId == 382731) then
+			todo = nil
+		end
+	elseif spellName == "Dream Breath" then
+		if actionType == "spell" and (actionDataId == 355936 or actionDataId == 382614) then
 			todo = nil
 		end
 	elseif level >= requiredLevel then
@@ -1874,7 +1887,6 @@ local function UpdateBars(event)
 				spell("F3", "Zephyr")
 				empty("F4")
 				empty("F5")
-				empty("F6")
 				empty("CQ")
 
 			elseif spec == 2 then
@@ -1882,8 +1894,8 @@ local function UpdateBars(event)
 				
 				------ Macros ------
 
-				-- Reversion / Azure Strike
-				m("C02", nil, "#showtooltip\n/use [harm]Azure Strike;Reversion")
+				-- Verdant Embrace / Azure Strike
+				m("C02", nil, "#showtooltip\n/use [harm]Azure Strike;Verdant Embrace")
 
 				-- Echo / Disintegrate
 				m("C03", nil, "#showtooltip\n/use [harm]Disintegrate;Echo")
@@ -1896,6 +1908,9 @@ local function UpdateBars(event)
 
 				-- Living Flame Healing
 				m("C13", nil, "#showtooltip\n/use [help][@player]Living Flame")
+
+				-- Emerald Communion
+				m("C14", nil, "#showtooltip\n/use !Emerald Communion")
 				
 				
 				------ Left ------
@@ -1910,21 +1925,21 @@ local function UpdateBars(event)
 				empty("AE")
 
 				-- Middle
-				spell("C", "Temporal Anomaly")
-				empty("SC")
+				spell("C", "Spiritbloom")
+				spell("SC", "Emerald Blossom")
 				spell("Q", "Dream Breath")
 				spell("E", "Fire Breath")
-				spell("G", "Emerald Communion")
-				spell("SG", "Dream Flight")
+				spell("G", "Stasis")
+				macro("SG", "C14", "Emerald Communion")
 				macro("SE", "C08", "Quell")
 
 				-- Bottom
 				spell("1", "Living Flame")
-				if known("Reversion") then macro("2", "C02") else spell("2", "Azure Strike") end
+				if known("Verdant Embrace") then macro("2", "C02") else spell("2", "Azure Strike") end
 				if known("Echo") then macro("3", "C03") else spell("3", "Disintegrate") end
-				spell("4", "Emerald Blossom")
-				spell("5", "Spiritbloom")
-				spell("6", "Stasis")
+				spell("4", "Reversion")
+				spell("5", "Temporal Anomaly")
+				spell("6", "Dream Flight")
 				spell("V", "Deep Breath")
 				racial("CE")
 
@@ -2377,9 +2392,9 @@ local function UpdateBars(event)
 				
 				------ Left ------
 				-- Top
-				spell("N", "Meteor")
+				spell("N", "Shifting Power")
 				spell("SN", "Presence of Mind")
-				spell("R", "Nether Tempest")
+				spell("R", "Meteor")
 				spell("SR", "Spellsteal")
 				spell("CR", "Remove Curse")
 				if not known("Arcane Orb") then empty("H") else spell("H", "Fire Blast") end
@@ -2390,9 +2405,9 @@ local function UpdateBars(event)
 				spell("C", "Evocation")
 				macro("SC", "C14", "Conjure Mana Gem")
 				spell("Q", "Arcane Explosion")
-				macro("E", "C10", "Touch of the Magi")
+				spell("E", "Nether Tempest")
 				spell("G", "Arcane Surge")
-				spell("SG", "Shifting Power")
+				spell("SG", "Radiant Spark")
 				macro("SE", "C08", "Counterspell")
 
 				-- Bottom
@@ -2400,7 +2415,7 @@ local function UpdateBars(event)
 				spell("2", "Arcane Missiles")
 				spell("3", "Arcane Barrage")
 				if known("Arcane Orb") then spell("4", "Arcane Orb") else spell("4", "Fire Blast") end
-				spell("5", "Radiant Spark")
+				macro("5", "C10", "Touch of the Magi")
 				spell("6", "Ice Nova")
 				spell("V", "Rune of Power")
 				spell("CE", "Frost Nova")
@@ -2408,9 +2423,9 @@ local function UpdateBars(event)
 				------ Right ------
 				-- Top
 				spell("AB3", "Ring of Frost")
-				spell("AF", "Ice Floes")
-				spell("CF", "Alter Time")
-				spell("SF", "Displacement")
+				spell("AF", "Alter Time")
+				spell("CF", "Displacement")
+				spell("SF", "Ice Floes")
 				spell("F", "Blink")
 
 				-- Middle
@@ -2446,9 +2461,9 @@ local function UpdateBars(event)
 				
 				------ Left ------
 				-- Top
-				spell("N", "Meteor")
+				spell("N", "Shifting Power")
 				empty("SN")
-				empty("R")
+				spell("R", "Meteor")
 				spell("SR", "Spellsteal")
 				spell("CR", "Remove Curse")
 				empty("H")
@@ -2461,7 +2476,7 @@ local function UpdateBars(event)
 				spell("Q", "Arcane Explosion")
 				spell("E", "Living Bomb")
 				spell("G", "Combustion")
-				spell("SG", "Shifting Power")
+				empty("SH")
 				macro("SE", "C08", "Counterspell")
 
 				-- Bottom
@@ -2477,9 +2492,9 @@ local function UpdateBars(event)
 				------ Right ------
 				-- Top
 				spell("AB3", "Ring of Frost")
-				spell("AF", "Ice Floes")
-				spell("CF", "Alter Time")
-				spell("SF", "Displacement")
+				spell("AF", "Alter Time")
+				spell("CF", "Displacement")
+				spell("SF", "Ice Floes")
 				spell("F", "Blink")
 
 				-- Middle
@@ -2524,9 +2539,9 @@ local function UpdateBars(event)
 				
 				------ Left ------
 				-- Top
-				spell("N", "Meteor")
+				spell("N", "Shifting Power")
 				spell("SN", "Ray of Frost")
-				if level < 23 then empty("R") else macro("R", "C10", "Summon Water Elemental") end
+				spell("R", "Meteor")
 				spell("SR", "Spellsteal")
 				spell("CR", "Remove Curse")
 				spell("H", "Fire Blast")
@@ -2534,12 +2549,12 @@ local function UpdateBars(event)
 				racial("AE")
 
 				-- Middle
-				spell("C", "Glacial Spike")
-				spell("SC", "Comet Storm")
+				spell("C", "Comet Storm")
+				if level < 23 then empty("SC") else macro("SC", "C10", "Summon Water Elemental") end
 				spell("Q", "Arcane Explosion")
 				spell("E", "Frozen Orb")
 				spell("G", "Icy Veins")
-				spell("SG", "Shifting Power")
+				spell("SG", "Glacial Spike")
 				macro("SE", "C08", "Counterspell")
 
 				-- Bottom
@@ -2555,9 +2570,9 @@ local function UpdateBars(event)
 				------ Right ------
 				-- Top
 				spell("AB3", "Ring of Frost")
-				spell("AF", "Ice Floes")
-				spell("CF", "Alter Time")
-				spell("SF", "Displacement")
+				spell("AF", "Alter Time")
+				spell("CF", "Displacement")
+				spell("SF", "Ice Floes")
 				spell("F", "Blink")
 
 				-- Middle
