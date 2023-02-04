@@ -2077,7 +2077,7 @@ local function UpdateBars(event)
 				spell("SN", "Wailing Arrow")
 				macro("R", "C09")
 				spell("SR", "Tranquilizing Shot")
-				empty("CR")
+				macro("CR", "G019")
 				spell("H", "Hunter's Mark")
 				spell("SH", "Sentinel Owl")
 				racial("AE")
@@ -2161,7 +2161,7 @@ local function UpdateBars(event)
 				spell("SN", "Wailing Arrow")
 				macro("R", "C09")
 				spell("SR", "Tranquilizing Shot")
-				empty("CR")
+				macro("CR", "G019")
 				spell("H", "Hunter's Mark")
 				spell("SH", "Sentinel Owl")
 				racial("AE")
@@ -2248,7 +2248,7 @@ local function UpdateBars(event)
 				empty("SN")
 				macro("R", "C09")
 				spell("SR", "Tranquilizing Shot")
-				empty("CR")
+				macro("CR", "G019")
 				spell("H", "Hunter's Mark")
 				spell("SH", "Sentinel Owl")
 				racial("AE")
@@ -3466,8 +3466,8 @@ local function UpdateBars(event)
 				-- Vampiric Touch / Flash Heal
 				m("C01", nil, "#showtooltip\n/use [help]Flash Heal;Vampiric Touch")
 
-				-- Mind Flay / Holy Nova
-				m("C03", nil, "#showtooltip\n/use [mod:shift]Holy Nova;Smite")
+				-- Mind Blast / Holy Nova
+				m("C03", nil, "#showtooltip\n/use [mod:shift]Holy Nova;Mind Blast")
 
 				-- Shadow Word: Death / Prayer of Mending
 				m("C04", nil, "#showtooltip\n/use [help]Prayer of Mending;Shadow Word: Death")
@@ -3514,7 +3514,7 @@ local function UpdateBars(event)
 				-- Middle
 				spell("C", "Shadow Crash")
 				spell("SC", "Dark Void")
-				if known("Mind Spike") and known("Holy Nova") then macro("Q", "C03") elseif known("Holy Nova") then spell("Q", "Holy Nova") elseif known("Mind Spike") then spell("Q", "Smite") else empty("Q") end
+				if known("Mind Spike") then spell("Q", "Smite") else empty("Q") end
 				if known("Renew") then macro("E", "C07") else spell("E", "Shadow Word: Pain") end
 				if known("Dark Ascension") then spell("G", "Dark Ascension") else spell("G", "Void Eruption") end
 				macro("SG", "C08", "Power Infusion")
@@ -3523,7 +3523,7 @@ local function UpdateBars(event)
 				-- Bottom
 				macro("1", "C01")
 				if known("Mind Spike") then spell("2", "Mind Spike") else spell("2", "Smite") end
-				spell("3", "Mind Blast")
+				if known("Holy Nova") then macro("3", "C03") else spell("3", "Mind Blast") end
 				if known("Prayer of Mending") then macro("4", "C04") else spell("4", "Shadow Word: Death") end
 				if known("Devouring Plague") and known("Mind Sear") then macro("5", "C05") else spell("5", "Devouring Plague") end
 				spell("6", "Mindgames")
@@ -4352,6 +4352,9 @@ local function UpdateBars(event)
 				-- Shadow Bolt
 				m("C01", nil, "#showtooltip Shadow Bolt\n/petattack\n/petassist\n/petattack\n/use Shadow Bolt")
 
+				-- Demonbolt
+				m("C02", nil, "#showtooltip\n/use Demonbolt\n/stopcasting")
+
 				-- Pet Primary
 				m("C07", nil, "#showtooltip\n/use [pet:Felguard/Wrathguard]Axe Toss;[pet:Felhunter/Observer]Spell Lock;[pet:Succubus/Incubus/Shivarra]Seduction;[pet:Voidwalker/Voidlord,nobtn:2]Suffering;[nobtn:2]Command Demon\n/petautocasttoggle [btn:2]Suffering")
 				
@@ -4381,7 +4384,7 @@ local function UpdateBars(event)
 
 				-- Bottom
 				macro("1", "C01")
-				spell("2", "Demonbolt")
+				macro("2", "C02", "Demonbolt")
 				spell("3", "Call Dreadstalkers")
 				spell("4", "Hand of Gul'dan")
 				if known("Bilescourge Bombers") then spell("5", "Bilescourge Bombers") else spell("5", "Demonic Strength") end
@@ -4833,7 +4836,7 @@ local function UpdateBars(event)
 
 				-- Bottom
 				if known("Shield Slam") then spell("1", "Shield Slam") else spell("1", "Slam") end
-				if known("Shield Slam") then spell("2", "Slam") empty("2") end
+				if known("Shield Slam") then spell("2", "Slam") else empty("2") end
 				spell("3", "Execute")
 				empty("4")
 				spell("5", "Shield Block")
