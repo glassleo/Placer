@@ -215,6 +215,7 @@ local spellNameToId = {
 	["Blessing of the Seasons"] = 388007,
 	["Divine Toll"] = 375576,
 	["Wake of Ashes"] = 255937,
+	["Guardian of Ancient Kings"] = 86659,
 	-- Priest
 	["Apotheosis"] = 200183,
 	["Body and Soul"] = 64129,
@@ -230,9 +231,12 @@ local spellNameToId = {
 	["Serrated Bone Knife"] = 385424,
 	["Stealth"] = 1784,
 	-- Shaman
+	["Earthgrab Totem"] = 51485,
 	["Hex"] = 51514,
 	["Primal Elementalist"] = 117013,
 	["Primordial Wave"] = 375982,
+	["Purge"] = 370,
+	["Wind Rush Totem"] = 192077,
 	-- Warlock
 	["Command Demon"] = 119898,
 	["Demonic Circle"] = 48018,
@@ -378,6 +382,10 @@ local function spell(slotName, spellName, requiredLevel)
 		end
 	elseif spellName == "Dream Breath" then
 		if actionType == "spell" and (actionDataId == 355936 or actionDataId == 382614) then
+			todo = nil
+		end
+	elseif spellName == "Guardian of Ancient Kings" then
+		if actionType == "spell" and (actionDataId == 86659 or actionDataId == 212641) then
 			todo = nil
 		end
 	elseif level >= requiredLevel then
@@ -554,8 +562,8 @@ local function UpdateBars(event)
 		local spec = GetSpecialization() or 5
 		local timewalking = false
 		local covenant = C_Covenants and C_Covenants.GetActiveCovenantID() or 0
-		local configID = C_ClassTalents.GetLastSelectedSavedConfigID(PlayerUtil.GetCurrentSpecID())
-		local loadout = configID and C_Traits.GetConfigInfo(configID).name or "Unknown"
+		--local configID = C_ClassTalents.GetLastSelectedSavedConfigID(PlayerUtil.GetCurrentSpecID())
+		--local loadout = configID and C_Traits.GetConfigInfo(configID).name or "Unknown"
 		local custom = Automagic and Automagic.Characters and Automagic.Characters[name.."-"..realm] or Automagic.Characters[name] or {}
 
 		-- Timewalking/Party Sync
@@ -2791,7 +2799,7 @@ local function UpdateBars(event)
 				if known("Rising Sun Kick") and known("Enveloping Mist") then macro("2", "C02") elseif known("Rising Sun Kick") then spell("2", "Rising Sun Kick") else spell("2", "Enveloping Mist") end
 				macro("3", "C03")
 				spell("4", "Essence Font")
-				spell("5", "Refreshing Jade Wind")
+				spell("5", "Sheilun's Gift") --spell("5", "Refreshing Jade Wind")
 				spell("6", "Zen Pulse")
 				spell("V", "Touch of Death")
 				spell("CE", "Leg Sweep")
@@ -3335,7 +3343,7 @@ local function UpdateBars(event)
 				if known("Prayer of Mending") and known("Shadow Word: Death") then macro("4", "C04") elseif known("Prayer of Mending") then spell("4", "Prayer of Mending") else spell("4", "Shadow Word: Death") end
 				if known("Schism") then macro("5", "C05") else spell("5", "Power Word: Shield") end
 				spell("6", "Mindgames")
-				spell("V", "Shadowfiend")
+				if known("Mindbender") then spell("V", "Shadowfiend") else macro("V", "G014", "Shadowfiend") end
 				spell("CE", "Light's Wrath")
 
 				------ Right ------
@@ -3428,7 +3436,7 @@ local function UpdateBars(event)
 				if known("Shadow Word: Death") and known("Prayer of Mending") then macro("4", "C04") elseif known("Shadow Word: Death") then spell("4", "Shadow Word: Death") else spell("4", "Prayer of Mending") end
 				if known("Circle of Healing") and known("Mindgames") then macro("5", "C05") elseif known("Mindgames") then spell("5", "Mindgames") else spell("5", "Circle of Healing") end
 				spell("6", "Divine Word")
-				spell("V", "Shadowfiend")
+				macro("V", "G014", "Shadowfiend")
 				spell("CE", "Holy Word: Chastise")
 
 				------ Right ------
@@ -3473,7 +3481,7 @@ local function UpdateBars(event)
 				m("C04", nil, "#showtooltip\n/use [help]Prayer of Mending;Shadow Word: Death")
 
 				-- Devouring Plague / Mind Sear
-				m("C05", nil, "#showtooltip\n/use [mod:shift]Mind Sear;Devouring Plague")
+				--m("C05", nil, "#showtooltip\n/use [mod:shift]Mind Sear;Devouring Plague")
 
 				-- Renew/Shadow Word: Pain
 				m("C07", nil, "#showtooltip\n/use [help]Renew;Shadow Word: Pain")
@@ -3512,9 +3520,9 @@ local function UpdateBars(event)
 				racial("AE")
 
 				-- Middle
-				spell("C", "Shadow Crash")
-				spell("SC", "Dark Void")
-				if known("Mind Spike") then spell("Q", "Smite") else empty("Q") end
+				if known("Mind Spike") then spell("C", "Smite") else empty("C") end
+				spell("SC", "Shadow Crash")
+				spell("Q", "Mind Sear") --spell("Q", "Dark Void")
 				if known("Renew") then macro("E", "C07") else spell("E", "Shadow Word: Pain") end
 				if known("Dark Ascension") then spell("G", "Dark Ascension") else spell("G", "Void Eruption") end
 				macro("SG", "C08", "Power Infusion")
@@ -3525,9 +3533,9 @@ local function UpdateBars(event)
 				if known("Mind Spike") then spell("2", "Mind Spike") else spell("2", "Smite") end
 				if known("Holy Nova") then macro("3", "C03") else spell("3", "Mind Blast") end
 				if known("Prayer of Mending") then macro("4", "C04") else spell("4", "Shadow Word: Death") end
-				if known("Devouring Plague") and known("Mind Sear") then macro("5", "C05") else spell("5", "Devouring Plague") end
+				spell("5", "Devouring Plague")
 				spell("6", "Mindgames")
-				spell("V", "Shadowfiend")
+				if known("Mindbender") then spell("V", "Shadowfiend") else macro("V", "G014", "Shadowfiend") end
 				spell("CE", "Psychic Horror")
 
 				------ Right ------
@@ -3985,7 +3993,7 @@ local function UpdateBars(event)
 				spell("N", "Primordial Wave")
 				spell("SN", "Nature's Swiftness")
 				spell("R", "Totemic Projection")
-				if known("Purge") then spell("SR", "Purge") else spell("SR", "Greater Purge") end
+				if known("Greater Purge") then spell("SR", "Greater Purge") else spell("SR", "Purge") end
 				spell("CR", "Cleanse Spirit")
 				spell("H", "Earth Shield")
 				spell("SH", "Poison Cleansing Totem")
@@ -4063,7 +4071,7 @@ local function UpdateBars(event)
 				spell("N", "Primordial Wave")
 				spell("SN", "Nature's Swiftness")
 				spell("R", "Totemic Projection")
-				if known("Purge") then spell("SR", "Purge") else spell("SR", "Greater Purge") end
+				if known("Greater Purge") then spell("SR", "Greater Purge") else spell("SR", "Purge") end
 				spell("CR", "Cleanse Spirit")
 				spell("H", "Earth Shield")
 				spell("SH", "Poison Cleansing Totem")
@@ -4150,7 +4158,7 @@ local function UpdateBars(event)
 				spell("N", "Primordial Wave")
 				spell("SN", "Nature's Swiftness")
 				spell("R", "Totemic Projection")
-				if known("Purge") then spell("SR", "Purge") else spell("SR", "Greater Purge") end
+				if known("Greater Purge") then spell("SR", "Greater Purge") else spell("SR", "Purge") end
 				spell("CR", "Purify Spirit")
 				spell("H", "Earth Shield")
 				spell("SH", "Poison Cleansing Totem")
@@ -4352,9 +4360,6 @@ local function UpdateBars(event)
 				-- Shadow Bolt
 				m("C01", nil, "#showtooltip Shadow Bolt\n/petattack\n/petassist\n/petattack\n/use Shadow Bolt")
 
-				-- Demonbolt
-				m("C02", nil, "#showtooltip\n/use Demonbolt\n/stopcasting")
-
 				-- Pet Primary
 				m("C07", nil, "#showtooltip\n/use [pet:Felguard/Wrathguard]Axe Toss;[pet:Felhunter/Observer]Spell Lock;[pet:Succubus/Incubus/Shivarra]Seduction;[pet:Voidwalker/Voidlord,nobtn:2]Suffering;[nobtn:2]Command Demon\n/petautocasttoggle [btn:2]Suffering")
 				
@@ -4384,7 +4389,7 @@ local function UpdateBars(event)
 
 				-- Bottom
 				macro("1", "C01")
-				macro("2", "C02", "Demonbolt")
+				spell("2", "Demonbolt")
 				spell("3", "Call Dreadstalkers")
 				spell("4", "Hand of Gul'dan")
 				if known("Bilescourge Bombers") then spell("5", "Bilescourge Bombers") else spell("5", "Demonic Strength") end
