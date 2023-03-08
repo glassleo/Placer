@@ -1308,7 +1308,7 @@ local function UpdateBars(event)
 				m("C15", nil, "#showtooltip\n/cancelaura Travel Form\n/cancelaura [btn:2]Prowl\n/use [nobtn:2]!Prowl")
 
 				-- Cat Form
-				m("C16", nil, "#showtooltip Bear Form\n/use [noform:2,nobtn:2]Cat Form\n/cancelform [btn:2]")
+				m("C16", nil, "#showtooltip Cat Form\n/use [noform:2,nobtn:2]Cat Form\n/cancelform [btn:2]")
 
 				
 				------ Left ------
@@ -1406,7 +1406,7 @@ local function UpdateBars(event)
 				spell("F4", "Renewal")
 				spell("F5", "Nature's Vigil")
 				empty("F6")
-				macro("CQ", "C14")
+				macro("CQ", "C14", "Moonkin Form")
 
 			elseif spec == 3 then
 				--! Guardian Druid
@@ -1547,7 +1547,7 @@ local function UpdateBars(event)
 				spell("F4", "Nature's Vigil")
 				empty("F5")
 				empty("F6")
-				macro("CQ", "C14")
+				macro("CQ", "C14", "Moonkin Form")
 
 			elseif spec == 4 then
 				--! Restoration Druid
@@ -4001,10 +4001,10 @@ local function UpdateBars(event)
 
 				-- Middle
 				spell("C", "Frost Shock")
-				spell("SC", "Icefury")
-				if known("Primal Elementalist") then macro("Q", "C10") else spell("Q", "Liquid Magma Totem") end
+				if known("Primal Elementalist") then macro("SC", "C10") else spell("SC", "Liquid Magma Totem") end
+				spell("Q", "Earthquake")
 				spell("E", "Flame Shock")
-				if known("Fire Elemental") or known("Storm Elemental") then macro("G", "C09") else empty("G") end
+				spell("G", "Ascendance")
 				empty("SG")
 				macro("SE", "C08", "Wind Shear")
 
@@ -4013,9 +4013,9 @@ local function UpdateBars(event)
 				if known("Healing Wave") and known("Lava Burst") then macro("2", "C02") elseif known("Lava Burst") then spell("2", "Lava Burst") else spell("2", "Healing Wave") end
 				if known("Chain Heal") and known("Chain Lightning") then macro("3", "C03") elseif known("Chain Lightning") then spell("3", "Chain Lightning") else spell("3", "Chain Heal") end
 				spell("4", "Earth Shock")
-				spell("5", "Earthquake")
+				spell("5", "Icefury")
 				spell("6", "Stormkeeper")
-				spell("V", "Ascendance")
+				if known("Fire Elemental") or known("Storm Elemental") then macro("V", "C09") else empty("V") end
 				spell("CE", "Capacitor Totem")
 
 				------ Right ------
@@ -4079,10 +4079,10 @@ local function UpdateBars(event)
 
 				-- Middle
 				spell("C", "Frost Shock")
-				spell("SC", "Ice Strike")
+				spell("SC", "Sundering")
 				spell("Q", "Fire Nova")
 				spell("E", "Flame Shock")
-				spell("G", "Feral Spirit")
+				spell("G", "Ascendance")
 				spell("SG", "Doom Winds")
 				macro("SE", "C08", "Wind Shear")
 
@@ -4092,8 +4092,8 @@ local function UpdateBars(event)
 				spell("3", "Crash Lightning")
 				if known("Lava Burst") then spell("4", "Lava Burst") elseif known("Elemental Blast") then spell("4", "Elemental Blast") else spell("4", "Lightning Bolt") end
 				if known("Lava Burst") or known("Elemental Blast") then macro("5", "C05") else spell("5", "Chain Lightning") end
-				spell("6", "Sundering")
-				spell("V", "Ascendance")
+				spell("6", "Ice Strike")
+				spell("V", "Feral Spirit")
 				spell("CE", "Capacitor Totem")
 
 				------ Right ------
