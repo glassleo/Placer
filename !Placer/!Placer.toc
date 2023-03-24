@@ -1,8 +1,8 @@
-## Interface: 100005
+## Interface: 100007
 ## Title: Placer
 ## Notes: Places action bara data
 ## Author: Leo
-## Version: 10.0.5
+## Version: 10.0.7
 ## OptionalDeps: !Automagic
 
 Placer.lua
