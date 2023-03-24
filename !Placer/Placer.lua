@@ -353,7 +353,7 @@ local function spell(slotName, spellName, requiredLevel)
 			todo = nil
 		end
 	elseif spellName == "Wild Charge" then
-		if actionType == "spell" and (actionDataId == 102401 or actionDataId == 49376 or actionDataId == 16979 or actionDataId == 102417 or actionDataId == 102416) then
+		if actionType == "spell" and (actionDataId == 102401 or actionDataId == 49376 or actionDataId == 16979 or actionDataId == 102417 or actionDataId == 102416 or actionDataId == 102383) then
 			todo = nil
 		end
 	elseif spellName == "Stampeding Roar" then
@@ -373,7 +373,7 @@ local function spell(slotName, spellName, requiredLevel)
 			todo = nil
 		end
 	elseif spellName == "Execute" then
-		if actionType == "spell" and (actionDataId == 163201 or actionDataId == 280735 or actionDataId == 330325) then
+		if actionType == "spell" and (actionDataId == 163201 or actionDataId == 280735 or actionDataId == 330325 or actionDataId == 5308) then
 			todo = nil
 		end
 	elseif spellName == "Spiritbloom" then
@@ -2400,7 +2400,7 @@ local function UpdateBars(event)
 				
 				------ Left ------
 				-- Top
-				spell("N", "Shifting Power")
+				spell("N", "Radiant Spark")
 				spell("SN", "Presence of Mind")
 				spell("R", "Meteor")
 				spell("SR", "Spellsteal")
@@ -2411,11 +2411,11 @@ local function UpdateBars(event)
 
 				-- Middle
 				spell("C", "Evocation")
-				macro("SC", "C14", "Conjure Mana Gem")
+				spell("SC", "Ice Nova")
 				spell("Q", "Arcane Explosion")
 				spell("E", "Nether Tempest")
 				spell("G", "Arcane Surge")
-				spell("SG", "Radiant Spark")
+				macro("SG", "C14", "Conjure Mana Gem")
 				macro("SE", "C08", "Counterspell")
 
 				-- Bottom
@@ -2424,7 +2424,7 @@ local function UpdateBars(event)
 				spell("3", "Arcane Barrage")
 				if known("Arcane Orb") then spell("4", "Arcane Orb") else spell("4", "Fire Blast") end
 				macro("5", "C10", "Touch of the Magi")
-				spell("6", "Ice Nova")
+				spell("6", "Shifting Power")
 				spell("V", "Rune of Power")
 				spell("CE", "Frost Nova")
 
@@ -2469,9 +2469,9 @@ local function UpdateBars(event)
 				
 				------ Left ------
 				-- Top
-				spell("N", "Shifting Power")
+				spell("N", "Meteor")
 				empty("SN")
-				spell("R", "Meteor")
+				empty("R")
 				spell("SR", "Spellsteal")
 				spell("CR", "Remove Curse")
 				empty("H")
@@ -2480,7 +2480,7 @@ local function UpdateBars(event)
 
 				-- Middle
 				spell("C", "Scorch")
-				empty("SC")
+				spell("SC", "Ice Nova")
 				spell("Q", "Arcane Explosion")
 				spell("E", "Living Bomb")
 				spell("G", "Combustion")
@@ -2493,7 +2493,7 @@ local function UpdateBars(event)
 				spell("3", "Pyroblast")
 				spell("4", "Flamestrike")
 				spell("5", "Phoenix Flames")
-				spell("6", "Ice Nova")
+				spell("6", "Shifting Power")
 				spell("V", "Rune of Power")
 				spell("CE", "Frost Nova")
 
@@ -2547,7 +2547,7 @@ local function UpdateBars(event)
 				
 				------ Left ------
 				-- Top
-				spell("N", "Shifting Power")
+				if level < 23 then empty("N") else macro("N", "C10", "Summon Water Elemental") end
 				spell("SN", "Ray of Frost")
 				spell("R", "Meteor")
 				spell("SR", "Spellsteal")
@@ -2558,7 +2558,7 @@ local function UpdateBars(event)
 
 				-- Middle
 				spell("C", "Comet Storm")
-				if level < 23 then empty("SC") else macro("SC", "C10", "Summon Water Elemental") end
+				spell("SC", "Ice Nova")
 				spell("Q", "Arcane Explosion")
 				spell("E", "Frozen Orb")
 				spell("G", "Icy Veins")
@@ -2571,7 +2571,7 @@ local function UpdateBars(event)
 				if known("Ice Lance") then spell("3", "Ice Lance") else spell("3", "Fire Blast") end
 				if known("Blizzard") then spell("4", "Blizzard") else spell("4", "Arcane Explosion") end
 				spell("5", "Ebonbolt")
-				spell("6", "Ice Nova")
+				spell("6", "Shifting Power")
 				spell("V", "Rune of Power")
 				spell("CE", "Frost Nova")
 
@@ -3074,6 +3074,13 @@ local function UpdateBars(event)
 				-- Rebuke
 				m("C08", nil, "#showtooltip Rebuke\n/stopcasting\n/stopcasting\n/use Rebuke")
 
+				-- Avenging Wrath
+				if name == "Leo" then
+					m("C10", nil, "#showtooltip\n/use Avenging Wrath\n/use item:193762")
+				else
+					m("C10", nil, "#showtooltip\n/use Avenging Wrath")
+				end
+
 				-- Blessing of Freedom @player
 				m("C13", 135878, "#showtooltip Blessing of Freedom\n/use [@player]Blessing of Freedom")
 
@@ -3094,7 +3101,7 @@ local function UpdateBars(event)
 				empty("SC")
 				spell("Q", "Word of Glory")
 				spell("E", "Consecration")
-				spell("G", "Avenging Wrath")
+				macro("G", "C10", "Avenging Wrath")
 				spell("SG", "Moment of Glory")
 				macro("SE", "C08", "Rebuke")
 
@@ -3412,11 +3419,11 @@ local function UpdateBars(event)
 				------ Left ------
 				-- Top
 				spell("N", "Holy Nova")
-				spell("SN", "Void Shift")
+				spell("SN", "Divine Word")
 				spell("R", "Mind Soothe")
 				spell("SR", "Dispel Magic")
 				spell("CR", "Purify")
-				if known("Divine Star") then spell("H", "Divine Star") else spell("H", "Halo") end
+				spell("H", "Void Shift")
 				empty("SH")
 				racial("AE")
 
@@ -3435,7 +3442,7 @@ local function UpdateBars(event)
 				if known("Prayer of Healing") and known("Empyreal Blaze") then macro("3", "C03") elseif known("Prayer of Healing") then spell("3", "Prayer of Healing") else spell("3", "Empyreal Blaze") end
 				if known("Shadow Word: Death") and known("Prayer of Mending") then macro("4", "C04") elseif known("Shadow Word: Death") then spell("4", "Shadow Word: Death") else spell("4", "Prayer of Mending") end
 				if known("Circle of Healing") and known("Mindgames") then macro("5", "C05") elseif known("Mindgames") then spell("5", "Mindgames") else spell("5", "Circle of Healing") end
-				spell("6", "Divine Word")
+				if known("Divine Star") then spell("6", "Divine Star") else spell("6", "Halo") end
 				macro("V", "G014", "Shadowfiend")
 				spell("CE", "Holy Word: Chastise")
 
@@ -4208,7 +4215,7 @@ local function UpdateBars(event)
 				if known("Mana Tide Totem") and known("Mana Spring Totem") then macro("F4", "C14") elseif known("Mana Spring Totem") then spell("F4", "Mana Spring Totem") else spell("F4", "Mana Tide Totem") end
 				if known("Stoneskin Totem") then spell("F5", "Stoneskin Totem") else spell("F5", "Tranquil Air Totem") end
 				spell("F6", "Totemic Recall")
-				empty("CQ")
+				spell("CQ", "Water Walking")
 
 			else
 				--! Unspecialized Shaman
