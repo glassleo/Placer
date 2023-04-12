@@ -243,7 +243,7 @@ local spellNameToId = {
 	["Demonic Circle: Teleport"] = 48020,
 	["Shadow Bolt"] = 686,
 	["Soul Rot"] = 386997,
-	--Warrior
+	-- Warrior
 	["Annihilator"] = 383916,
 	["Blood and Thunder"] = 384277,
 	["Devastator"] = 236279,
@@ -262,6 +262,8 @@ local function known(spell)
 	else
 		if spellNameToId[spell] then
 			spellId = spellNameToId[spell]
+		elseif spell == "Bladestorm" and GetSpecialization() == 1 then
+			spellId = 227847 -- Bladestorm workaround for Arms
 		else
 			spellId = select(7, GetSpellInfo(spell))
 		end
@@ -336,6 +338,12 @@ local function spell(slotName, spellName, requiredLevel)
 		if actionType == "spell" and actionDataId == spellId then
 			todo = nil
 		end
+	elseif spellName == "Bladestorm" and GetSpecialization() == 1 then
+		spellId = 227847
+
+		if actionType == "spell" and (actionDataId == spellId or actionDataId == 389774) then
+			todo = nil
+		end
 	elseif spellName == "Blessing of the Seasons" then
 		if actionType == "spell" and (actionDataId == 328622 or actionDataId == 328281 or actionDataId == 328282 or actionDataId == 328620) then
 			todo = nil
@@ -386,6 +394,14 @@ local function spell(slotName, spellName, requiredLevel)
 		end
 	elseif spellName == "Guardian of Ancient Kings" then
 		if actionType == "spell" and (actionDataId == 86659 or actionDataId == 212641) then
+			todo = nil
+		end
+	elseif spellName == "Sigil of Flame" then
+		if actionType == "spell" and (actionDataId == 204596 or actionDataId == 204513) then
+			todo = nil
+		end
+	elseif spellName == "Sigil of Misery" then
+		if actionType == "spell" and (actionDataId == 207684 or actionDataId == 202140) then
 			todo = nil
 		end
 	elseif level >= requiredLevel then
@@ -1227,7 +1243,7 @@ local function UpdateBars(event)
 				if known("Rejuvenation") then macro("B E", "C07") else spell("B E", "Moonfire") end
 				spell("B G", "Heart of the Wild")
 				spell("B SG", "Convoke the Spirits")
-				macro("C SE", "C08", "Skull Bash")
+				macro("B SE", "C08", "Skull Bash")
 
 				-- Bottom
 				spell("B 1", "Mangle")
@@ -2779,7 +2795,7 @@ local function UpdateBars(event)
 				spell("N", "Bonedust Brew")
 				spell("SN", "Summon White Tiger Statue")
 				spell("R", "Provoke")
-				macro("SR", "C14", "Summon Black Ox Statue")
+				spell("SR", "Crackling Jade Lightning")
 				spell("CR", "Detox")
 				spell("H", "Life Cocoon")
 				spell("SH", "Mana Tea")
@@ -4341,8 +4357,8 @@ local function UpdateBars(event)
 				spell("F", "Burning Rush")
 
 				-- Middle
-				spell("T", "Banish")
-				spell("ST", "Fear")
+				spell("T", "Fear")
+				spell("ST", "Banish")
 				if known("Howl of Terror") then spell("CT", "Howl of Terror") else spell("CT", "Mortal Coil") end
 				spell("AT", "Subjugate Demon")
 				spell("CB3", "Shadowflame")
@@ -4413,8 +4429,8 @@ local function UpdateBars(event)
 				spell("F", "Burning Rush")
 
 				-- Middle
-				spell("T", "Banish")
-				spell("ST", "Fear")
+				spell("T", "Fear")
+				spell("ST", "Banish")
 				if known("Howl of Terror") then spell("CT", "Howl of Terror") else spell("CT", "Mortal Coil") end
 				spell("AT", "Subjugate Demon")
 				spell("CB3", "Shadowflame")
@@ -4485,8 +4501,8 @@ local function UpdateBars(event)
 				spell("F", "Burning Rush")
 
 				-- Middle
-				spell("T", "Banish")
-				spell("ST", "Fear")
+				spell("T", "Fear")
+				spell("ST", "Banish")
 				if known("Howl of Terror") then spell("CT", "Howl of Terror") else spell("CT", "Mortal Coil") end
 				spell("AT", "Subjugate Demon")
 				spell("CB3", "Shadowflame")
@@ -4900,7 +4916,7 @@ local function UpdateBars(event)
 		spell("D 2", 372610) -- Skyward Ascent
 		spell("D 3", "Whirling Surge")
 		empty("D 4")
-		empty("D 5")
+		spell("D 5", "Aerial Halt")
 		empty("D 6")
 		spell("D V", "Bronze Timelock")
 		empty("D CE")
