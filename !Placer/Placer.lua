@@ -228,7 +228,7 @@ local spellNameToId = {
 	["Echoing Reprimand"] = 385616,
 	["Flagellation"] = 384631,
 	["Sepsis"] = 385408,
-	["Serrated Bone Knife"] = 385424,
+	["Serrated Bone Spike"] = 385424,
 	["Stealth"] = 1784,
 	-- Shaman
 	["Earthgrab Totem"] = 51485,
@@ -264,6 +264,9 @@ local function known(spell)
 			spellId = spellNameToId[spell]
 		elseif spell == "Bladestorm" and GetSpecialization() == 1 then
 			spellId = 227847 -- Bladestorm workaround for Arms
+		elseif spell == "Death and Decay" then
+			-- Death's Due workaround
+			if IsPlayerSpell(315442) or IsSpellKnown(315442) then return true end
 		else
 			spellId = select(7, GetSpellInfo(spell))
 		end
@@ -2098,7 +2101,7 @@ local function UpdateBars(event)
 				------ Left ------
 				-- Top
 				if known("Stampede") then spell("N", "Stampede") else spell("N", "Death Chakram") end
-				spell("SN", "Wailing Arrow")
+				spell("SN", "Steel Trap")
 				macro("R", "C09")
 				spell("SR", "Tranquilizing Shot")
 				macro("CR", "G019")
@@ -2121,7 +2124,7 @@ local function UpdateBars(event)
 				if known("Cobra Shot") and known("Barbed Shot") then spell("3", "Steady Shot") elseif known("Cobra Shot") then empty("3") else spell("3", "Arcane Shot") end
 				spell("4", "Kill Shot")
 				spell("5", "Dire Beast")
-				spell("6", "Steel Trap")
+				spell("6", "Wailing Arrow")
 				spell("V", "Call of the Wild")
 				if known("Scatter Shot") then spell("CE", "Scatter Shot") else spell("CE", "Binding Shot") end
 
@@ -2182,7 +2185,7 @@ local function UpdateBars(event)
 				------ Left ------
 				-- Top
 				if known("Stampede") then spell("N", "Stampede") else spell("N", "Death Chakram") end
-				spell("SN", "Wailing Arrow")
+				spell("SN", "Steel Trap")
 				macro("R", "C09")
 				spell("SR", "Tranquilizing Shot")
 				macro("CR", "G019")
@@ -2205,15 +2208,15 @@ local function UpdateBars(event)
 				spell("3", "Arcane Shot")
 				spell("4", "Kill Shot")
 				spell("5", "Rapid Fire")
-				spell("6", "Steel Trap")
-				spell("V", "Bursting Shot")
+				spell("6", "Wailing Arrow")
+				spell("V", "Salvo")
 				if known("Scatter Shot") then spell("CE", "Scatter Shot") else spell("CE", "Binding Shot") end
 
 				------ Right ------
 				-- Top
 				spell("AB3", "Flare")
 				if level < 28 then empty("AF") else macro("AF", "C16") end
-				empty("CF")
+				spell("CF", "Burning Shot")
 				spell("SF", "Disengage")
 				spell("F", "Aspect of the Cheetah")
 
@@ -2269,7 +2272,7 @@ local function UpdateBars(event)
 				------ Left ------
 				-- Top
 				if known("Stampede") then spell("N", "Stampede") else spell("N", "Death Chakram") end
-				empty("SN")
+				spell("SN", "Steel Trap")
 				macro("R", "C09")
 				spell("SR", "Tranquilizing Shot")
 				macro("CR", "G019")
@@ -2279,7 +2282,7 @@ local function UpdateBars(event)
 
 				-- Middle
 				if known("Explosive Shot") then spell("C", "Explosive Shot") else spell("C", "Barrage") end
-				spell("SC", "Fury of the Eagle")
+				empty("SC")
 				spell("Q", "Flanking Strike")
 				spell("E", "Serpent Sting")
 				spell("G", "Coordinated Assault")
@@ -2292,7 +2295,7 @@ local function UpdateBars(event)
 				spell("3", "Wildfire Bomb")
 				spell("4", "Kill Shot")
 				if known("Carve") then spell("5", "Carve") else spell("5", "Butchery") end
-				spell("6", "Steel Trap")
+				spell("6", "Fury of the Eagle")
 				spell("V", "Aspect of the Eagle")
 				if known("Scatter Shot") then spell("CE", "Scatter Shot") else spell("CE", "Binding Shot") end
 
@@ -3228,10 +3231,10 @@ local function UpdateBars(event)
 				empty("CV")
 
 				-- Bottom
-				if known("Shield of Vengeance") then spell("F1", "Shield of Vengeance") else spell("F1", "Divine Protection") end
+				spell("F1", "Divine Protection")
 				spell("F2", "Divine Shield")
-				if known("Justicar's Vengeance") then spell("F3", "Justicar's Vengeance") else spell("F3", "Eye for an Eye") end
-				empty("F4")
+				spell("F3", "Shield of Vengeance")
+				if known("Justicar's Vengeance") then spell("F4", "Justicar's Vengeance") else spell("F4", "Eye for an Eye") end
 				empty("F5")
 				empty("F6")
 				spell("CQ", "Lay on Hands")
@@ -3693,7 +3696,7 @@ local function UpdateBars(event)
 				spell("SN", "Shadow Dance")
 				spell("R", "Marked for Death")
 				spell("SR", "Shiv")
-				spell("CR", "Indiscriminate Carnage")
+				if known("Sepsis") then spell("CR", "Sepsis") else spell("CR", "Serrated Bone Spike") end
 				empty("H")
 				empty("SH")
 				racial("AE")
@@ -3704,17 +3707,17 @@ local function UpdateBars(event)
 				spell("Q", "Fan of Knives")
 				spell("E", "Garrote")
 				spell("G", "Deathmark")
-				if known("Sepsis") then spell("SG", "Sepsis") else spell("SG", "Serrated Bone Knife") end
+				spell("SG", "Exsanguinate")
 				macro("SE", "C08", "Kick")
 
 				-- Bottom
 				macro("1", "C01")
 				spell("2", "Rupture")
-				macro("3", "C03", "Eviscerate")
+				spell("3", "Eviscerate")
 				spell("4", "Slice and Dice")
-				spell("5", "Kingsbane")
+				spell("5", "Crimson Tempest") --spell("5", "Kingsbane")
 				spell("6", "Echoing Reprimand")
-				spell("V", "Exsanguinate")
+				spell("V", "Indiscriminate Carnage")
 				spell("CE", "Kidney Shot")
 
 				------ Right ------
