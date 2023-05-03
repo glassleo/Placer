@@ -1,8 +1,9 @@
-## Interface: 100007
+## Interface: 100100
 ## Title: Placer
 ## Notes: Places action bara data
 ## Author: Leo
-## Version: 10.0.7
+## Version: 10.1
 ## OptionalDeps: !Automagic
+## IconTexture: 4200123
 
 Placer.lua

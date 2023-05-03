@@ -265,8 +265,8 @@ local function known(spell)
 		elseif spell == "Bladestorm" and GetSpecialization() == 1 then
 			spellId = 227847 -- Bladestorm workaround for Arms
 		elseif spell == "Death and Decay" then
-			-- Death's Due workaround
-			if IsPlayerSpell(315442) or IsSpellKnown(315442) then return true end
+			if IsPlayerSpell(315442) or IsSpellKnown(315442) then return true end -- Death's Due
+			if IsPlayerSpell(152280) or IsSpellKnown(152280) then return true end -- Defile
 		else
 			spellId = select(7, GetSpellInfo(spell))
 		end
@@ -360,7 +360,7 @@ local function spell(slotName, spellName, requiredLevel)
 			todo = nil
 		end
 	elseif spellName == "Swipe" then
-		if actionType == "spell" and (actionDataId == 213764 or actionDataId == 213771 or actionDataId == 106785) then
+		if actionType == "spell" and (actionDataId == 213764 or actionDataId == 213771 or actionDataId == 106785 or actionDataId == 202028) then
 			todo = nil
 		end
 	elseif spellName == "Wild Charge" then
@@ -668,7 +668,7 @@ local function UpdateBars(event)
 				spell("1", "Marrowrend")
 				spell("2", "Blood Boil")
 				macro("3", "C03")
-				macro("4", "C04", "Death and Decay")
+				macro("4", "C04")
 				spell("5", "Death Strike")
 				if known("Blooddrinker") then spell("6", "Blooddrinker") else spell("6", "Consumption") end
 				spell("V", "Rune Tap")
@@ -746,7 +746,7 @@ local function UpdateBars(event)
 				spell("1", "Rune Strike")
 				spell("2", "Remorseless Winter")
 				if known("Frost Strike") then macro("3", "C03") else spell("3", "Death Coil") end
-				macro("4", "C04", "Death and Decay")
+				macro("4", "C04")
 				spell("5", "Glacial Advance")
 				macro("6", "C06", "Breath of Sindragosa")
 				spell("V", "Pillar of Frost")
@@ -824,7 +824,7 @@ local function UpdateBars(event)
 				spell("1", "Rune Strike")
 				spell("2", "Scourge Strike")
 				spell("3", "Death Coil")
-				macro("4", "C04", "Death and Decay")
+				macro("4", "C04")
 				spell("5", "Abomination Limb")
 				spell("6", "Apocalypse")
 				spell("V", "Dark Transformation")
@@ -1206,7 +1206,7 @@ local function UpdateBars(event)
 				if known("Rejuvenation") then macro("E", "C07") else spell("E", "Moonfire") end
 				if known("Heart of the Wild") and known("Celestial Alignment") then macro("G", "C09") elseif known("Heart of the Wild") then spell("G", "Heart of the Wild") else spell("G", "Celestial Alignment") end
 				spell("SG", "Convoke the Spirits")
-				macro("SE", "C08", "Skull Bash")
+				macro("SE", "C06", "Solar Beam")
 
 				-- Bottom
 				macro("1", "C01")
@@ -1214,7 +1214,7 @@ local function UpdateBars(event)
 				if known("Wild Growth") then macro("3", "C03") else spell("3", "Starsurge") end
 				spell("4", "Sunfire")
 				spell("5", "Stellar Flare")
-				macro("6", "C06", "Solar Beam")
+				macro("6", "C08", "Skull Bash")
 				spell("V", "Astral Communion")
 				if known("Incapacitating Roar") then spell("CE", "Incapacitating Roar") else spell("CE", "Mighty Bash") end
 
@@ -1524,11 +1524,11 @@ local function UpdateBars(event)
 				------ Bear Form ------
 				-- Middle
 				spell("B C", "Bristling Fur")
-				empty("B SC")
+				spell("B SC", "Convoke the Spirits")
 				spell("B Q", "Frenzied Regeneration")
 				if known("Rejuvenation") then macro("B E", "C07") else spell("B E", "Moonfire") end
 				spell("B G", "Berserk")
-				spell("B SG", "Convoke the Spirits")
+				spell("B SG", "Heart of the Wild")
 				macro("B SE", "C08", "Skull Bash")
 
 				-- Bottom
@@ -3323,8 +3323,8 @@ local function UpdateBars(event)
 				-- Prayer of Mending / Shadow Word: Death
 				m("C04", nil, "#showtooltip\n/use [harm]Shadow Word: Death;Prayer of Mending")
 
-				-- Power Word: Shield / Schism
-				m("C05", nil, "#showtooltip\n/use [harm]Schism;Power Word: Shield")
+				-- Power Word: Shield / Mindgames
+				m("C05", nil, "#showtooltip\n/use [harm]Mindgames;Power Word: Shield")
 
 				-- Renew/Shadow Word: Pain
 				m("C07", nil, "#showtooltip\n/use [harm]Shadow Word: Pain;Renew")
@@ -3344,31 +3344,31 @@ local function UpdateBars(event)
 				
 				------ Left ------
 				-- Top
-				if known("Divine Star") then spell("N", "Divine Star") else spell("N", "Halo") end
-				spell("SN", "Void Shift") --spell("SN", "Power Word: Life")
+				spell("N", "Power Word: Life")
+				empty("SN")
 				spell("R", "Mind Soothe")
 				spell("SR", "Dispel Magic")
 				spell("CR", "Purify")
-				empty("H") --spell("H", "Pain Suppression")
-				empty("SH") --spell("SH", "Void Shift")
+				spell("H", "Pain Suppression")
+				spell("SH", "Void Shift")
 				racial("AE")
 
 				-- Middle
 				spell("C", "Power Word: Solace")
 				spell("SC", "Shadow Covenant")
-				spell("Q", "Power Word: Life") --spell("Q", "Holy Nova")
+				spell("Q", "Holy Nova")
 				if known("Renew") then macro("E", "C07") else spell("E", "Shadow Word: Pain") end
-				spell("G", "Rapture")
+				spell("G", "Schism")
 				macro("SG", "C08", "Power Infusion")
-				spell("SE", "Pain Suppression") --empty("SE")
+				spell("SE", "Rapture")
 
 				-- Bottom
 				macro("1", "C01")
 				spell("2", "Penance")
 				if known("Power Word: Radiance") then macro("3", "C03") else spell("3", "Mind Blast") end
 				if known("Prayer of Mending") and known("Shadow Word: Death") then macro("4", "C04") elseif known("Prayer of Mending") then spell("4", "Prayer of Mending") else spell("4", "Shadow Word: Death") end
-				if known("Schism") then macro("5", "C05") else spell("5", "Power Word: Shield") end
-				spell("6", "Mindgames")
+				if known("Mindgames") then macro("5", "C05") else spell("5", "Power Word: Shield") end
+				if known("Divine Star") then spell("6", "Divine Star") else spell("6", "Halo") end
 				if known("Mindbender") then spell("V", "Shadowfiend") else macro("V", "G014", "Shadowfiend") end
 				spell("CE", "Light's Wrath")
 
@@ -3437,7 +3437,7 @@ local function UpdateBars(event)
 				
 				------ Left ------
 				-- Top
-				spell("N", "Holy Nova")
+				spell("N", "Power Word: Life")
 				spell("SN", "Divine Word")
 				spell("R", "Mind Soothe")
 				spell("SR", "Dispel Magic")
@@ -3449,7 +3449,7 @@ local function UpdateBars(event)
 				-- Middle
 				spell("C", "Holy Word: Serenity")
 				spell("SC", "Holy Word: Sanctify")
-				spell("Q", "Power Word: Life")
+				spell("Q", "Holy Nova")
 				if known("Renew") then macro("E", "C07") else spell("E", "Shadow Word: Pain") end
 				if known("Apotheosis") then spell("G", "Apotheosis") else spell("G", "Holy Word: Salvation") end
 				macro("SG", "C08", "Power Infusion")
