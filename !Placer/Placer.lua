@@ -348,7 +348,7 @@ local function spell(slotName, spellName, requiredLevel)
 			todo = nil
 		end
 	elseif spellName == "Blessing of the Seasons" then
-		if actionType == "spell" and (actionDataId == 328622 or actionDataId == 328281 or actionDataId == 328282 or actionDataId == 328620) then
+		if actionType == "spell" and (actionDataId == 328622 or actionDataId == 328281 or actionDataId == 328282 or actionDataId == 328620 or actionDataId == 388007 or actionDataId == 388010 or actionDataId == 388011 or actionDataId == 388013) then
 			todo = nil
 		end
 	elseif spellName == "New Moon" then
@@ -3197,7 +3197,7 @@ local function UpdateBars(event)
 				spell("C", "Wake of Ashes")
 				spell("SC", "Exorcism")
 				if known("Divine Storm") then macro("Q", "C06") else spell("Q", "Word of Glory") end
-				spell("E", "Consecration")
+				if known(404834) then empty("E") else spell("E", "Consecration") end
 				spell("G", "Avenging Wrath")
 				spell("SG", "Final Reckoning")
 				macro("SE", "C08", "Rebuke")
@@ -3344,7 +3344,7 @@ local function UpdateBars(event)
 				
 				------ Left ------
 				-- Top
-				spell("N", "Power Word: Life")
+				spell("N", "Holy Nova")
 				empty("SN")
 				spell("R", "Mind Soothe")
 				spell("SR", "Dispel Magic")
@@ -3356,7 +3356,7 @@ local function UpdateBars(event)
 				-- Middle
 				spell("C", "Power Word: Solace")
 				spell("SC", "Shadow Covenant")
-				spell("Q", "Holy Nova")
+				spell("Q", "Power Word: Life")
 				if known("Renew") then macro("E", "C07") else spell("E", "Shadow Word: Pain") end
 				spell("G", "Schism")
 				macro("SG", "C08", "Power Infusion")
@@ -3368,7 +3368,7 @@ local function UpdateBars(event)
 				if known("Power Word: Radiance") then macro("3", "C03") else spell("3", "Mind Blast") end
 				if known("Prayer of Mending") and known("Shadow Word: Death") then macro("4", "C04") elseif known("Prayer of Mending") then spell("4", "Prayer of Mending") else spell("4", "Shadow Word: Death") end
 				if known("Mindgames") then macro("5", "C05") else spell("5", "Power Word: Shield") end
-				if known("Divine Star") then spell("6", "Divine Star") else spell("6", "Halo") end
+				if known(110744) then spell("6", "Divine Star") elseif known(120517) then spell("6", "Halo") else empty("6") end
 				if known("Mindbender") then spell("V", "Shadowfiend") else macro("V", "G014", "Shadowfiend") end
 				spell("CE", "Light's Wrath")
 
@@ -3437,7 +3437,7 @@ local function UpdateBars(event)
 				
 				------ Left ------
 				-- Top
-				spell("N", "Power Word: Life")
+				spell("N", "Holy Nova")
 				spell("SN", "Divine Word")
 				spell("R", "Mind Soothe")
 				spell("SR", "Dispel Magic")
@@ -3449,7 +3449,7 @@ local function UpdateBars(event)
 				-- Middle
 				spell("C", "Holy Word: Serenity")
 				spell("SC", "Holy Word: Sanctify")
-				spell("Q", "Holy Nova")
+				spell("Q", "Power Word: Life")
 				if known("Renew") then macro("E", "C07") else spell("E", "Shadow Word: Pain") end
 				if known("Apotheosis") then spell("G", "Apotheosis") else spell("G", "Holy Word: Salvation") end
 				macro("SG", "C08", "Power Infusion")
@@ -3461,7 +3461,7 @@ local function UpdateBars(event)
 				if known("Prayer of Healing") and known("Empyreal Blaze") then macro("3", "C03") elseif known("Prayer of Healing") then spell("3", "Prayer of Healing") else spell("3", "Empyreal Blaze") end
 				if known("Shadow Word: Death") and known("Prayer of Mending") then macro("4", "C04") elseif known("Shadow Word: Death") then spell("4", "Shadow Word: Death") else spell("4", "Prayer of Mending") end
 				if known("Circle of Healing") and known("Mindgames") then macro("5", "C05") elseif known("Mindgames") then spell("5", "Mindgames") else spell("5", "Circle of Healing") end
-				if known("Divine Star") then spell("6", "Divine Star") else spell("6", "Halo") end
+				if known(110744) then spell("6", "Divine Star") elseif known(120517) then spell("6", "Halo") else empty("6") end
 				macro("V", "G014", "Shadowfiend")
 				spell("CE", "Holy Word: Chastise")
 
@@ -3536,8 +3536,8 @@ local function UpdateBars(event)
 				
 				------ Left ------
 				-- Top
-				if known("Divine Star") then spell("N", "Divine Star") else spell("N", "Halo") end
-				if known("Damnation") then spell("SN", "Damnation") else spell("SN", "Void Torrent") end
+				spell("N", "Holy Nova")
+				empty("SN")
 				spell("R", "Mind Soothe")
 				spell("SR", "Dispel Magic")
 				spell("CR", "Purify Disease")
@@ -3546,18 +3546,18 @@ local function UpdateBars(event)
 				racial("AE")
 
 				-- Middle
-				if known("Mind Spike") then spell("C", "Smite") else empty("C") end
-				spell("SC", "Shadow Crash")
-				spell("Q", "Mind Sear") --spell("Q", "Dark Void")
+				spell("C", "Void Torrent")
+				if known(122121) then spell("SC", "Divine Star") elseif known(120644) then spell("SC", "Halo") else empty("SC") end
+				spell("Q", "Shadow Crash")
 				if known("Renew") then macro("E", "C07") else spell("E", "Shadow Word: Pain") end
-				if known("Dark Ascension") then spell("G", "Dark Ascension") else spell("G", "Void Eruption") end
+				if known(391109) then spell("G", "Dark Ascension") elseif known(228260) then spell("G", "Void Eruption") else empty("G") end
 				macro("SG", "C08", "Power Infusion")
 				macro("SE", "C10", "Silence")
 
 				-- Bottom
 				macro("1", "C01")
-				if known("Mind Spike") then spell("2", "Mind Spike") else spell("2", "Smite") end
-				if known("Holy Nova") then macro("3", "C03") else spell("3", "Mind Blast") end
+				spell("2", "Smite")
+				spell("3", "Mind Blast")
 				if known("Prayer of Mending") then macro("4", "C04") else spell("4", "Shadow Word: Death") end
 				spell("5", "Devouring Plague")
 				spell("6", "Mindgames")
@@ -4919,7 +4919,7 @@ local function UpdateBars(event)
 		spell("D 2", 372610) -- Skyward Ascent
 		spell("D 3", "Whirling Surge")
 		empty("D 4")
-		spell("D 5", "Aerial Halt")
+		spell("D 5", 403092) -- Aerial Halt
 		empty("D 6")
 		spell("D V", "Bronze Timelock")
 		empty("D CE")
@@ -4929,7 +4929,7 @@ local function UpdateBars(event)
 		spell("S 2", 376744) -- Skyward Ascent
 		empty("S 3")
 		empty("S 4")
-		empty("S 5")
+		spell("S 5", 403216) -- Aerial Halt
 		empty("S 6")
 		empty("S V")
 		empty("S CE")
@@ -4997,6 +4997,29 @@ local function UpdateEquipmentSets()
 				C_EquipmentSet.ModifyEquipmentSet(id, name, icons[class.."_"..name])
 			elseif icons[faction.."_"..name] then
 				C_EquipmentSet.ModifyEquipmentSet(id, name, icons[faction.."_"..name])
+			end
+		end
+	end
+
+	if TalentLoadoutsExGUI and TalentLoadoutsExGUI[class] then
+		for s, t in pairs(TalentLoadoutsExGUI[class]) do
+			for i, d in pairs(t) do
+				local name = d.name or ""
+				if strsub(name, 0, 3) == "2H " or strsub(name, 0, 3) == "DW " then
+					name = strsub(name, 4)
+				end
+
+				if name == "Dungeons" then
+					TalentLoadoutsExGUI[class][s][i].icon = 463447
+				elseif name == "Timewalking" then
+					TalentLoadoutsExGUI[class][s][i].icon = 463446
+				elseif name == "Arena" then
+					TalentLoadoutsExGUI[class][s][i].icon = 1322720
+				elseif name == "Battlegrounds" then
+					TalentLoadoutsExGUI[class][s][i].icon = 236352
+				elseif name == "Solo" then
+					TalentLoadoutsExGUI[class][s][i].icon = 1322721
+				end
 			end
 		end
 	end
