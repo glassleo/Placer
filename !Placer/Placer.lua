@@ -3027,7 +3027,7 @@ local function UpdateBars(event)
 				
 				------ Left ------
 				-- Top
-				spell("N", "Divine Toll")
+				empty("N")
 				spell("SN", "Divine Favor")
 				spell("R", "Hand of Reckoning")
 				empty("SR")
@@ -3052,7 +3052,7 @@ local function UpdateBars(event)
 				if known("Light of the Martyr") and known("Hammer of Wrath") then macro("4", "C04") elseif known("Hammer of Wrath") then spell("4", "Hammer of Wrath") else spell("4", "Light of the Martyr") end
 				if known("Light of Dawn") then macro("5", "C05") else spell("5", "Shield of the Righteous") end
 				spell("6", "Seraphim")
-				spell("V", "Holy Avenger")
+				spell("V", "Divine Toll")
 				spell("CE", "Hammer of Justice")
 
 				------ Right ------
@@ -3102,11 +3102,13 @@ local function UpdateBars(event)
 
 				-- Blessing of Freedom @player
 				m("C13", 135878, "#showtooltip Blessing of Freedom\n/use [@player]Blessing of Freedom")
+				
+				m("C14", nil, "#showtooltip Blessing of Freedom\n/use [help][@focus,nodead][]Blessing of Freedom")
 
 				
 				------ Left ------
 				-- Top
-				spell("N", "Divine Toll")
+				empty("N")
 				empty("SN")
 				spell("R", "Hand of Reckoning")
 				empty("SR")
@@ -3131,13 +3133,13 @@ local function UpdateBars(event)
 				spell("4", "Hammer of Wrath")
 				spell("5", "Shield of the Righteous")
 				spell("6", "Seraphim")
-				spell("V", "Holy Avenger")
+				spell("V", "Divine Toll")
 				spell("CE", "Hammer of Justice")
 
 				------ Right ------
 				-- Top
 				empty("AB3")
-				spell("AF", "Blessing of Freedom")
+				macro("AF", "C14", "Blessing of Freedom")
 				empty("CF")
 				macro("SF", "C13", "Blessing of Freedom")
 				spell("F", "Divine Steed")
@@ -3184,8 +3186,8 @@ local function UpdateBars(event)
 				
 				------ Left ------
 				-- Top
-				spell("N", "Divine Toll")
-				spell("SN", "Execution Sentence")
+				spell("N", "Execution Sentence")
+				empty("SN")
 				spell("R", "Hand of Reckoning")
 				empty("SR")
 				spell("CR", "Cleanse Toxins")
@@ -3195,7 +3197,7 @@ local function UpdateBars(event)
 
 				-- Middle
 				spell("C", "Wake of Ashes")
-				spell("SC", "Exorcism")
+				empty("SC")
 				if known("Divine Storm") then macro("Q", "C06") else spell("Q", "Word of Glory") end
 				if known(404834) then empty("E") else spell("E", "Consecration") end
 				spell("G", "Avenging Wrath")
@@ -3209,7 +3211,7 @@ local function UpdateBars(event)
 				spell("4", "Hammer of Wrath")
 				macro("5", "C05")
 				spell("6", "Seraphim")
-				spell("V", "Holy Avenger")
+				spell("V", "Divine Toll")
 				spell("CE", "Hammer of Justice")
 
 				------ Right ------
