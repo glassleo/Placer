@@ -384,7 +384,7 @@ local function spell(slotName, spellName, requiredLevel)
 			todo = nil
 		end
 	elseif spellName == "Execute" then
-		if actionType == "spell" and (actionDataId == 163201 or actionDataId == 280735 or actionDataId == 330325 or actionDataId == 5308) then
+		if actionType == "spell" and (actionDataId == 163201 or actionDataId == 280735 or actionDataId == 330325 or actionDataId == 5308 or actionDataId == 281000) then
 			todo = nil
 		end
 	elseif spellName == "Spiritbloom" then
@@ -400,11 +400,15 @@ local function spell(slotName, spellName, requiredLevel)
 			todo = nil
 		end
 	elseif spellName == "Sigil of Flame" then
-		if actionType == "spell" and (actionDataId == 204596 or actionDataId == 204513) then
+		if actionType == "spell" and (actionDataId == 204596 or actionDataId == 204513 or actionDataId == 389810) then
 			todo = nil
 		end
 	elseif spellName == "Sigil of Misery" then
-		if actionType == "spell" and (actionDataId == 207684 or actionDataId == 202140) then
+		if actionType == "spell" and (actionDataId == 207684 or actionDataId == 202140 or actionDataId == 389813) then
+			todo = nil
+		end
+	elseif spellName == "Celestial Alignment" then
+		if actionType == "spell" and (actionDataId == 194223 or actionDataId == 102560) then
 			todo = nil
 		end
 	elseif level >= requiredLevel then
@@ -1638,7 +1642,7 @@ local function UpdateBars(event)
 				spell("Q", "Efflorescence")
 				macro("E", "C07")
 				if known("Flourish") and known("Heart of the Wild") then macro("G", "C06") elseif known("Heart of the Wild") then spell("G", "Heart of the Wild") else spell("G", "Flourish") end
-				if known("Convoke the Spirits") then spell("SG", "Convoke the Spirits") else spell("SG", "Incarnation: Tree of Life") end
+				if known("Convoke the Spirits") then spell("SG", "Convoke the Spirits") elseif known(33891) then spell("SG", "Incarnation: Tree of Life") else empty("SG") end
 				macro("SE", "C08", "Skull Bash")
 
 				-- Bottom
@@ -2076,6 +2080,9 @@ local function UpdateBars(event)
 				-- Kill Command
 				m("C02", nil, "#showtooltip Kill Command\n/petattack\n/petassist\n/petattack\n/use Kill Command")
 
+				-- Wailing Arrow
+				m("C06", 132170, "#showtooltip\n/use Wailing Arrow")
+
 				-- Counter Shot
 				m("C08", nil, "#showtooltip Counter Shot\n/stopcasting\n/stopcasting\n/use Counter Shot")
 
@@ -2124,7 +2131,7 @@ local function UpdateBars(event)
 				if known("Cobra Shot") and known("Barbed Shot") then spell("3", "Steady Shot") elseif known("Cobra Shot") then empty("3") else spell("3", "Arcane Shot") end
 				spell("4", "Kill Shot")
 				spell("5", "Dire Beast")
-				spell("6", "Wailing Arrow")
+				macro("6", "C06", "Wailing Arrow")
 				spell("V", "Call of the Wild")
 				if known("Scatter Shot") then spell("CE", "Scatter Shot") else spell("CE", "Binding Shot") end
 
@@ -2159,6 +2166,9 @@ local function UpdateBars(event)
 				--! Marksmanship Hunter
 				
 				------ Macros ------
+
+				-- Wailing Arrow
+				m("C06", 132170, "#showtooltip\n/use Wailing Arrow")
 
 				-- Counter Shot
 				m("C08", nil, "#showtooltip Counter Shot\n/stopcasting\n/stopcasting\n/use Counter Shot")
@@ -2208,7 +2218,7 @@ local function UpdateBars(event)
 				spell("3", "Arcane Shot")
 				spell("4", "Kill Shot")
 				spell("5", "Rapid Fire")
-				spell("6", "Wailing Arrow")
+				macro("6", "C06", "Wailing Arrow")
 				spell("V", "Salvo")
 				if known("Scatter Shot") then spell("CE", "Scatter Shot") else spell("CE", "Binding Shot") end
 
@@ -3087,9 +3097,6 @@ local function UpdateBars(event)
 
 				------ Macros ------
 
-				-- Crusader Strike / Flash of Light
-				m("C01", nil, "#showtooltip\n/use [help]Flash of Light;Crusader Strike")
-
 				-- Rebuke
 				m("C08", nil, "#showtooltip Rebuke\n/stopcasting\n/stopcasting\n/use Rebuke")
 
@@ -3127,7 +3134,7 @@ local function UpdateBars(event)
 				macro("SE", "C08", "Rebuke")
 
 				-- Bottom
-				macro("1", "C01")
+				spell("1", "Crusader Strike")
 				spell("2", "Avenger's Shield")
 				spell("3", "Judgment")
 				spell("4", "Hammer of Wrath")
@@ -3168,9 +3175,6 @@ local function UpdateBars(event)
 
 				------ Macros ------
 
-				-- Crusader Strike / Flash of Light
-				m("C01", nil, "#showtooltip\n/use [help]Flash of Light;Crusader Strike")
-
 				-- Templar's Verdict / Shield of the Righteous
 				m("C05", nil, "#showtooltip\n/use [worn:shield]Shield of the Righteous;Templar's Verdict")
 
@@ -3186,7 +3190,7 @@ local function UpdateBars(event)
 				
 				------ Left ------
 				-- Top
-				spell("N", "Execution Sentence")
+				if known(404834) then empty("N") else spell("N", "Execution Sentence") end
 				empty("SN")
 				spell("R", "Hand of Reckoning")
 				empty("SR")
@@ -3199,13 +3203,13 @@ local function UpdateBars(event)
 				spell("C", "Wake of Ashes")
 				empty("SC")
 				if known("Divine Storm") then macro("Q", "C06") else spell("Q", "Word of Glory") end
-				if known(404834) then empty("E") else spell("E", "Consecration") end
+				if known(404834) then spell("E", "Execution Sentence") else spell("E", "Consecration") end
 				spell("G", "Avenging Wrath")
 				spell("SG", "Final Reckoning")
 				macro("SE", "C08", "Rebuke")
 
 				-- Bottom
-				macro("1", "C01")
+				spell("1", "Crusader Strike")
 				spell("2", "Blade of Justice")
 				spell("3", "Judgment")
 				spell("4", "Hammer of Wrath")
@@ -4954,6 +4958,7 @@ local function UpdateEquipmentSets()
 		["DRUID_Feral"] = 132115,
 		["DRUID_Guardian"] = 132276,
 		["DRUID_Restoration"] = 136041,
+		["EVOKER_Augmentation"] = 5198700,
 		["EVOKER_Devastation"] = 4511811,
 		["EVOKER_Preservation"] = 4511812,
 		["HUNTER_Beast Mastery"] = 461112,
