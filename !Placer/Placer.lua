@@ -4318,7 +4318,7 @@ local function UpdateBars(event)
 				------ Macros ------
 
 				-- Shadow Bolt
-				m("C02", nil, "#showtooltip Shadow Bolt\n/petattack\n/petassist\n/petattack\n/use Shadow Bolt")
+				m("C01", nil, "#showtooltip Shadow Bolt\n/petattack\n/petassist\n/petattack\n/use Shadow Bolt")
 
 				-- Pet Primary
 				m("C07", nil, "#showtooltip\n/use [pet:Felhunter/Observer]Spell Lock;[pet:Succubus/Incubus/Shivarra]Seduction;[pet:Voidwalker/Voidlord,nobtn:2]Suffering;[nobtn:2]Command Demon\n/petautocasttoggle [btn:2]Suffering")
@@ -4339,20 +4339,20 @@ local function UpdateBars(event)
 				racial("AE")
 
 				-- Middle
-				spell("C", "Siphon Life")
+				macro("C", "C01") -- Shadow Bolt
 				spell("SC", "Soul Swap")
 				if known("Phantom Singularity") then spell("Q", "Phantom Singularity") else spell("Q", "Vile Taint") end
-				spell("E", "Agony")
+				spell("E", "Seed of Corruption")
 				spell("G", "Summon Darkglare")
 				spell("SG", "Summon Soulkeeper")
 				macro("SE", "C07")
 
 				-- Bottom
 				spell("1", "Corruption")
-				macro("2", "C02")
-				spell("3", "Seed of Corruption")
-				spell("4", "Malefic Rapture")
-				spell("5", "Unstable Affliction")
+				spell("2", "Agony")
+				spell("3", "Siphon Life")
+				spell("4", "Unstable Affliction")
+				spell("5", "Malefic Rapture")
 				spell("6", "Haunt")
 				macro("V", "C08")
 				spell("CE", "Shadowfury")
