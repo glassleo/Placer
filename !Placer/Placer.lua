@@ -197,6 +197,8 @@ local spellNameToId = {
 	["Eternity Surge"] = 359073,
 	["Fire Breath"] = 357208,
 	["Spiritbloom"] = 367226,
+	["Oppressing Roar"] = 372048,
+	["Upheaval"] = 396286,
 	-- Hunter
 	["Cobra Shot"] = 193455,
 	["Death Chakram"] = 375891,
@@ -409,6 +411,14 @@ local function spell(slotName, spellName, requiredLevel)
 		end
 	elseif spellName == "Celestial Alignment" then
 		if actionType == "spell" and (actionDataId == 194223 or actionDataId == 102560) then
+			todo = nil
+		end
+	elseif spellName == "Oppressing Roar" then
+		if actionType == "spell" and (actionDataId == 372048 or actionDataId == 406971) then
+			todo = nil
+		end
+	elseif spellName == "Upheaval" then
+		if actionType == "spell" and (actionDataId == 396286 or actionDataId == 408092) then
 			todo = nil
 		end
 	elseif level >= requiredLevel then
@@ -1857,9 +1867,6 @@ local function UpdateBars(event)
 				-- Quell
 				m("C08", nil, "#showtooltip Quell\n/stopcasting\n/stopcasting\n/use Quell")
 
-				-- Verdant Embrace
-				m("C10", nil, "#showtooltip Verdant Embrace\n/use [help]Verdant Embrace")
-
 				-- Living Flame Healing
 				m("C13", nil, "#showtooltip\n/use [help][@player]Living Flame")
 				
@@ -1898,7 +1905,7 @@ local function UpdateBars(event)
 				-- Top
 				empty("AB3")
 				spell("AF", "Rescue")
-				macro("CF", "C10", "Verdant Embrace")
+				spell("CF", "Verdant Embrace")
 				spell("SF", "Time Spiral")
 				spell("F", "Hover")
 
@@ -1933,9 +1940,6 @@ local function UpdateBars(event)
 
 				-- Quell
 				m("C08", nil, "#showtooltip Quell\n/stopcasting\n/stopcasting\n/use Quell")
-
-				-- Verdant Embrace
-				m("C10", nil, "#showtooltip Verdant Embrace\n/use [help]Verdant Embrace")
 
 				-- Living Flame Healing
 				m("C13", nil, "#showtooltip\n/use [help][@player]Living Flame")
@@ -1978,7 +1982,7 @@ local function UpdateBars(event)
 				-- Top
 				empty("AB3")
 				spell("AF", "Rescue")
-				macro("CF", "C10", "Verdant Embrace")
+				spell("CF", "Verdant Embrace")
 				spell("SF", "Time Spiral")
 				spell("F", "Hover")
 
@@ -2000,6 +2004,80 @@ local function UpdateBars(event)
 				empty("F5")
 				empty("F6")
 				empty("CQ")
+
+			elseif spec == 3 then
+				--! Augmentation Evoker
+				
+				------ Macros ------
+
+				-- Prescience
+				m("C09", nil, "#showtooltip\n/use [@focus,help,nodead][help,nodead][@player]Prescience")
+
+				-- Blistering Scales
+				m("C10", nil, "#showtooltip\n/use Blistering Scales")
+
+				-- Quell
+				m("C08", nil, "#showtooltip Quell\n/stopcasting\n/stopcasting\n/use Quell")
+
+				-- Living Flame Healing
+				m("C13", nil, "#showtooltip\n/use [help][@player]Living Flame")
+				
+				
+				------ Left ------
+				-- Top
+				empty("N")
+				spell("SN", "Tip the Scales")
+				spell("R", "Emerald Blossom")
+				spell("SR", "Unravel")
+				spell("CR", "Expunge")
+				empty("H")
+				spell("SH", "Cauterizing Flame")
+				empty("AE")
+
+				-- Middle
+				macro("C", "C10", "Blistering Scales")
+				empty("SC")
+				macro("Q", "C09", "Prescience")
+				spell("E", "Fire Breath")
+				spell("G", "Time Skip")
+				empty("SG")
+				macro("SE", "C08", "Quell")
+
+				-- Bottom
+				spell("1", "Living Flame")
+				spell("2", "Azure Strike")
+				spell("3", "Disintegrate")
+				spell("4", "Ebon Might")
+				spell("5", "Upheaval")
+				empty("6")
+				spell("V", "Deep Breath")
+				racial("CE")
+
+				------ Right ------
+				-- Top
+				empty("AB3")
+				spell("AF", "Rescue")
+				spell("CF", "Verdant Embrace")
+				spell("SF", "Time Spiral")
+				spell("F", "Hover")
+
+				-- Middle
+				spell("T", "Sleep Walk")
+				spell("ST", "Landslide")
+				spell("CT", "Oppressing Roar")
+				empty("AT")
+				spell("CB3", "Wing Buffet")
+				macro("SQ", "C13", "Living Flame")
+				spell("SV", "Visage")
+				spell("CV", "Soar")
+
+				-- Bottom
+				spell("F1", "Obsidian Scales")
+				spell("F2", "Renewing Blaze")
+				spell("F3", "Zephyr")
+				empty("F4")
+				empty("F5")
+				spell("CQ", "Spatial Paradox")
 
 			else
 				--! Unspecialized Evoker
@@ -2429,32 +2507,32 @@ local function UpdateBars(event)
 				
 				------ Left ------
 				-- Top
-				spell("N", "Radiant Spark")
-				spell("SN", "Presence of Mind")
-				spell("R", "Meteor")
+				if level < 23 then empty("N") else macro("N", "C10", "Summon Water Elemental") end
+				empty("SN")
+				empty("R")
 				spell("SR", "Spellsteal")
 				spell("CR", "Remove Curse")
-				if not known("Arcane Orb") then empty("H") else spell("H", "Fire Blast") end
-				spell("SH", "Supernova")
+				spell("H", "Fire Blast")
+				empty("SH")
 				racial("AE")
 
 				-- Middle
-				spell("C", "Evocation")
+				empty("C")
 				spell("SC", "Ice Nova")
 				spell("Q", "Arcane Explosion")
-				spell("E", "Nether Tempest")
+				empty("E")
 				spell("G", "Arcane Surge")
-				macro("SG", "C14", "Conjure Mana Gem")
+				empty("SG")
 				macro("SE", "C08", "Counterspell")
 
 				-- Bottom
-				spell("1", "Arcane Blast")
-				spell("2", "Arcane Missiles")
-				spell("3", "Arcane Barrage")
-				if known("Arcane Orb") then spell("4", "Arcane Orb") else spell("4", "Fire Blast") end
-				macro("5", "C10", "Touch of the Magi")
+				empty("1")
+				empty("2")
+				empty("3")
+				empty("4")
+				empty("5")
 				spell("6", "Shifting Power")
-				spell("V", "Rune of Power")
+				empty("V")
 				spell("CE", "Frost Nova")
 
 				------ Right ------
@@ -2472,8 +2550,8 @@ local function UpdateBars(event)
 				spell("AT", "Mass Polymorph")
 				spell("CB3", "Blast Wave")
 				spell("SQ", "Cone of Cold")
-				spell("SV", "Invisibility")
-				spell("CV", "Greater Invisibility")
+				if known("Mass Barrier") then spell("SV", "Mass Barrier") else spell("SV", "Mass Invisibility") end
+				spell("CV", "Invisibility")
 
 				-- Bottom
 				spell("F1", "Prismatic Barrier")
@@ -2498,32 +2576,32 @@ local function UpdateBars(event)
 				
 				------ Left ------
 				-- Top
-				spell("N", "Meteor")
+				if level < 23 then empty("N") else macro("N", "C10", "Summon Water Elemental") end
 				empty("SN")
 				empty("R")
 				spell("SR", "Spellsteal")
 				spell("CR", "Remove Curse")
-				empty("H")
+				spell("H", "Fire Blast")
 				empty("SH")
 				racial("AE")
 
 				-- Middle
-				spell("C", "Scorch")
+				empty("C")
 				spell("SC", "Ice Nova")
 				spell("Q", "Arcane Explosion")
-				spell("E", "Living Bomb")
+				empty("E")
 				spell("G", "Combustion")
-				empty("SH")
+				empty("SG")
 				macro("SE", "C08", "Counterspell")
 
 				-- Bottom
-				spell("1", "Fireball")
-				spell("2", "Fire Blast")
-				spell("3", "Pyroblast")
-				spell("4", "Flamestrike")
-				spell("5", "Phoenix Flames")
+				empty("1")
+				empty("2")
+				empty("3")
+				empty("4")
+				empty("5")
 				spell("6", "Shifting Power")
-				spell("V", "Rune of Power")
+				empty("V")
 				spell("CE", "Frost Nova")
 
 				------ Right ------
@@ -2541,8 +2619,8 @@ local function UpdateBars(event)
 				spell("AT", "Mass Polymorph")
 				spell("CB3", "Blast Wave")
 				spell("SQ", "Cone of Cold")
-				spell("SV", "Invisibility")
-				spell("CV", "Greater Invisibility")
+				if known("Mass Barrier") then spell("SV", "Mass Barrier") else spell("SV", "Mass Invisibility") end
+				spell("CV", "Invisibility")
 
 				-- Bottom
 				spell("F1", "Blazing Barrier")
@@ -2576,9 +2654,9 @@ local function UpdateBars(event)
 				
 				------ Left ------
 				-- Top
-				if level < 23 then empty("N") else macro("N", "C10", "Summon Water Elemental") end
-				spell("SN", "Ray of Frost")
-				spell("R", "Meteor")
+				empty("N")
+				empty("SN")
+				macro("R", "C10", "Icy Veins") -- Freeze
 				spell("SR", "Spellsteal")
 				spell("CR", "Remove Curse")
 				spell("H", "Fire Blast")
@@ -2586,22 +2664,22 @@ local function UpdateBars(event)
 				racial("AE")
 
 				-- Middle
-				spell("C", "Comet Storm")
+				spell("C", "Ray of Frost")
 				spell("SC", "Ice Nova")
 				spell("Q", "Arcane Explosion")
-				spell("E", "Frozen Orb")
+				spell("E", "Comet Storm")
 				spell("G", "Icy Veins")
-				spell("SG", "Glacial Spike")
+				spell("SG", "Shifting Power")
 				macro("SE", "C08", "Counterspell")
 
 				-- Bottom
-				if known("Summon Water Elemental") then macro("1", "C01") else spell("1", "Frostbolt") end
+				macro("1", "C01") -- Frostbolt
 				spell("2", "Flurry")
 				if known("Ice Lance") then spell("3", "Ice Lance") else spell("3", "Fire Blast") end
 				if known("Blizzard") then spell("4", "Blizzard") else spell("4", "Arcane Explosion") end
-				spell("5", "Ebonbolt")
-				spell("6", "Shifting Power")
-				spell("V", "Rune of Power")
+				spell("5", "Glacial Spike")
+				empty("6")
+				spell("V", "Frozen Orb")
 				spell("CE", "Frost Nova")
 
 				------ Right ------
@@ -2619,8 +2697,8 @@ local function UpdateBars(event)
 				spell("AT", "Mass Polymorph")
 				spell("CB3", "Blast Wave")
 				spell("SQ", "Cone of Cold")
-				spell("SV", "Invisibility")
-				spell("CV", "Greater Invisibility")
+				if known("Mass Barrier") then spell("SV", "Mass Barrier") else spell("SV", "Mass Invisibility") end
+				spell("CV", "Invisibility")
 
 				-- Bottom
 				macro("F1", "C12", "Ice Barrier")
@@ -4947,11 +5025,16 @@ local function UpdateEquipmentSets()
 	local icons = {
 		["Timewalking"] = 463446,
 		["Speed"] = 965900,
-		["Alliance_PvP"] = 463448,
-		["Horde_PvP"] = 463449,
+		["PvP"] = 1322720,
+		["Arena"] = 1322720,
+		["Battlegrounds"] = 236352,
+		["Solo"] = 1322721,
+		["Raid"] = 135901,
+		["Dungeons"] = 135884,
 		["DEATHKNIGHT_Blood"] = 135770,
 		["DEATHKNIGHT_Frost"] = 135773,
 		["DEATHKNIGHT_Unholy"] = 135775,
+		["DEATHKNIGHT_Obliteration"] = 326443,
 		["DEMONHUNTER_Havoc"] = 1247264,
 		["DEMONHUNTER_Vengeance"] = 1247265,
 		["DRUID_Balance"] = 136096,
@@ -4961,6 +5044,7 @@ local function UpdateEquipmentSets()
 		["EVOKER_Augmentation"] = 5198700,
 		["EVOKER_Devastation"] = 4511811,
 		["EVOKER_Preservation"] = 4511812,
+		["EVOKER_Overawe"] = 4622467,
 		["HUNTER_Beast Mastery"] = 461112,
 		["HUNTER_Marksmanship"] = 236179,
 		["HUNTER_Survival"] = 461113,
@@ -4973,9 +5057,12 @@ local function UpdateEquipmentSets()
 		["PALADIN_Holy"] = 135920,
 		["PALADIN_Protection"] = 236264,
 		["PALADIN_Retribution"] = 135873,
+		["PALADIN_Spellwarding"] = 135880,
 		["PRIEST_Discipline"] = 135940,
 		["PRIEST_Holy"] = 237542,
 		["PRIEST_Shadow"] = 136207,
+		["PRIEST_Void Eruption"] = 1386548,
+		["PRIEST_Dark Ascension"] = 1445237,
 		["ROGUE_Assassination"] = 236270,
 		["ROGUE_Outlaw"] = 236286,
 		["ROGUE_Subtlety"] = 132320,
@@ -5002,8 +5089,6 @@ local function UpdateEquipmentSets()
 				C_EquipmentSet.ModifyEquipmentSet(id, name, icons[name])
 			elseif icons[class.."_"..name] then
 				C_EquipmentSet.ModifyEquipmentSet(id, name, icons[class.."_"..name])
-			elseif icons[faction.."_"..name] then
-				C_EquipmentSet.ModifyEquipmentSet(id, name, icons[faction.."_"..name])
 			end
 		end
 	end
@@ -5016,16 +5101,10 @@ local function UpdateEquipmentSets()
 					name = strsub(name, 4)
 				end
 
-				if name == "Dungeons" then
-					TalentLoadoutsExGUI[class][s][i].icon = 463447
-				elseif name == "Timewalking" then
-					TalentLoadoutsExGUI[class][s][i].icon = 463446
-				elseif name == "Arena" then
-					TalentLoadoutsExGUI[class][s][i].icon = 1322720
-				elseif name == "Battlegrounds" then
-					TalentLoadoutsExGUI[class][s][i].icon = 236352
-				elseif name == "Solo" then
-					TalentLoadoutsExGUI[class][s][i].icon = 1322721
+				if icons[name] then
+					TalentLoadoutsExGUI[class][s][i].icon = icons[name]
+				elseif icons[class.."_"..name] then
+					TalentLoadoutsExGUI[class][s][i].icon = icons[class.."_"..name]
 				end
 			end
 		end
