@@ -206,6 +206,7 @@ local spellNameToId = {
 	["Wailing Arrow"] = 392060,
 	["Wildfire Bomb"] = 259495,
 	-- Mage
+	["Displacement"] = 389713,
 	["Polymorph"] = 118,
 	["Radiant Spark"] = 376103,
 	["Shifting Power"] = 382440,
@@ -269,6 +270,11 @@ local function known(spell)
 		elseif spell == "Death and Decay" then
 			if IsPlayerSpell(315442) or IsSpellKnown(315442) then return true end -- Death's Due
 			if IsPlayerSpell(152280) or IsSpellKnown(152280) then return true end -- Defile
+		elseif spell == "Smite" then
+			if IsPlayerSpell(73510) or IsSpellKnown(73510) then return true end -- Mind Spike
+			if IsPlayerSpell(407466) or IsSpellKnown(407466) then return true end -- Mind Spike: Insanity
+			if IsPlayerSpell(15407) or IsSpellKnown(15407) then return true end -- Mind Flay
+			if IsPlayerSpell(391403) or IsSpellKnown(391403) then return true end -- Mind Flay: Insanity
 		else
 			spellId = select(7, GetSpellInfo(spell))
 		end
@@ -419,6 +425,10 @@ local function spell(slotName, spellName, requiredLevel)
 		end
 	elseif spellName == "Upheaval" then
 		if actionType == "spell" and (actionDataId == 396286 or actionDataId == 408092) then
+			todo = nil
+		end
+	elseif spellName == "Smite" then
+		if actionType == "spell" and (actionDataId == 585 or actionDataId == 407466 or actionDataId == 73510) then
 			todo = nil
 		end
 	elseif level >= requiredLevel then
@@ -2010,11 +2020,8 @@ local function UpdateBars(event)
 				
 				------ Macros ------
 
-				-- Prescience
-				m("C09", nil, "#showtooltip\n/use [@focus,help,nodead][help,nodead][@player]Prescience")
-
-				-- Blistering Scales
-				m("C10", nil, "#showtooltip\n/use Blistering Scales")
+				-- Eruption
+				m("C03", nil, "#showtooltip Disintegrate\n/use [nostance:1]Black Attunement\n/use Disintegrate")
 
 				-- Quell
 				m("C08", nil, "#showtooltip Quell\n/stopcasting\n/stopcasting\n/use Quell")
@@ -2035,18 +2042,18 @@ local function UpdateBars(event)
 				empty("AE")
 
 				-- Middle
-				macro("C", "C10", "Blistering Scales")
+				spell("C", "Blistering Scales")
 				empty("SC")
-				macro("Q", "C09", "Prescience")
+				spell("Q", "Prescience")
 				spell("E", "Fire Breath")
-				spell("G", "Time Skip")
+				if known(412713) then empty("G") else spell("G", "Time Skip") end
 				empty("SG")
 				macro("SE", "C08", "Quell")
 
 				-- Bottom
 				spell("1", "Living Flame")
 				spell("2", "Azure Strike")
-				spell("3", "Disintegrate")
+				if known(403208) then macro("3", "C03") else spell("3", "Disintegrate") end
 				spell("4", "Ebon Might")
 				spell("5", "Upheaval")
 				empty("6")
@@ -2507,32 +2514,32 @@ local function UpdateBars(event)
 				
 				------ Left ------
 				-- Top
-				if level < 23 then empty("N") else macro("N", "C10", "Summon Water Elemental") end
-				empty("SN")
-				empty("R")
+				spell("N", "Supernova")
+				spell("SN", "Presence of Mind")
+				spell("R", "Fire Blast")
 				spell("SR", "Spellsteal")
 				spell("CR", "Remove Curse")
-				spell("H", "Fire Blast")
+				empty("H")
 				empty("SH")
 				racial("AE")
 
 				-- Middle
-				empty("C")
+				spell("C", "Radiant Spark")
 				spell("SC", "Ice Nova")
 				spell("Q", "Arcane Explosion")
-				empty("E")
+				spell("E", "Nether Tempest")
 				spell("G", "Arcane Surge")
-				empty("SG")
+				spell("SG", "Shifting Power")
 				macro("SE", "C08", "Counterspell")
 
 				-- Bottom
-				empty("1")
-				empty("2")
-				empty("3")
-				empty("4")
-				empty("5")
-				spell("6", "Shifting Power")
-				empty("V")
+				spell("1", "Arcane Blast")
+				spell("2", "Arcane Missiles")
+				spell("3", "Arcane Barrage")
+				spell("4", "Touch of the Magi")
+				spell("5", "Arcane Orb")
+				macro("6", "C14", "Conjure Mana Gem")
+				spell("V", "Evocation")
 				spell("CE", "Frost Nova")
 
 				------ Right ------
@@ -2581,27 +2588,27 @@ local function UpdateBars(event)
 				empty("R")
 				spell("SR", "Spellsteal")
 				spell("CR", "Remove Curse")
-				spell("H", "Fire Blast")
+				empty("H")
 				empty("SH")
 				racial("AE")
 
 				-- Middle
-				empty("C")
+				spell("C", "Scorch")
 				spell("SC", "Ice Nova")
 				spell("Q", "Arcane Explosion")
-				empty("E")
+				spell("E", "Fire Blast")
 				spell("G", "Combustion")
-				empty("SG")
+				spell("SG", "Shifting Power")
 				macro("SE", "C08", "Counterspell")
 
 				-- Bottom
-				empty("1")
-				empty("2")
-				empty("3")
-				empty("4")
-				empty("5")
-				spell("6", "Shifting Power")
-				empty("V")
+				spell("1", "Fireball")
+				spell("2", "Phoenix Flames")
+				spell("3", "Pyroblast")
+				spell("4", "Flamestrike")
+				spell("5", "Meteor")
+				empty("6")
+				spell("V", "Living Bomb")
 				spell("CE", "Frost Nova")
 
 				------ Right ------
@@ -3095,7 +3102,7 @@ local function UpdateBars(event)
 				m("C01", nil, "#showtooltip\n/use [harm]Crusader Strike;Flash of Light")
 
 				-- Holy Light / Judgment
-				m("C03", nil, "#showtooltip\n/use [harm]Judgment;Holy Light")
+				m("C02", nil, "#showtooltip\n/use [harm]Judgment;Holy Light")
 
 				-- Light of the Martyr / Hammer of Wrath
 				m("C04", nil, "#showtooltip\n/use [harm]Hammer of Wrath;Light of the Martyr")
@@ -3103,8 +3110,8 @@ local function UpdateBars(event)
 				-- Light of Dawn / Shield of the Righteous
 				m("C05", nil, "#showtooltip\n/use [harm,worn:shield]Shield of the Righteous;Light of Dawn")
 
-				-- Bestow Faith / Consecration
-				m("C07", nil, "#showtooltip\n/use [help]Bestow Faith;Consecration")
+				-- Beacon of Light / Beacon of Faith
+				m("C07", nil, "#showtooltip\n/use [mod:ctrl]Beacon of Faith;Beacon of Light")
 
 				-- Rebuke
 				m("C08", nil, "#showtooltip Rebuke\n/stopcasting\n/stopcasting\n/use Rebuke")
@@ -3115,31 +3122,31 @@ local function UpdateBars(event)
 				
 				------ Left ------
 				-- Top
-				empty("N")
-				spell("SN", "Divine Favor")
+				spell("N", "Light of the Martyr")
+				if known(210294) then spell("SN", "Divine Favor") elseif known(414273) then spell("SN", "Hand of Divinity") else empty("SN") end
 				spell("R", "Hand of Reckoning")
 				empty("SR")
 				spell("CR", "Cleanse")
 				spell("H", "Blessing of Sacrifice")
-				empty("SH")
+				if known(156910) then macro("SH", "C07") else spell("SH", "Beacon of Light") end
 				racial("AE")
 
 				-- Middle
-				if known("Light's Hammer") then spell("C", "Light's Hammer") else spell("C", "Holy Prism") end
-				spell("SC", "Barrier of Faith")
+				spell("C", "Barrier of Faith")
+				if known(114158) then spell("SC", "Light's Hammer") elseif known(114165) then spell("SC", "Holy Prism") else empty("SC") end
 				spell("Q", "Word of Glory")
-				if known("Bestow Faith") then macro("E", "C07") else spell("E", "Consecration") end
+				spell("E", "Consecration")
 				spell("G", "Avenging Wrath")
 				spell("SG", "Blessing of the Seasons")
 				macro("SE", "C08", "Rebuke")
 
 				-- Bottom
 				macro("1", "C01")
-				spell("2", "Holy Shock")
-				if known("Holy Light") then macro("3", "C03") else spell("3", "Judgment") end
+				if known("Holy Light") then macro("2", "C02") else spell("2", "Judgment") end
+				spell("3", "Holy Shock")
 				if known("Light of the Martyr") and known("Hammer of Wrath") then macro("4", "C04") elseif known("Hammer of Wrath") then spell("4", "Hammer of Wrath") else spell("4", "Light of the Martyr") end
 				if known("Light of Dawn") then macro("5", "C05") else spell("5", "Shield of the Righteous") end
-				spell("6", "Seraphim")
+				spell("6", "Tyr's Deliverance")
 				spell("V", "Divine Toll")
 				spell("CE", "Hammer of Justice")
 
@@ -3165,9 +3172,9 @@ local function UpdateBars(event)
 				spell("F1", "Divine Protection")
 				spell("F2", "Divine Shield")
 				spell("F3", "Aura Mastery")
-				spell("F4", "Tyr's Deliverance")
-				spell("F5", "Beacon of Light")
-				spell("F6", "Beacon of Faith")
+				spell("F4", "Daybreak")
+				empty("F5")
+				empty("F6")
 				spell("CQ", "Lay on Hands")
 
 			elseif spec == 2 then
@@ -3414,7 +3421,7 @@ local function UpdateBars(event)
 				m("C07", nil, "#showtooltip\n/use [harm]Shadow Word: Pain;Renew")
 
 				-- Power Infusion
-				m("C08", nil, "#showtooltip\n/use [@focus,help,nodead][help,nodead][@player]Power Infusion")
+				m("C08", nil, "#showtooltip\n/use [@focus,help,nodead][help,nodead][@player]Power Infusion\n/use item:193773")
 
 				-- Mind Control
 				m("C09", 1718004, "#showtooltip\n/use Mind Control")
@@ -3507,7 +3514,7 @@ local function UpdateBars(event)
 				m("C07", nil, "#showtooltip\n/use [harm]Shadow Word: Pain;Renew")
 
 				-- Power Infusion
-				m("C08", nil, "#showtooltip\n/use [@focus,help,nodead][help,nodead][@player]Power Infusion")
+				m("C08", nil, "#showtooltip\n/use [@focus,help,nodead][help,nodead][@player]Power Infusion\n/use item:193773")
 
 				-- Mind Control
 				m("C09", 1718004, "#showtooltip\n/use Mind Control")
@@ -3584,20 +3591,14 @@ local function UpdateBars(event)
 				-- Vampiric Touch / Flash Heal
 				m("C01", nil, "#showtooltip\n/use [help]Flash Heal;Vampiric Touch")
 
-				-- Mind Blast / Holy Nova
-				m("C03", nil, "#showtooltip\n/use [mod:shift]Holy Nova;Mind Blast")
-
 				-- Shadow Word: Death / Prayer of Mending
 				m("C04", nil, "#showtooltip\n/use [help]Prayer of Mending;Shadow Word: Death")
-
-				-- Devouring Plague / Mind Sear
-				--m("C05", nil, "#showtooltip\n/use [mod:shift]Mind Sear;Devouring Plague")
 
 				-- Renew/Shadow Word: Pain
 				m("C07", nil, "#showtooltip\n/use [help]Renew;Shadow Word: Pain")
 
 				-- Power Infusion
-				m("C08", nil, "#showtooltip\n/use [@focus,help,nodead][help,nodead][@player]Power Infusion")
+				m("C08", nil, "#showtooltip\n/use [@focus,help,nodead][help,nodead][@player]Power Infusion\n/use item:193773")
 
 				-- Mind Control
 				m("C09", 1718004, "#showtooltip\n/use Mind Control")
@@ -3640,8 +3641,8 @@ local function UpdateBars(event)
 
 				-- Bottom
 				macro("1", "C01")
-				spell("2", "Smite")
-				spell("3", "Mind Blast")
+				spell("2", "Mind Blast")
+				spell("3", "Smite")
 				if known("Prayer of Mending") then macro("4", "C04") else spell("4", "Shadow Word: Death") end
 				spell("5", "Devouring Plague")
 				spell("6", "Mindgames")
@@ -4399,10 +4400,10 @@ local function UpdateBars(event)
 				m("C01", nil, "#showtooltip Shadow Bolt\n/petattack\n/petassist\n/petattack\n/use Shadow Bolt")
 
 				-- Pet Primary
-				m("C07", nil, "#showtooltip\n/use [pet:Felhunter/Observer]Spell Lock;[pet:Succubus/Incubus/Shivarra]Seduction;[pet:Voidwalker/Voidlord,nobtn:2]Suffering;[nobtn:2]Command Demon\n/petautocasttoggle [btn:2]Suffering")
+				m("C07", nil, "#showtooltip\n/use [pet:Felhunter]Spell Lock;[pet:Succubus/Incubus/Shivarra]Seduction;[pet:Voidwalker/Voidlord,nobtn:2]Suffering;[nobtn:2]Command Demon\n/petautocasttoggle [btn:2]Suffering")
 				
 				-- Pet Secondary
-				m("C08", nil, "#showtooltip\n/use [pet:Felhunter/Observer]Devour Magic;[pet:Imp/Fel Imp]Flee;[pet:Succubus/Incubus/Shivarra]Lesser Invisibility;[pet:Voidwalker/Voidlord]Shadow Bulwark;Command Demon")
+				m("C08", nil, "#showtooltip\n/use [pet:Felhunter]Devour Magic;[pet:Imp/Fel Imp]Flee;[pet:Succubus/Incubus/Shivarra]Lesser Invisibility;[pet:Voidwalker/Voidlord]Shadow Bulwark;Command Demon")
 
 				
 				------ Left ------
@@ -4471,10 +4472,10 @@ local function UpdateBars(event)
 				m("C01", nil, "#showtooltip Shadow Bolt\n/petattack\n/petassist\n/petattack\n/use Shadow Bolt")
 
 				-- Pet Primary
-				m("C07", nil, "#showtooltip\n/use [pet:Felguard/Wrathguard]Axe Toss;[pet:Felhunter/Observer]Spell Lock;[pet:Succubus/Incubus/Shivarra]Seduction;[pet:Voidwalker/Voidlord,nobtn:2]Suffering;[nobtn:2]Command Demon\n/petautocasttoggle [btn:2]Suffering")
+				m("C07", nil, "#showtooltip\n/use [pet:Felguard/Wrathguard]Axe Toss;[pet:Felhunter]Spell Lock;[pet:Succubus/Incubus/Shivarra]Seduction;[pet:Voidwalker/Voidlord,nobtn:2]Suffering;[nobtn:2]Command Demon\n/petautocasttoggle [btn:2]Suffering")
 				
 				-- Pet Secondary
-				m("C08", nil, "/use [pet:Felguard/Wrathguard,nobtn:2]Felstorm;[pet:Felhunter/Observer]Devour Magic;[pet:Imp/Fel Imp]Flee;[pet:Succubus/Incubus/Shivarra]Lesser Invisibility;[pet:Voidwalker/Voidlord]Shadow Bulwark;Command Demon\n/petautocasttoggle [btn:2]Felstorm")
+				m("C08", nil, "/use [pet:Felguard/Wrathguard,nobtn:2]Felstorm;[pet:Felhunter]Devour Magic;[pet:Imp/Fel Imp]Flee;[pet:Succubus/Incubus/Shivarra]Lesser Invisibility;[pet:Voidwalker/Voidlord]Shadow Bulwark;Command Demon\n/petautocasttoggle [btn:2]Felstorm")
 
 				
 				------ Left ------
@@ -4543,10 +4544,10 @@ local function UpdateBars(event)
 				m("C02", nil, "#showtooltip Shadow Bolt\n/petattack\n/petassist\n/petattack\n/use Shadow Bolt")
 
 				-- Pet Primary
-				m("C07", nil, "#showtooltip\n/use [pet:Felhunter/Observer]Spell Lock;[pet:Succubus/Incubus/Shivarra]Seduction;[pet:Voidwalker/Voidlord,nobtn:2]Suffering;[nobtn:2]Command Demon\n/petautocasttoggle [btn:2]Suffering")
+				m("C07", nil, "#showtooltip\n/use [pet:Felhunter]Spell Lock;[pet:Succubus/Incubus/Shivarra]Seduction;[pet:Voidwalker/Voidlord,nobtn:2]Suffering;[nobtn:2]Command Demon\n/petautocasttoggle [btn:2]Suffering")
 				
 				-- Pet Secondary
-				m("C08", nil, "#showtooltip\n/use [pet:Felhunter/Observer]Devour Magic;[pet:Imp/Fel Imp]Flee;[pet:Succubus/Incubus/Shivarra]Lesser Invisibility;[pet:Voidwalker/Voidlord]Shadow Bulwark;Command Demon")
+				m("C08", nil, "#showtooltip\n/use [pet:Felhunter]Devour Magic;[pet:Imp/Fel Imp]Flee;[pet:Succubus/Incubus/Shivarra]Lesser Invisibility;[pet:Voidwalker/Voidlord]Shadow Bulwark;Command Demon")
 				
 
 				------ Left ------
@@ -5023,6 +5024,7 @@ end
 
 local function UpdateEquipmentSets()
 	local icons = {
+		--! Icons
 		["Timewalking"] = 463446,
 		["Speed"] = 965900,
 		["PvP"] = 1322720,
@@ -5031,6 +5033,11 @@ local function UpdateEquipmentSets()
 		["Solo"] = 1322721,
 		["Raid"] = 135901,
 		["Dungeons"] = 135884,
+
+		-- Bosses
+		["Sarkareth"] = 5161750,
+
+		-- Classes
 		["DEATHKNIGHT_Blood"] = 135770,
 		["DEATHKNIGHT_Frost"] = 135773,
 		["DEATHKNIGHT_Unholy"] = 135775,
@@ -5069,11 +5076,13 @@ local function UpdateEquipmentSets()
 		["SHAMAN_Elemental"] = 136048,
 		["SHAMAN_Enhancement"] = 237581,
 		["SHAMAN_Restoration"] = 136052,
+		["SHAMAN_Poison Cleansing"] = 136070,
 		["WARLOCK_Affliction"] = 136145,
 		["WARLOCK_Demonology"] = 136172,
 		["WARLOCK_Destruction"] = 136186,
 		["WARRIOR_Arms"] = 132355,
 		["WARRIOR_Fury"] = 132347,
+		["WARRIOR_Single-Minded"] = 458974,
 		["WARRIOR_Protection"] = 132341,
 	}
 
@@ -5097,7 +5106,7 @@ local function UpdateEquipmentSets()
 		for s, t in pairs(TalentLoadoutsExGUI[class]) do
 			for i, d in pairs(t) do
 				local name = d.name or ""
-				if strsub(name, 0, 3) == "2H " or strsub(name, 0, 3) == "DW " then
+				if strsub(name, 0, 3) == "1H " or strsub(name, 0, 3) == "2H " or strsub(name, 0, 3) == "DW " or strsub(name, 0, 3) == "SM " then
 					name = strsub(name, 4)
 				end
 
