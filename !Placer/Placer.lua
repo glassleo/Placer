@@ -1,4 +1,4 @@
-local Placer = CreateFrame("FRAME", "Placer")
+Placer = CreateFrame("FRAME", "Placer")
 
 Placer:RegisterEvent("PLAYER_LOGIN")
 Placer:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
@@ -308,6 +308,7 @@ local function spell(slotName, spellName, requiredLevel)
 			["Black Cat"] = 61305,
 			["Bumblebee"] = 277792,
 			["Direhorn"] = 277787,
+			["Duck"] = 391622,
 			["Monkey"] = 161354,
 			["Penguin"] = 161355,
 			["Pig"] = 28272,
@@ -587,7 +588,11 @@ local function racial(slotName)
 	end
 end
 
-local function UpdateBars(event)
+Placer.FocusTargets = {}
+Placer.FocusTargetNames = {}
+Placer.FocusTargetColors = {}
+
+function Placer.UpdateBars(event)
 	--print(event) -- Debug
 
 	if InCombatLockdown() then
@@ -1276,8 +1281,8 @@ local function UpdateBars(event)
 				spell("B 1", "Mangle")
 				spell("B 2", "Thrash")
 				spell("B 3", "Swipe")
-				spell("B 4", "Ironfur")
-				empty("B 5")
+				empty("B 4")
+				spell("B 5", "Ironfur")
 				empty("B 6")
 				empty("B V")
 				if known("Incapacitating Roar") then spell("B CE", "Incapacitating Roar") else spell("B CE", "Mighty Bash") end
@@ -1291,9 +1296,9 @@ local function UpdateBars(event)
 				macro("F", "C13")
 
 				-- Middle
-				spell("T", "Cyclone")
+				if known("Cyclone") then spell("T", "Cyclone") else spell("T", "Hibernate") end
 				spell("ST", "Entangling Roots")
-				spell("CT", "Hibernate")
+				if known("Cyclone") then spell("CT", "Hibernate") else empty("CT") end
 				empty("AT")
 				spell("CB3", "Typhoon")
 				spell("SQ", "Regrowth")
@@ -1418,8 +1423,8 @@ local function UpdateBars(event)
 				spell("B 1", "Mangle")
 				spell("B 2", "Thrash")
 				spell("B 3", "Swipe")
-				spell("B 4", "Ironfur")
-				empty("B 5")
+				empty("B 4")
+				spell("B 5", "Ironfur")
 				empty("B 6")
 				empty("B V")
 				if known("Incapacitating Roar") then spell("B CE", "Incapacitating Roar") else spell("B CE", "Mighty Bash") end
@@ -1433,9 +1438,9 @@ local function UpdateBars(event)
 				macro("F", "C13")
 
 				-- Middle
-				spell("T", "Cyclone")
+				if known("Cyclone") then spell("T", "Cyclone") else spell("T", "Hibernate") end
 				spell("ST", "Entangling Roots")
-				spell("CT", "Hibernate")
+				if known("Cyclone") then spell("CT", "Hibernate") else empty("CT") end
 				empty("AT")
 				spell("CB3", "Typhoon")
 				spell("SQ", "Regrowth")
@@ -1548,19 +1553,19 @@ local function UpdateBars(event)
 				------ Bear Form ------
 				-- Middle
 				spell("B C", "Bristling Fur")
-				spell("B SC", "Convoke the Spirits")
+				spell("B SC", "Swipe")
 				spell("B Q", "Frenzied Regeneration")
 				if known("Rejuvenation") then macro("B E", "C07") else spell("B E", "Moonfire") end
 				spell("B G", "Berserk")
-				spell("B SG", "Heart of the Wild")
+				spell("B SG", "Convoke the Spirits")
 				macro("B SE", "C08", "Skull Bash")
 
 				-- Bottom
 				spell("B 1", "Mangle")
 				spell("B 2", "Thrash")
-				spell("B 3", "Swipe")
-				spell("B 4", "Ironfur")
-				spell("B 5", "Maul")
+				spell("B 3", "Raze")
+				spell("B 4", "Maul")
+				spell("B 5", "Ironfur")
 				spell("B 6", "Pulverize")
 				spell("B V", "Rage of the Sleeper")
 				if known("Incapacitating Roar") then spell("B CE", "Incapacitating Roar") else spell("B CE", "Mighty Bash") end
@@ -1574,9 +1579,9 @@ local function UpdateBars(event)
 				macro("F", "C13")
 
 				-- Middle
-				spell("T", "Cyclone")
+				if known("Cyclone") then spell("T", "Cyclone") else spell("T", "Hibernate") end
 				spell("ST", "Entangling Roots")
-				spell("CT", "Hibernate")
+				if known("Cyclone") then spell("CT", "Hibernate") else empty("CT") end
 				empty("AT")
 				spell("CB3", "Typhoon")
 				spell("SQ", "Regrowth")
@@ -1709,8 +1714,8 @@ local function UpdateBars(event)
 				spell("B 1", "Mangle")
 				spell("B 2", "Thrash")
 				spell("B 3", "Swipe")
-				spell("B 4", "Ironfur")
-				empty("B 5")
+				empty("B 4")
+				spell("B 5", "Ironfur")
 				empty("B 6")
 				spell("B V", "Nature's Vigil")
 				if known("Incapacitating Roar") then spell("B CE", "Incapacitating Roar") else spell("B CE", "Mighty Bash") end
@@ -1724,9 +1729,9 @@ local function UpdateBars(event)
 				macro("F", "C13")
 
 				-- Middle
-				spell("T", "Cyclone")
+				if known("Cyclone") then spell("T", "Cyclone") else spell("T", "Hibernate") end
 				spell("ST", "Entangling Roots")
-				spell("CT", "Hibernate")
+				if known("Cyclone") then spell("CT", "Hibernate") else empty("CT") end
 				empty("AT")
 				spell("CB3", "Typhoon")
 				spell("SQ", "Regrowth")
@@ -1883,10 +1888,10 @@ local function UpdateBars(event)
 				
 				------ Left ------
 				-- Top
-				empty("N")
+				spell("N", "Unravel")
 				spell("SN", "Tip the Scales")
 				spell("R", "Emerald Blossom")
-				spell("SR", "Unravel")
+				spell("SR", "Oppressing Roar")
 				spell("CR", "Expunge")
 				empty("H")
 				spell("SH", "Cauterizing Flame")
@@ -1922,7 +1927,7 @@ local function UpdateBars(event)
 				-- Middle
 				spell("T", "Sleep Walk")
 				spell("ST", "Landslide")
-				spell("CT", "Oppressing Roar")
+				empty("CT")
 				empty("AT")
 				spell("CB3", "Wing Buffet")
 				macro("SQ", "C13", "Living Flame")
@@ -1960,10 +1965,10 @@ local function UpdateBars(event)
 				
 				------ Left ------
 				-- Top
-				empty("N")
+				spell("N", "Unravel")
 				spell("SN", "Tip the Scales")
 				empty("R")
-				spell("SR", "Unravel")
+				spell("SR", "Oppressing Roar")
 				spell("CR", "Expunge")
 				spell("H", "Time Dilation")
 				spell("SH", "Cauterizing Flame")
@@ -1999,7 +2004,7 @@ local function UpdateBars(event)
 				-- Middle
 				spell("T", "Sleep Walk")
 				spell("ST", "Landslide")
-				spell("CT", "Oppressing Roar")
+				empty("CT")
 				empty("AT")
 				spell("CB3", "Wing Buffet")
 				macro("SQ", "C13", "Living Flame")
@@ -2026,25 +2031,34 @@ local function UpdateBars(event)
 				-- Quell
 				m("C08", nil, "#showtooltip Quell\n/stopcasting\n/stopcasting\n/use Quell")
 
+				-- Blistering Scales
+				m("C10", nil, "#showtooltip\n/use [help][@" .. (Placer.FocusTargets[3] or "party1") .. ",help][]Blistering Scales")
+
+				-- Prescience 1
+				m("C11", nil, "#showtooltip\n/use [@" .. (Placer.FocusTargets[1] or "focus") .. ",help][]Prescience")
+
+				-- Prescience 2
+				m("C12", nil, "#showtooltip\n/use [@" .. (Placer.FocusTargets[2] or "focus") .. ",help][]Prescience")
+
 				-- Living Flame Healing
 				m("C13", nil, "#showtooltip\n/use [help][@player]Living Flame")
 				
 				
 				------ Left ------
 				-- Top
-				empty("N")
+				spell("N", "Unravel")
 				spell("SN", "Tip the Scales")
 				spell("R", "Emerald Blossom")
-				spell("SR", "Unravel")
+				spell("SR", "Oppressing Roar")
 				spell("CR", "Expunge")
 				empty("H")
 				spell("SH", "Cauterizing Flame")
 				empty("AE")
 
 				-- Middle
-				spell("C", "Blistering Scales")
-				empty("SC")
-				spell("Q", "Prescience")
+				macro("C", "C11", "Prescience")
+				if Placer.FocusTargets[2] then macro("SC", "C12", "Prescience") else empty("SC") end
+				macro("Q", "C10", "Blistering Scales")
 				spell("E", "Fire Breath")
 				if known(412713) then empty("G") else spell("G", "Time Skip") end
 				empty("SG")
@@ -2071,7 +2085,7 @@ local function UpdateBars(event)
 				-- Middle
 				spell("T", "Sleep Walk")
 				spell("ST", "Landslide")
-				spell("CT", "Oppressing Roar")
+				empty("CT")
 				empty("AT")
 				spell("CB3", "Wing Buffet")
 				macro("SQ", "C13", "Living Flame")
@@ -2218,7 +2232,7 @@ local function UpdateBars(event)
 				spell("5", "Dire Beast")
 				macro("6", "C06", "Wailing Arrow")
 				spell("V", "Call of the Wild")
-				if known("Scatter Shot") then spell("CE", "Scatter Shot") else spell("CE", "Binding Shot") end
+				if known("Intimidation") then spell("CE", "Intimidation") else spell("CE", "High Explosive Trap") end
 
 				------ Right ------
 				-- Top
@@ -2233,7 +2247,7 @@ local function UpdateBars(event)
 				spell("ST", "Wing Clip")
 				spell("CT", "Tar Trap")
 				spell("AT", "Scare Beast")
-				if known("Intimidation") then spell("CB3", "Intimidation") else spell("CB3", "High Explosive Trap") end
+				if known("Scatter Shot") then spell("CB3", "Scatter Shot") else spell("CB3", "Binding Shot") end
 				macro("SQ", "C15")
 				spell("SV", "Camouflage")
 				spell("CV", "Feign Death")
@@ -2305,7 +2319,7 @@ local function UpdateBars(event)
 				spell("5", "Rapid Fire")
 				macro("6", "C06", "Wailing Arrow")
 				spell("V", "Salvo")
-				if known("Scatter Shot") then spell("CE", "Scatter Shot") else spell("CE", "Binding Shot") end
+				if known("Intimidation") then spell("CE", "Intimidation") else spell("CE", "High Explosive Trap") end
 
 				------ Right ------
 				-- Top
@@ -2320,7 +2334,7 @@ local function UpdateBars(event)
 				spell("ST", "Wing Clip")
 				spell("CT", "Tar Trap")
 				spell("AT", "Scare Beast")
-				if known("Intimidation") then spell("CB3", "Intimidation") else spell("CB3", "High Explosive Trap") end
+				if known("Scatter Shot") then spell("CB3", "Scatter Shot") else spell("CB3", "Binding Shot") end
 				macro("SQ", "C15")
 				spell("SV", "Camouflage")
 				spell("CV", "Feign Death")
@@ -2392,7 +2406,7 @@ local function UpdateBars(event)
 				if known("Carve") then spell("5", "Carve") else spell("5", "Butchery") end
 				spell("6", "Fury of the Eagle")
 				spell("V", "Aspect of the Eagle")
-				if known("Scatter Shot") then spell("CE", "Scatter Shot") else spell("CE", "Binding Shot") end
+				if known("Intimidation") then spell("CE", "Intimidation") else spell("CE", "High Explosive Trap") end
 
 				------ Right ------
 				-- Top
@@ -2407,7 +2421,7 @@ local function UpdateBars(event)
 				spell("ST", "Wing Clip")
 				spell("CT", "Tar Trap")
 				spell("AT", "Scare Beast")
-				if known("Intimidation") then spell("CB3", "Intimidation") else spell("CB3", "High Explosive Trap") end
+				if known("Scatter Shot") then spell("CB3", "Scatter Shot") else spell("CB3", "Binding Shot") end
 				macro("SQ", "C15")
 				spell("SV", "Camouflage")
 				spell("CV", "Feign Death")
@@ -3421,7 +3435,7 @@ local function UpdateBars(event)
 				m("C07", nil, "#showtooltip\n/use [harm]Shadow Word: Pain;Renew")
 
 				-- Power Infusion
-				m("C08", nil, "#showtooltip\n/use [@focus,help,nodead][help,nodead][@player]Power Infusion\n/use item:193773")
+				m("C08", nil, "#showtooltip\n/use [help][@" .. (Placer.FocusTargets[1] or "focus") .. ",help][@player]Power Infusion\n/use item:193773")
 
 				-- Mind Control
 				m("C09", 1718004, "#showtooltip\n/use Mind Control")
@@ -3514,7 +3528,7 @@ local function UpdateBars(event)
 				m("C07", nil, "#showtooltip\n/use [harm]Shadow Word: Pain;Renew")
 
 				-- Power Infusion
-				m("C08", nil, "#showtooltip\n/use [@focus,help,nodead][help,nodead][@player]Power Infusion\n/use item:193773")
+				m("C08", nil, "#showtooltip\n/use [help][@" .. (Placer.FocusTargets[1] or "focus") .. ",help][@player]Power Infusion\n/use item:193773")
 
 				-- Mind Control
 				m("C09", 1718004, "#showtooltip\n/use Mind Control")
@@ -3598,7 +3612,7 @@ local function UpdateBars(event)
 				m("C07", nil, "#showtooltip\n/use [help]Renew;Shadow Word: Pain")
 
 				-- Power Infusion
-				m("C08", nil, "#showtooltip\n/use [@focus,help,nodead][help,nodead][@player]Power Infusion\n/use item:193773")
+				m("C08", nil, "#showtooltip\n/use [help][@" .. (Placer.FocusTargets[1] or "focus") .. ",help][@player]Power Infusion\n/use item:193773")
 
 				-- Mind Control
 				m("C09", 1718004, "#showtooltip\n/use Mind Control")
@@ -4101,9 +4115,9 @@ local function UpdateBars(event)
 				
 				------ Left ------
 				-- Top
-				spell("N", "Primordial Wave")
+				spell("N", "Ascendance")
 				spell("SN", "Nature's Swiftness")
-				spell("R", "Totemic Projection")
+				empty("R")
 				if known("Greater Purge") then spell("SR", "Greater Purge") else spell("SR", "Purge") end
 				spell("CR", "Cleanse Spirit")
 				spell("H", "Earth Shield")
@@ -4111,12 +4125,12 @@ local function UpdateBars(event)
 				racial("AE")
 
 				-- Middle
-				spell("C", "Frost Shock")
-				if known("Primal Elementalist") then macro("SC", "C10") else spell("SC", "Liquid Magma Totem") end
+				spell("C", "Icefury")
+				spell("SC", "Liquid Magma Totem")
 				spell("Q", "Earthquake")
 				spell("E", "Flame Shock")
-				spell("G", "Ascendance")
-				empty("SG")
+				if known("Fire Elemental") or known("Storm Elemental") then macro("G", "C09") else empty("G") end
+				if known("Primal Elementalist") then macro("SG", "C10") else empty("SG") end
 				macro("SE", "C08", "Wind Shear")
 
 				-- Bottom
@@ -4124,9 +4138,9 @@ local function UpdateBars(event)
 				if known("Healing Wave") and known("Lava Burst") then macro("2", "C02") elseif known("Lava Burst") then spell("2", "Lava Burst") else spell("2", "Healing Wave") end
 				if known("Chain Heal") and known("Chain Lightning") then macro("3", "C03") elseif known("Chain Lightning") then spell("3", "Chain Lightning") else spell("3", "Chain Heal") end
 				spell("4", "Earth Shock")
-				spell("5", "Icefury")
+				spell("5", "Frost Shock")
 				spell("6", "Stormkeeper")
-				if known("Fire Elemental") or known("Storm Elemental") then macro("V", "C09") else empty("V") end
+				spell("V", "Primordial Wave")
 				spell("CE", "Capacitor Totem")
 
 				------ Right ------
@@ -4144,7 +4158,7 @@ local function UpdateBars(event)
 				empty("AT")
 				spell("CB3", "Thunderstorm")
 				spell("SQ", "Healing Surge")
-				empty("SV")
+				spell("SV", "Totemic Projection")
 				spell("CV", "Tremor Totem")
 
 				-- Bottom
@@ -4179,9 +4193,9 @@ local function UpdateBars(event)
 				
 				------ Left ------
 				-- Top
-				spell("N", "Primordial Wave")
+				spell("N", "Ascendance")
 				spell("SN", "Nature's Swiftness")
-				spell("R", "Totemic Projection")
+				spell("R", "Windfury Totem")
 				if known("Greater Purge") then spell("SR", "Greater Purge") else spell("SR", "Purge") end
 				spell("CR", "Cleanse Spirit")
 				spell("H", "Earth Shield")
@@ -4189,22 +4203,22 @@ local function UpdateBars(event)
 				racial("AE")
 
 				-- Middle
-				spell("C", "Frost Shock")
-				spell("SC", "Sundering")
-				spell("Q", "Fire Nova")
+				spell("C", "Lightning Bolt")
+				spell("SC", "Chain Lightning")
+				spell("Q", "Crash Lightning")
 				spell("E", "Flame Shock")
-				spell("G", "Ascendance")
+				spell("G", "Feral Spirit")
 				spell("SG", "Doom Winds")
 				macro("SE", "C08", "Wind Shear")
 
 				-- Bottom
 				spell("1", "Primal Strike")
 				spell("2", "Lava Lash")
-				spell("3", "Crash Lightning")
+				if known("Ice Strike") then spell("3", "Ice Strike") else spell("3", "Fire Nova") end
 				if known("Lava Burst") then spell("4", "Lava Burst") elseif known("Elemental Blast") then spell("4", "Elemental Blast") else spell("4", "Lightning Bolt") end
-				if known("Lava Burst") or known("Elemental Blast") then macro("5", "C05") else spell("5", "Chain Lightning") end
-				spell("6", "Ice Strike")
-				spell("V", "Feral Spirit")
+				spell("5", "Frost Shock")
+				spell("6", "Sundering")
+				spell("V", "Primordial Wave")
 				spell("CE", "Capacitor Totem")
 
 				------ Right ------
@@ -4222,7 +4236,7 @@ local function UpdateBars(event)
 				empty("AT")
 				spell("CB3", "Thunderstorm")
 				spell("SQ", "Healing Surge")
-				spell("SV", "Windfury Totem")
+				spell("SV", "Totemic Projection")
 				spell("CV", "Tremor Totem")
 
 				-- Bottom
@@ -4266,22 +4280,22 @@ local function UpdateBars(event)
 				
 				------ Left ------
 				-- Top
-				spell("N", "Primordial Wave")
+				spell("N", "Wellspring")
 				spell("SN", "Nature's Swiftness")
-				spell("R", "Totemic Projection")
+				spell("R", "Mana Tide Totem")
 				if known("Greater Purge") then spell("SR", "Greater Purge") else spell("SR", "Purge") end
 				spell("CR", "Purify Spirit")
-				spell("H", "Earth Shield")
+				if known("Earthen Wall Totem") then spell("H", "Earthen Wall Totem") else spell("H", "Ancestral Protection Totem") end
 				spell("SH", "Poison Cleansing Totem")
 				racial("AE")
 
 				-- Middle
-				if known("Unleash Life") and known("Frost Shock") then macro("C", "C09") elseif known("Frost Shock") then spell("C", "Frost Shock") else spell("C", "Unleash Life") end
-				spell("SC", "Wellspring")
-				spell("Q", "Downpour")
+				spell("C", "Earth Shield")
+				spell("SC", "Downpour")
+				spell("Q", "Unleash Life")
 				if known("Riptide") then macro("E", "C07") else spell("E", "Flame Shock") end
-				spell("G", "Spirit Link Totem")
-				spell("SG", "Ancestral Guidance")
+				spell("G", "Ascendance")
+				spell("SG", "Spirit Link Totem")
 				macro("SE", "C08", "Wind Shear")
 
 				-- Bottom
@@ -4291,7 +4305,7 @@ local function UpdateBars(event)
 				spell("4", "Healing Rain")
 				spell("5", "Healing Stream Totem")
 				if known("Ever-Rising Tide") and known("Stormkeeper") then macro("6", "C06") elseif known("Stormkeeper") then spell("6", "Stormkeeper") else spell("6", "Ever-Rising Tide") end
-				spell("V", "Ascendance")
+				spell("V", "Primordial Wave")
 				spell("CE", "Capacitor Totem")
 
 				------ Right ------
@@ -4309,14 +4323,14 @@ local function UpdateBars(event)
 				empty("AT")
 				spell("CB3", "Thunderstorm")
 				spell("SQ", "Healing Surge")
-				if known("Earthen Wall Totem") then spell("SV", "Earthen Wall Totem") else spell("SV", "Ancestral Protection Totem") end
+				spell("SV", "Totemic Projection")
 				spell("CV", "Tremor Totem")
 
 				-- Bottom
 				spell("F1", "Astral Shift")
 				spell("F2", "Earth Elemental")
 				spell("F3", "Healing Tide Totem")
-				if known("Mana Tide Totem") and known("Mana Spring Totem") then macro("F4", "C14") elseif known("Mana Spring Totem") then spell("F4", "Mana Spring Totem") else spell("F4", "Mana Tide Totem") end
+				spell("F4", "Ancestral Guidance")
 				if known("Stoneskin Totem") then spell("F5", "Stoneskin Totem") else spell("F5", "Tranquil Air Totem") end
 				spell("F6", "Totemic Recall")
 				spell("CQ", "Water Walking")
@@ -4400,11 +4414,11 @@ local function UpdateBars(event)
 				m("C01", nil, "#showtooltip Shadow Bolt\n/petattack\n/petassist\n/petattack\n/use Shadow Bolt")
 
 				-- Pet Primary
-				m("C07", nil, "#showtooltip\n/use [pet:Felhunter]Spell Lock;[pet:Succubus/Incubus/Shivarra]Seduction;[pet:Voidwalker/Voidlord,nobtn:2]Suffering;[nobtn:2]Command Demon\n/petautocasttoggle [btn:2]Suffering")
+				m("C07", nil, "#showtooltip\n/use [pet:Voidwalker,nobtn:2]Suffering;[nobtn:2]Command Demon\n/petautocasttoggle [pet:Voidwalker,btn:2]Suffering;[pet:Imp,btn:2]Singe Magic")
 				
 				-- Pet Secondary
-				m("C08", nil, "#showtooltip\n/use [pet:Felhunter]Devour Magic;[pet:Imp/Fel Imp]Flee;[pet:Succubus/Incubus/Shivarra]Lesser Invisibility;[pet:Voidwalker/Voidlord]Shadow Bulwark;Command Demon")
-
+				m("C08", nil, "#showtooltip\n/use [pet:Felhunter]Devour Magic;[pet:Imp,nobtn:2]Flee;[pet:Succubus,nobtn:2]Lesser Invisibility;[nobtn:2]Command Demon\n/petautocasttoggle [pet:Imp,btn:2]Flee;[pet:Succubus,btn:2]Lesser Invisibility;[pet:Voidwalker,btn:2]Shadow Bulwark")
+				
 				
 				------ Left ------
 				-- Top
@@ -4472,10 +4486,10 @@ local function UpdateBars(event)
 				m("C01", nil, "#showtooltip Shadow Bolt\n/petattack\n/petassist\n/petattack\n/use Shadow Bolt")
 
 				-- Pet Primary
-				m("C07", nil, "#showtooltip\n/use [pet:Felguard/Wrathguard]Axe Toss;[pet:Felhunter]Spell Lock;[pet:Succubus/Incubus/Shivarra]Seduction;[pet:Voidwalker/Voidlord,nobtn:2]Suffering;[nobtn:2]Command Demon\n/petautocasttoggle [btn:2]Suffering")
+				m("C07", nil, "#showtooltip\n/use [pet:Voidwalker,nobtn:2]Suffering;[nobtn:2]Command Demon\n/petautocasttoggle [pet:Voidwalker,btn:2]Suffering;[pet:Imp,btn:2]Singe Magic")
 				
 				-- Pet Secondary
-				m("C08", nil, "/use [pet:Felguard/Wrathguard,nobtn:2]Felstorm;[pet:Felhunter]Devour Magic;[pet:Imp/Fel Imp]Flee;[pet:Succubus/Incubus/Shivarra]Lesser Invisibility;[pet:Voidwalker/Voidlord]Shadow Bulwark;Command Demon\n/petautocasttoggle [btn:2]Felstorm")
+				m("C08", nil, "/use [pet:Felguard,nobtn:2]Felstorm;[pet:Felhunter]Devour Magic;[pet:Imp,nobtn:2]Flee;[pet:Succubus]Lesser Invisibility;[nobtn:2]Command Demon\n/petautocasttoggle [pet:Felguard,btn:2]Felstorm;[pet:Imp,btn:2]Flee;[pet:Voidwalker,btn:2]Shadow Bulwark")
 
 				
 				------ Left ------
@@ -4544,10 +4558,10 @@ local function UpdateBars(event)
 				m("C02", nil, "#showtooltip Shadow Bolt\n/petattack\n/petassist\n/petattack\n/use Shadow Bolt")
 
 				-- Pet Primary
-				m("C07", nil, "#showtooltip\n/use [pet:Felhunter]Spell Lock;[pet:Succubus/Incubus/Shivarra]Seduction;[pet:Voidwalker/Voidlord,nobtn:2]Suffering;[nobtn:2]Command Demon\n/petautocasttoggle [btn:2]Suffering")
+				m("C07", nil, "#showtooltip\n/use [pet:Voidwalker,nobtn:2]Suffering;[nobtn:2]Command Demon\n/petautocasttoggle [pet:Voidwalker,btn:2]Suffering;[pet:Imp,btn:2]Singe Magic")
 				
 				-- Pet Secondary
-				m("C08", nil, "#showtooltip\n/use [pet:Felhunter]Devour Magic;[pet:Imp/Fel Imp]Flee;[pet:Succubus/Incubus/Shivarra]Lesser Invisibility;[pet:Voidwalker/Voidlord]Shadow Bulwark;Command Demon")
+				m("C08", nil, "#showtooltip\n/use [pet:Felhunter]Devour Magic;[pet:Imp,nobtn:2]Flee;[pet:Succubus,nobtn:2]Lesser Invisibility;[nobtn:2]Command Demon\n/petautocasttoggle [pet:Imp,btn:2]Flee;[pet:Succubus,btn:2]Lesser Invisibility;[pet:Voidwalker,btn:2]Shadow Bulwark")
 				
 
 				------ Left ------
@@ -5022,7 +5036,7 @@ local function UpdateBars(event)
 	end
 end
 
-local function UpdateEquipmentSets()
+function Placer.UpdateEquipmentSets()
 	local icons = {
 		--! Icons
 		["Timewalking"] = 463446,
@@ -5034,6 +5048,20 @@ local function UpdateEquipmentSets()
 		["Raid"] = 135901,
 		["Dungeons"] = 135884,
 
+		-- Affixes
+		["Fortified"] = 463829, -- 2
+		["Tyrannical"] = 236401, -- 2
+		["Afflicted"] = 237555, -- 7
+		["Entangling"] = 134412, -- 7
+		["Incorporeal"] = 298642, -- 7
+		["Sanguine"] = 136124, -- 7
+		["Storming"] = 136018, -- 7
+		["Volcanic"] = 451169, -- 7
+		["Bolstering"] = 132333, -- 14
+		["Bursting"] = 1035055, -- 14
+		["Raging"] = 132345, -- 14
+		["Spiteful"] = 135945, -- 14
+
 		-- Bosses
 		["Sarkareth"] = 5161750,
 
@@ -5042,44 +5070,63 @@ local function UpdateEquipmentSets()
 		["DEATHKNIGHT_Frost"] = 135773,
 		["DEATHKNIGHT_Unholy"] = 135775,
 		["DEATHKNIGHT_Obliteration"] = 326443,
+
 		["DEMONHUNTER_Havoc"] = 1247264,
 		["DEMONHUNTER_Vengeance"] = 1247265,
+
 		["DRUID_Balance"] = 136096,
 		["DRUID_Feral"] = 132115,
 		["DRUID_Guardian"] = 132276,
 		["DRUID_Restoration"] = 136041,
+		["DRUID_Decurse"] = 135952,
+		["DRUID_Cyclone"] = 136022,
+		["DRUID_Hibernate"] = 136090,
+
 		["EVOKER_Augmentation"] = 5198700,
 		["EVOKER_Devastation"] = 4511811,
 		["EVOKER_Preservation"] = 4511812,
 		["EVOKER_Overawe"] = 4622467,
+		["EVOKER_Sleep Walk"] = 1396974,
+
 		["HUNTER_Beast Mastery"] = 461112,
 		["HUNTER_Marksmanship"] = 236179,
 		["HUNTER_Survival"] = 461113,
+
 		["MAGE_Arcane"] = 135932,
 		["MAGE_Fire"] = 135810,
 		["MAGE_Frost"] = 135846,
+
 		["MONK_Brewmaster"] = 608951,
 		["MONK_Mistweaver"] = 608952,
 		["MONK_Windwalker"] = 608953,
+
 		["PALADIN_Holy"] = 135920,
 		["PALADIN_Protection"] = 236264,
 		["PALADIN_Retribution"] = 135873,
 		["PALADIN_Spellwarding"] = 135880,
+		["PALADIN_Turn Evil"] = 571559,
+
 		["PRIEST_Discipline"] = 135940,
 		["PRIEST_Holy"] = 237542,
 		["PRIEST_Shadow"] = 136207,
 		["PRIEST_Void Eruption"] = 1386548,
 		["PRIEST_Dark Ascension"] = 1445237,
+		["PRIEST_Shackle Undead"] = 136091,
+
 		["ROGUE_Assassination"] = 236270,
 		["ROGUE_Outlaw"] = 236286,
 		["ROGUE_Subtlety"] = 132320,
+
 		["SHAMAN_Elemental"] = 136048,
 		["SHAMAN_Enhancement"] = 237581,
 		["SHAMAN_Restoration"] = 136052,
 		["SHAMAN_Poison Cleansing"] = 136070,
+
 		["WARLOCK_Affliction"] = 136145,
 		["WARLOCK_Demonology"] = 136172,
 		["WARLOCK_Destruction"] = 136186,
+		["WARLOCK_Banish"] = 136135,
+
 		["WARRIOR_Arms"] = 132355,
 		["WARRIOR_Fury"] = 132347,
 		["WARRIOR_Single-Minded"] = 458974,
@@ -5120,12 +5167,48 @@ local function UpdateEquipmentSets()
 	end
 end
 
+function Placer.SetFocus(id, keybind, fallback)
+	local id = tonumber(id or 1) or 1
+	local keybind = keybind or id
+	local target = UnitExists("target") and "target" or (fallback and UnitExists(fallback)) and fallback or "player"
+	local fallback = fallback or "target"
+	local name, realm = UnitFullName(target)
+	local _, class = UnitClass(name and target or "player")
+	local color = "ff9d9d9d"
+	if name and not UnitIsPlayer(target) then
+		color = "ff1aff1a"
+	elseif name and class then
+		color = select(4, GetClassColor(class))
+	end
+
+	if IsShiftKeyDown() then
+		Placer.FocusTargets[id] = nil
+		Placer.FocusTargetNames[id] = nil
+		Placer.FocusTargetColors[id] = nil
+		DEFAULT_CHAT_FRAME:AddMessage(CreateAtlasMarkup("Focus") .. " |cff71d5ff" .. keybind .. "|r  |cff595959Cleared|r")
+	else
+		Placer.FocusTargets[id] = name or fallback
+		Placer.FocusTargetNames[id] = name or nil
+		if realm then
+			Placer.FocusTargets[id] = Placer.FocusTargets[id] .. "-" .. realm
+		end
+		Placer.FocusTargetColors[id] = color
+		
+		DEFAULT_CHAT_FRAME:AddMessage(CreateAtlasMarkup("Focus") .. " |cff71d5ff" .. keybind .. "|r  |c" .. color .. name .. "|r")
+	end
+	if InCombatLockdown() then
+		DEFAULT_CHAT_FRAME:AddMessage("|cffff2020Macros will update once combat ends|r")
+	end
+
+	Placer.UpdateBars("PLACER_SETFOCUS")
+end
+
 Placer:SetScript("OnEvent", function(self, event)
 	if event == "PLAYER_LOGIN" and not loaded then
 		-- Delay the first load
 		C_Timer.After(0.5, function()
 			loaded = true
-			UpdateBars(event)
+			Placer.UpdateBars(event)
 		end)
 	end
 
@@ -5139,7 +5222,7 @@ Placer:SetScript("OnEvent", function(self, event)
 
 			C_Timer.After(0.5, function()
 				locked = false
-				UpdateBars(event)
+				Placer.UpdateBars(event)
 			end)
 		end
 	end
@@ -5162,7 +5245,7 @@ function SlashCmdList.PLACER(msg, editbox)
 			end
 		end
 	else
-		UpdateBars("SLASH_PLACER")
-		UpdateEquipmentSets()
+		Placer.UpdateBars("SLASH_PLACER")
+		Placer.UpdateEquipmentSets()
 	end
 end
